@@ -1,0 +1,55 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net9.0</TargetFrameworks>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+	  <EnablePackageValidation>false</EnablePackageValidation>
+	  <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+	  <OutputPath>./bin</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0|AnyCPU'">
+    <DefineConstants>$(DefineConstants);ASYNC</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0|AnyCPU'">
+    <DefineConstants>$(DefineConstants);ASYNC</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+	  <None Include="PostBuildEvent.ps1" />
+	  <Compile Include="Compression.fsx" />
+	  <None Include="PB 20241017 before use mailboxprocessor.fsx" />
+	  <None Include="PB 20241014.before_change.fsx" />
+	  <None Include="PB 20241014.fsx" />
+      <Compile Include="PB.fsx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FSharp.Collections.ParallelSeq" Version="1.2.0" />
+    <PackageReference Include="FAkka.ProtoBuf.FSharp" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NTDLS.Katzebase.Parsers.Generic\NTDLS.Katzebase.Parsers.Generic.csproj" Condition="$(DefineConstants.Contains('KATZEBASE'))" />
+    <ProjectReference Include="..\protobuf-net-fsharp\src\ProtoBuf.FSharp\ProtoBuf.FSharp.fsproj" Condition="'$(Configuration)'=='Debug'" />
+	
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+    <PackageReference Include="FAkka.FsPickler">
+      <Version>9.0.4</Version>
+    </PackageReference>
+    <PackageReference Include="FAkka.FsPickler.Json">
+      <Version>9.0.4</Version>
+    </PackageReference>
+  </ItemGroup>
+	<PropertyGroup>
+		
+		<Version>9.0.4</Version>
+	</PropertyGroup>
+
+	<Target Name="PostPackNugetDeployWindows" AfterTargets="Pack" Condition="'$(Configuration)' == 'Release'">
+		<Exec Command="powershell -c &quot;write-host '====== Start Post-Build Event ======'&quot;&#xD;&#xA;powershell .\PostBuildEvent.ps1 $(AssemblyName)" />
+	</Target>
+</Project>
