@@ -19,7 +19,7 @@
 #r @"../../../Libs/FsPickler/bin/net9.0/FsPickler.dll"
 #r @"../../../Libs/FsPickler.Json/bin/net9.0/FsPickler.Json.dll"
 #r @"nuget: protobuf-net"
-#r @"G:\coldfar_py\sharftrade9\Libs5\KServer\protobuf-net-fsharp\src\ProtoBuf.FSharp\bin\Debug\netstandard2.0\protobuf-net-fsharp.dll"
+#r @"G:\coldfar_py\sharftrade9\Libs5\KServer\protobuf-net-fsharp\src\ProtoBuf.FSharp\bin\netstandard2.0\protobuf-net-fsharp.dll"
 #load @"Compression.fsx"
 #r "nuget: FSharp.Collections.ParallelSeq, 1.2.0"
 #endif
@@ -524,26 +524,97 @@ module CSL =
 
     type FActor<'T> = MailboxProcessor<'T>
 
-    type QueueProcessor<'T, 'OpResult>(slId: 'T) =
+
+    type QueueProcessorCmd<'OpResult> =
+    | Tsk of Task<'OpResult> * Guid option
+    | Lock of AsyncReplyChannel<Guid> * TimeSpan option  // 加入 timeout 參數
+    | Unlock of Guid
+    | SysLock
+    | SysUnlock of Guid
+
+    type QueueProcessorStatus =
+    | Locked of Guid
+    | Listenning
+
+    type QueueProcessor<'T, 'OpResult>(slId: 'T, _receiveTimeoutDefault) =
 
         // 定義一個 MailboxProcessor 來處理操作任務
-        let opProcessor = FActor.Start(fun (inbox:FActor<Task<'OpResult>>) ->
+        let opProcessor = FActor.Start(fun (inbox:FActor<QueueProcessorCmd<'OpResult>>) ->
+            let messageQueue = Queue<QueueProcessorCmd<'OpResult>>()
+            let mutable status = Listenning
+            let mutable _receiveTimeout = _receiveTimeoutDefault
+            //let mutable curLockGuid = Guid.Empty
             let rec loop () =
                 async {
-                    let! task = inbox.Receive()
+                    let! taskOpt = inbox.TryReceive(_receiveTimeout)
     #if DEBUG1
                     printfn "[%A] dequeued %A" slId task
     #endif
-                    task.Start ()
-                    let! tr = task |> Async.AwaitTask |> Async.Catch // 同步執行任務
+                    if taskOpt.IsSome then
+                    //| Some qpCmd when status = Listenning ->
+                        let rec goAhead _status =
+                            status <- _status
+                            let ifD, m = messageQueue.TryDequeue () 
+                            if ifD then
+                                procCmd m
+                        and execute (task:Task<'OpResult>) =
+                            task.Start ()
+                            let tr = task |> Async.AwaitTask |> Async.Catch |> Async.RunSynchronously // 同步執行任務
 
-                    match tr with
-                    | Choice1Of2 s -> 
+                            match tr with
+                            | Choice1Of2 s -> 
 #if DEBUG1
-                        printfn "Successfully: %A" s
+                                printfn "Successfully: %A" s
 #endif
-                        ()
-                    | Choice2Of2 exn -> printfn "Failed: %A" exn.Message
+                                ()
+                            | Choice2Of2 exn -> 
+                                printfn "Failed: %A" exn.Message
+                            goAhead Listenning
+
+                        and procCmd cmd =
+                            match status with
+                            | Locked curLockGuid ->
+                                match cmd with
+                                | SysUnlock g 
+                                | Unlock g when g = curLockGuid -> 
+                                    goAhead Listenning
+                                | Tsk (task, (Some g)) when g = curLockGuid ->
+                                    execute task
+                                | _ ->
+                                    messageQueue.Enqueue cmd
+                            
+                            | Listenning ->
+                                match cmd with
+                                | Tsk (_, (Some g)) ->
+                                    execute (task {
+                                        return (failwithf "Invalid lock %A" g)
+                                    })
+
+                                | Tsk (task, None) ->
+                                    execute task
+
+                                | Lock (replyLockId, timeoutTimeSpanOpt) -> // 處理 lock 並加入 timeout
+                                    let g = Guid.NewGuid()
+                                    status <- Locked g
+                                    replyLockId.Reply g
+
+                                    // 啟動 timeout 計時器，如果超時則自動 unlock
+                                    if timeoutTimeSpanOpt.IsSome then
+                                        async {
+                                            do! Async.Sleep (int timeoutTimeSpanOpt.Value.TotalMilliseconds)
+                                            inbox.Post (SysUnlock g)
+                                        }
+                                        |> Async.Start
+                                | _ ->
+                                    ()
+
+                        let ifD, m = messageQueue.TryDequeue () 
+                        if ifD then
+                            procCmd m
+                        procCmd taskOpt.Value
+
+                    else
+                        status <- Listenning
                     return! loop() // 繼續處理下一個任務
 
                 }
@@ -552,13 +623,25 @@ module CSL =
 
         // 提供給外部調用來向 MailboxProcessor 投遞任務
         member this.Enqueue (task: Task<'OpResult>) =
-            opProcessor.Post task
+            opProcessor.Post (Tsk (task, None))
+
+        member this.EnqueueWithLock (task: Task<'OpResult>, lockId) =
+            opProcessor.Post (Tsk (task, Some lockId))
 
         // ID 屬性
-        member this.id = slId
+        member this.Id = slId
 
-
-
+        member this.RequireLock (requireTimeoutOption:int option, (lockTimeoutOption: float option)) =
+            let arcFun = 
+                fun arc ->
+                    if lockTimeoutOption.IsSome then
+                        Lock (arc, Some <| TimeSpan.FromMilliseconds lockTimeoutOption.Value)
+                    else
+                        Lock (arc, None)
+            if requireTimeoutOption.IsSome then
+                opProcessor.PostAndTryAsyncReply (arcFun, requireTimeoutOption.Value)
+            else
+                opProcessor.PostAndTryAsyncReply arcFun
 
     type ConcurrentSortedList<'Key, 'Value, 'OpResult, 'ID
         when 'Key : comparison
@@ -569,16 +652,17 @@ module CSL =
         , outFun: 'ID -> OpResult<'Key, 'Value> -> 'OpResult
         , extractFunBase:'ID -> 'OpResult -> OpResult<'Key, 'Value>
         , lockObj: obj
+        , timeoutDefault
         ) =
         let sortedList = SortedList<'Key, 'Value>()
         //let lockObj = obj()
-        let opQueue = QueueProcessor<'ID, 'OpResult>(slId)
+        let opQueue = QueueProcessor<'ID, 'OpResult>(slId, timeoutDefault)
         let extractFun = extractFunBase slId
         let extractOpResult (opt:Task<'OpResult>) = extractFun opt.Result
 
-        member this.id = slId
-        member this.lockObj = lockObj
-
+        member this.Id = slId
+        member this.LockObj = lockObj
+        member this.OpQueue = opQueue
 
         member this.ExtractOpResult = extractOpResult
         /// 基础的 Add 操作（直接修改内部数据结构）
@@ -627,7 +711,7 @@ module CSL =
 
 
         /// 封装操作并添加到任务队列，执行后返回 Task
-        member this.LockableOps (op: Op<'Key, 'Value>) =
+        member this.LockableOps (op: Op<'Key, 'Value>, lockIdOpt: Guid option) =
             
             let rec taskToEnqueue op = 
 #if DEBUG1
@@ -686,9 +770,14 @@ module CSL =
             // 将操作添加到队列并运行队列
             let ts = taskToEnqueue op
             ts
-            |> Seq.iter opQueue.Enqueue 
-
+            |> if lockIdOpt.IsNone then
+                Seq.iter opQueue.Enqueue 
+               else
+                Seq.iter (fun t -> opQueue.EnqueueWithLock(t, lockIdOpt.Value))
             ts
+
+        member this.LockableOps (op: Op<'Key, 'Value>) =
+            this.LockableOps (op, None)
 
         member this.LockableOp (op: Op<'Key, 'Value>) =
             this.LockableOps op |> Seq.item 0
@@ -817,8 +906,11 @@ module CSL =
 
         member this._base = sortedList
 
+        member this.RequireLock (rtoOpt, ltoOpt) =
+            this.OpQueue.RequireLock(rtoOpt, ltoOpt)
+
         new (slId, outFun, extractFunBase) =
-            new ConcurrentSortedList<_, _, _, _>(slId, outFun, extractFunBase, obj())
+            new ConcurrentSortedList<_, _, _, _>(slId, outFun, extractFunBase, obj(), 30000)
 
 //#if ORZ
 
@@ -1128,8 +1220,10 @@ module PCSL =
             | :? AggregateException as ae ->
                 Choice3Of3 ae
 
-
-        
+        //open System.Threading.Tasks
+        //(task {
+        //    ()
+        //}).ContinueWith(Action<_> (fun (t:Task<unit>) ->  printfn "orz"))
 
     type PCSL<'Key, 'Value, 'ID
         when 'Key : comparison
@@ -1148,10 +1242,10 @@ module PCSL =
         ) =
         let js = JsonSerializer()
         let sortedList = PCSL<'Key, 'Value, SLTyp>(TSL, oFun, eFun)
-        let sortedListStatus = PCSL<'Key, 'Value, SLTyp>(TSLSts, oFun, eFun, sortedList.lockObj)
-        let sortedListPersistenceStatus = PCSL<'Key, 'Value, SLTyp>(TSLPSts, oFun, eFun, sortedList.lockObj)
-        let sortedListIndexReversed = PCSL<'Key, 'Value, SLTyp>(TSLIdxR, oFun, eFun, sortedList.lockObj)
-        let sortedListIndex         = PCSL<'Key, 'Value, SLTyp>(TSLIdx, oFun, eFun, sortedList.lockObj)
+        let sortedListStatus = PCSL<'Key, 'Value, SLTyp>(TSLSts, oFun, eFun, sortedList.LockObj, defaultTimeout)
+        let sortedListPersistenceStatus = PCSL<'Key, 'Value, SLTyp>(TSLPSts, oFun, eFun, sortedList.LockObj, defaultTimeout)
+        let sortedListIndexReversed = PCSL<'Key, 'Value, SLTyp>(TSLIdxR, oFun, eFun, sortedList.LockObj, defaultTimeout)
+        let sortedListIndex         = PCSL<'Key, 'Value, SLTyp>(TSLIdx, oFun, eFun, sortedList.LockObj, defaultTimeout)
 
         let schemaPath = Path.Combine(basePath, schemaName)
         let keysPath = Path.Combine(basePath, schemaName, "__keys__")
@@ -1198,7 +1292,7 @@ module PCSL =
                     | exn ->
                         printfn "indexInitialization failed for %s %s" fi.FullName exn.Message
             )
-
+        let mutable write2File = ModelContainer<'Value>.write2File
 
 
         do 
@@ -1249,7 +1343,7 @@ module PCSL =
             let inline write (key: 'Key, value: 'Value) =
                 let hashKey = getOrNewAndPersistKeyHash key
                 let filePath = Path.Combine(schemaPath, hashKey + ".val")
-                ModelContainer<'Value>.write2File filePath value
+                write2File filePath value
                 key
             write >>
             if ifRemoveFromBuffer then
@@ -1361,7 +1455,7 @@ module PCSL =
         member this.AddAsync(key: 'Key, value: 'Value, ifRemoveFromBuffer) =
 #if DEBUG1
 #else
-            lock sortedList.lockObj (fun () ->
+            lock sortedList.LockObj (fun () ->
 #endif
             if sortedListIndex.ContainsKeySafe (SLK key) then
                 [||]
@@ -1400,7 +1494,7 @@ module PCSL =
         member this.UpdateAsync(key: 'Key, value: 'Value, ifRemoveFromBuffer) =
 #if DEBUG1
 #else
-            lock sortedList.lockObj (fun () ->
+            lock sortedList.LockObj (fun () ->
 #endif
             if not <| sortedListIndex.ContainsKeySafe (SLK key) then
                 [||]
@@ -1434,7 +1528,7 @@ module PCSL =
         member this.UpsertAsync(key: 'Key, value: 'Value, ifRemoveFromBuffer) =
 #if DEBUG1
 #else
-            lock sortedList.lockObj (fun () ->
+            lock sortedList.LockObj (fun () ->
 #endif
             [|
                 sortedList.Upsert(SLK key, SLV value)
@@ -1461,7 +1555,7 @@ module PCSL =
         member this.RemoveAsync(key: 'Key) =
 #if DEBUG1
 #else
-            lock sortedList.lockObj (fun () ->
+            lock sortedList.LockObj (fun () ->
 #endif
             removePersistedKeyValue key
 #if DEBUG1
@@ -1489,7 +1583,7 @@ module PCSL =
 
         // 获取 value，如果 ConcurrentSortedList 中不存在则从文件系统中读取
         member this.TryGetValue(key: 'Key, _toMilli:int) = //: bool * 'Value option =
-            lock sortedList.lockObj (fun () ->
+            lock sortedList.LockObj (fun () ->
 #if DEBUG1
                 printfn "Query KV"
 #endif
@@ -1567,13 +1661,13 @@ module PTEST =
     #r "nuget: FAkka.FsPickler, 9.0.3"
     #r "nuget: FAkka.FsPickler.Json, 9.0.3"
     #r @"nuget: protobuf-net"
-    #r @"G:\coldfar_py\sharftrade9\Libs5\KServer\protobuf-net-fsharp\src\ProtoBuf.FSharp\bin\Debug\netstandard2.0\protobuf-net-fsharp.dll"
+    #r @"G:\coldfar_py\sharftrade9\Libs5\KServer\protobuf-net-fsharp\src\ProtoBuf.FSharp\bin\netstandard2.0\protobuf-net-fsharp.dll"
     //#load @"Compression.fsx"
     #r "nuget: FSharp.Collections.ParallelSeq, 1.2.0"
-    #r @"bin\Debug\net9.0\fstring.dll"
+    #r @"bin\net9.0\PersistedConcurrentSortedList.dll"
+    open PersistedConcurrentSortedList
     #endif
 
-    open fs
     open PB2
     open CSL
     open PCSL
@@ -1781,6 +1875,7 @@ module PTEST =
         pcsl.Update ("", (S "ORZ"), 3000)
 
         pcsl.Upsert ("123456", (S "ORZ1"), 3000)
+        pcsl.Upsert ("123456", (S "ORZ"))
 
         pcsl.Remove ("123456", 3000)
         pcsl.Remove ("123456")
@@ -1789,6 +1884,7 @@ module PTEST =
         pcsl.TryGetValue ("ORZ") |> snd |> _.Value |> (fun (A o) -> o.Length)
         pcsl.TryGetValue ("OGC")
 
+        pcsl["ORZ2"]
     
         pcsl.GenerateKeyHash "ORZ"
         pcsl.GetOrNewKeyHash "ORZ2"

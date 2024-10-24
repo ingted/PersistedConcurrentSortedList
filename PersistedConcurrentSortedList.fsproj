@@ -27,7 +27,7 @@
 
   <ItemGroup>
     <PackageReference Include="FSharp.Collections.ParallelSeq" Version="1.2.0" />
-    <PackageReference Include="FAkka.ProtoBuf.FSharp" Version="1.0.0" />
+    <PackageReference Include="FAkka.ProtoBuf.FSharp" Version="1.0.0"  Condition="'$(Configuration)'=='Release'"/>
   </ItemGroup>
 
   <ItemGroup>

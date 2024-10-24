@@ -1,6 +1,8 @@
 # Usage: take a look at PTEST module
 # ProtoBuf.FSharp: 
 
+# Supported Array/Struct similar with BigQuery
+
 Actually you could use the official ProtoBuf.FSharp, just replace deserialiseConcreteType in PB2 with
 
 ```

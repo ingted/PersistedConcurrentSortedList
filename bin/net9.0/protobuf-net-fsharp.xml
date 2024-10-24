@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+<assembly><name>protobuf-net-fsharp</name></assembly>
+<members>
+<member name="M:ProtoBuf.FSharp.MethodHelpers.nameOfQuotation(Microsoft.FSharp.Quotations.FSharpExpr)">
+<summary>
+ Allows you to get the nameof a method in older F# versions
+</summary>
+</member>
+<member name="M:ProtoBuf.FSharp.CodeGen.emitUnionSurrogateWithSubtypes(System.Reflection.Emit.ModuleBuilder,System.Type)">
+<summary>
+ Emit surrogate for UnionType in that style:
+ stuct UnionSurrogate {
+     public abstract class Base { public abstract UnionType Extract();  }
+     public class CaseA : Base { ... }
+     public class CaseB : Base { ... }
+     ...
+     Base Tag;
+ }
+</summary>
+</member>
+<member name="M:ProtoBuf.FSharp.CodeGen.emitUnionSurrogateWithTag(System.Reflection.Emit.ModuleBuilder,System.Type)">
+<summary>
+ Emit surrogate for UnionType in that style:
+ stuct UnionSurrogate {
+     public enum UnionTags { UnionTags_A, UnionTags_B, UnionTags_C, ... }
+     public class CaseA { ... }
+     public class CaseC { ... }
+     ...
+     public UnionTags Tag;
+     public CaseA DataA;
+     public CaseC DataC;
+     ...
+ }
+</summary>
+</member>
+<member name="M:ProtoBuf.FSharp.CodeGen.relevantUnionSubtypes(System.Type)">
+<summary>
+ Enumerate subtypes of union type that (maybe) represent union cases
+</summary>
+</member>
+<member name="M:ProtoBuf.FSharp.CodeGen.emitGetUnionTag(System.Reflection.Emit.ILGenerator,System.Type)">
+<summary>
+ Puts tag of union in arg 0 (of type &apos;unionType&apos;) on top of evaluation stack
+</summary>
+</member>
+<member name="M:ProtoBuf.FSharp.CodeGen.emitRecordSurrogate(System.Reflection.Emit.ModuleBuilder,System.Type,System.Boolean)">
+<summary>
+ Emits a record surrogate. Intended to be used to support value type records ONLY since Protobuf-net at time of writing does not support custom ValueTypes/Structs.
+</summary>
+</member>
+<member name="M:ProtoBuf.FSharp.CodeGen.emitSurrogateContent(System.Reflection.Emit.TypeBuilder,System.Type,System.Reflection.PropertyInfo[],System.Reflection.MethodBase,System.Boolean,System.Reflection.ConstructorInfo)">
+<summary>
+ Adds to &apos;tb&apos;:
+ * Fields representing &apos;targetFields&apos;
+ * Extract method to get &apos;targetType&apos; value from surrogate
+ * Constructor, that creates &apos;tb&apos; from &apos;targetType&apos; (if targetType is value type then it&apos;s passed by reference)
+</summary>
+</member>
+<member name="M:ProtoBuf.FSharp.CodeGen.emitFactory(System.Type,ProtoBuf.FSharp.ZeroValues.FieldWithZeroValueSetMethod[])">
+<summary>
+ Emits a factory to create the object making sure all values are default assigned as expected for F# consumption (e.g. no nulls where not possible to define for common cases)
+</summary>
+</member>
+<member name="M:ProtoBuf.FSharp.CodeGen.emitStackTopZeroCheck(System.Reflection.Emit.ILGenerator,System.Type)">
+<summary>
+ Checks if value on top of evaluation stack (should be of type &apos;topType&apos;) is null
+ and &apos;topType&apos; has zero value defined. If so, replaces stack top with corresponding zero value.
+ If &apos;topType&apos; is generic parameter then the check is performed in runtime by calling
+ ZeroValues.isApplicableTo and ZeroValues.getZeroValue&lt;&apos;t&gt;.
+</summary>
+</member>
+<member name="M:ProtoBuf.FSharp.CodeGen.emitDefaultValueViaCell(System.Reflection.Emit.ILGenerator,System.Type)">
+<summary>
+ Hack to get default value of type &apos;tp&apos; on top of evaluation stack:
+ create local variable of type tp, initialize it with initobj opcode and read it.
+ Used if &apos;tp&apos; is value type (for reference types ldnull works ok)
+</summary>
+</member>
+<member name="M:ProtoBuf.FSharp.Serialiser.registerOptionTypesIntoModel``1(System.Type,``0,ProtoBuf.Meta.RuntimeTypeModel)">
+<summary>
+ Allows users to register option types in advance. You can specify a custom suffix name for the Protobuf wrapper type generated.
+ This only needs to be called directly if your type either is not already a field in another type previously registered (e.g. a record or union)
+ and/or your not happy with the default type name in case of naming clashes.
+ By default if None is provided for the customTypeSuffix parameter for example with Option&lt;string&gt; the protobuf message will be an &quot;OptionalString&quot;.
+ If the model is already registered (explictly or implicitly via another registration) AND/OR the type passed in is not an option type this will no-op.
+</summary>
+</member>
+<member name="P:ProtoBuf.FSharp.Serialiser.CasesCountWhereNoFieldCasesGenerateType">
+<summary>
+ The magic number where if a union type has more than the above cases it simply is a tagged instance of the parent type.
+ Otherwise for this number and below even non-empty unions get their own inner class prefixed with &quot;_&quot;.
+</summary>
+</member>
+</members>
+</doc>
