@@ -1,4 +1,4 @@
-# Usage: take a look at PTEST module
+# Usage: take a look at QuickStart.fsx (module PCSLTest)
 # ProtoBuf.FSharp: 
 
 # Supported Array/Struct similar with BigQuery
