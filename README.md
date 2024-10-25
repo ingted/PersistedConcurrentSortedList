@@ -1,4 +1,4 @@
-# Supported Array/Struct similar with BigQuery
+# Supported Array/Struct similar with BigQuery in C# and F#
 # Usage: take a look at QuickStart.fsx (module PCSLTest)
 # ProtoBuf.FSharp mod: (if you don't want to use FAkka.ProtoBuf.FSharp) 
 

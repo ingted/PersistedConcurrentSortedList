@@ -6,7 +6,7 @@
     <authors>PersistedConcurrentSortedList</authors>
     <projectUrl>https://github.com/ingted/PersistedConcurrentSortedList</projectUrl>
     <description>SortedList with persistency and threadsafty.</description>
-    <repository type="git" commit="d62c05660d60e371eba6d95c13a1ce8b3723b6ad" />
+    <repository type="git" commit="d103340a8600502f00efad94a3e79ad6d01d7369" />
     <dependencies>
       <group targetFramework="net9.0">
         <dependency id="FAkka.FsPickler" version="9.0.4" exclude="Build,Analyzers" />

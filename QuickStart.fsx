@@ -7,12 +7,19 @@
 #r @"nuget: FAkka.ProtoBuf.FSharp, 1.0.0"
 #r @"nuget: FSharp.Collections.ParallelSeq, 1.2.0"
 #r @"bin\net9.0\PersistedConcurrentSortedList.dll"
+#else
+namespace PersistedConcurrentSortedList
 #endif
 
 open PersistedConcurrentSortedList
 open System.Collections.Generic
 
+module CSLTest =
+    open DefaultHelper
+    open PCSL
+    let csl = PCSL<string, fstring, SLTyp>(TSL, PCSLFunHelper<string, fstring>.oFun, PCSLFunHelper<string, fstring>.eFun)
 
+    //let (Some lock) = csl.RequireLock(None, None) |> Async.RunSynchronously
 
 module PCSLTest = 
     open DefaultHelper
