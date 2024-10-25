@@ -6,6 +6,8 @@
 	  <EnablePackageValidation>false</EnablePackageValidation>
 	  <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 	  <OutputPath>./bin</OutputPath>
+	  <Description>SortedList with persistency and threadsafty.</Description>
+	  <PackageProjectUrl>https://github.com/ingted/PersistedConcurrentSortedList</PackageProjectUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0|AnyCPU'">
@@ -17,17 +19,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+	  <None Include="README.md" />
 	  <None Include="PostBuildEvent.ps1" />
 	  <Compile Include="Compression.fsx" />
-	  <None Include="PB 20241017 before use mailboxprocessor.fsx" />
+	  <Compile Include="PB.fsx" />
+	  <Compile Include="CSL.fsx" />
+	  <Compile Include="Task.fsx" />
+	  <!--<None Include="PB 20241017 before use mailboxprocessor.fsx" />
 	  <None Include="PB 20241014.before_change.fsx" />
-	  <None Include="PB 20241014.fsx" />
-      <Compile Include="PB.fsx" />
+	  <None Include="PB 20241014.fsx" />-->
+      <Compile Include="PCSL.fsx" />
+      <Compile Include="DefaultHelper.fsx" />
+      <Compile Include="QuickStart.fsx" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FSharp.Collections.ParallelSeq" Version="1.2.0" />
-    <PackageReference Include="FAkka.ProtoBuf.FSharp" Version="1.0.0"  Condition="'$(Configuration)'=='Release'"/>
+    <PackageReference Include="FAkka.ProtoBuf.FSharp" Version="1.0.0" Condition="'$(Configuration)'=='Release'" />
   </ItemGroup>
 
   <ItemGroup>
@@ -46,7 +54,7 @@
   </ItemGroup>
 	<PropertyGroup>
 		
-		<Version>9.0.4</Version>
+		<Version>9.0.5</Version>
 	</PropertyGroup>
 
 	<Target Name="PostPackNugetDeployWindows" AfterTargets="Pack" Condition="'$(Configuration)' == 'Release'">

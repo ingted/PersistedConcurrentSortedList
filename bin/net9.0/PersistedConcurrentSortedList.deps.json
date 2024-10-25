@@ -6,14 +6,13 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v9.0": {
-      "PersistedConcurrentSortedList/9.0.4": {
+      "PersistedConcurrentSortedList/9.0.5": {
         "dependencies": {
           "FAkka.FsPickler": "9.0.4",
           "FAkka.FsPickler.Json": "9.0.4",
           "FAkka.ProtoBuf.FSharp": "1.0.0",
           "FSharp.Collections.ParallelSeq": "1.2.0",
-          "FSharp.Core": "9.0.100-beta.24406.3",
-          "protobuf-net-fsharp": "1.0.0.0"
+          "FSharp.Core": "9.0.100-beta.24406.3"
         },
         "runtime": {
           "PersistedConcurrentSortedList.dll": {}
@@ -41,6 +40,27 @@
           "lib/net9.0/FsPickler.Json.dll": {
             "assemblyVersion": "9.0.4.0",
             "fileVersion": "9.0.4.0"
+          }
+        }
+      },
+      "FAkka.ProtoBuf.FSharp/1.0.0": {
+        "dependencies": {
+          "FSharp.Core": "9.0.100-beta.24406.3",
+          "System.Buffers": "4.5.1",
+          "System.Collections.Immutable": "7.0.0",
+          "System.Memory": "4.5.5",
+          "System.Numerics.Vectors": "4.5.0",
+          "System.Reflection.Emit": "4.7.0",
+          "System.Reflection.Emit.ILGeneration": "4.7.0",
+          "System.Reflection.Emit.Lightweight": "4.7.0",
+          "System.Runtime.CompilerServices.Unsafe": "6.0.0",
+          "protobuf-net": "3.2.26",
+          "protobuf-net.Core": "3.2.26"
+        },
+        "runtime": {
+          "lib/netstandard2.0/protobuf-net-fsharp.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
           }
         }
       },
@@ -141,40 +161,11 @@
       "System.Reflection.Emit/4.7.0": {},
       "System.Reflection.Emit.ILGeneration/4.7.0": {},
       "System.Reflection.Emit.Lightweight/4.7.0": {},
-      "System.Runtime.CompilerServices.Unsafe/6.0.0": {},
-      "FAkka.ProtoBuf.FSharp/1.0.0": {
-        "dependencies": {
-          "FSharp.Core": "9.0.100-beta.24406.3",
-          "System.Buffers": "4.5.1",
-          "System.Collections.Immutable": "7.0.0",
-          "System.Memory": "4.5.5",
-          "System.Numerics.Vectors": "4.5.0",
-          "System.Reflection.Emit": "4.7.0",
-          "System.Reflection.Emit.ILGeneration": "4.7.0",
-          "System.Reflection.Emit.Lightweight": "4.7.0",
-          "System.Runtime.CompilerServices.Unsafe": "6.0.0",
-          "protobuf-net": "3.2.26",
-          "protobuf-net.Core": "3.2.26"
-        },
-        "runtime": {
-          "protobuf-net-fsharp.dll": {
-            "assemblyVersion": "1.0.0",
-            "fileVersion": ""
-          }
-        }
-      },
-      "protobuf-net-fsharp/1.0.0.0": {
-        "runtime": {
-          "protobuf-net-fsharp.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
-          }
-        }
-      }
+      "System.Runtime.CompilerServices.Unsafe/6.0.0": {}
     }
   },
   "libraries": {
-    "PersistedConcurrentSortedList/9.0.4": {
+    "PersistedConcurrentSortedList/9.0.5": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
@@ -192,6 +183,13 @@
       "sha512": "sha512-k0wYjn/nGojarPOBi/TZd5hI+yiQUmYL6kWUElP/sFZsFki6bXH7Bq9CDWbjWnJZGdswaiiVcoIp5DkgRDzt5Q==",
       "path": "fakka.fspickler.json/9.0.4",
       "hashPath": "fakka.fspickler.json.9.0.4.nupkg.sha512"
+    },
+    "FAkka.ProtoBuf.FSharp/1.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-atYnPnZJG6+uzqAt9WDKQP0TX3/TYsThMzzZ9hIoiIbWqpIESCIjGFEtu0fX6meQs4DAkwqZ44KYx9+d9yFfBQ==",
+      "path": "fakka.protobuf.fsharp/1.0.0",
+      "hashPath": "fakka.protobuf.fsharp.1.0.0.nupkg.sha512"
     },
     "FSharp.Collections.ParallelSeq/1.2.0": {
       "type": "package",
@@ -283,16 +281,6 @@
       "sha512": "sha512-/iUeP3tq1S0XdNNoMz5C9twLSrM/TH+qElHkXWaPvuNOt+99G75NrV0OS2EqHx5wMN7popYjpc8oTjC1y16DLg==",
       "path": "system.runtime.compilerservices.unsafe/6.0.0",
       "hashPath": "system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512"
-    },
-    "FAkka.ProtoBuf.FSharp/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "protobuf-net-fsharp/1.0.0.0": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
     }
   }
 }

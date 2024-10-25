@@ -2,16 +2,16 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>PersistedConcurrentSortedList</id>
-    <version>9.0.4</version>
+    <version>9.0.5</version>
     <authors>PersistedConcurrentSortedList</authors>
     <projectUrl>https://github.com/ingted/PersistedConcurrentSortedList</projectUrl>
     <description>SortedList with persistency and threadsafty.</description>
     <repository type="git" commit="d62c05660d60e371eba6d95c13a1ce8b3723b6ad" />
     <dependencies>
       <group targetFramework="net9.0">
-        <dependency id="FAkka.ProtoBuf.FSharp" version="1.0.0" exclude="Build,Analyzers" />
         <dependency id="FAkka.FsPickler" version="9.0.4" exclude="Build,Analyzers" />
         <dependency id="FAkka.FsPickler.Json" version="9.0.4" exclude="Build,Analyzers" />
+        <dependency id="FAkka.ProtoBuf.FSharp" version="1.0.0" exclude="Build,Analyzers" />
         <dependency id="FSharp.Collections.ParallelSeq" version="1.2.0" exclude="Build,Analyzers" />
         <dependency id="FSharp.Core" version="9.0.100-beta.24406.3" exclude="Build,Analyzers" />
       </group>
