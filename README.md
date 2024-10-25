@@ -1,9 +1,8 @@
-# Usage: take a look at QuickStart.fsx (module PCSLTest)
-# ProtoBuf.FSharp: 
-
 # Supported Array/Struct similar with BigQuery
+# Usage: take a look at QuickStart.fsx (module PCSLTest)
+# ProtoBuf.FSharp mod: (if you don't want to use FAkka.ProtoBuf.FSharp) 
 
-Actually you could use the official ProtoBuf.FSharp, just replace deserialiseConcreteType in PB2 with
+Actually you could use the official ProtoBuf.FSharp, just replace deserialiseConcreteType in PB with (adding it yourself)
 
 ```
 let deserialiseConcreteType<'t> (model: RuntimeTypeModel) (stream: Stream) = 
@@ -23,7 +22,7 @@ let deserialiseConcreteType<'t> (model: RuntimeTypeModel) (stream: Stream) =
     model.Deserialize(stream, null, actualType) :?> 't
 ```
 
-Quick start:
+Quick start: (dotnet fsi QuickStart.fsx)
 
 ```
 let pcsl = PersistedConcurrentSortedList<string, fstring>(
