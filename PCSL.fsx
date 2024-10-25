@@ -653,7 +653,7 @@ module PCSL =
         |}
 
         member this.InfoPrint =
-            printfn "%A" this.Info
+            printfn "Info: %A" this.Info
 
         new (maxDoP, basePath, schemaName, oFun, eFun) =
             PersistedConcurrentSortedList<'Key, 'Value>(

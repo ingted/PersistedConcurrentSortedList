@@ -16,10 +16,16 @@ open System.Collections.Generic
 
 module CSLTest =
     open DefaultHelper
+    open CSL
     open PCSL
     let csl = PCSL<string, fstring, SLTyp>(TSL, PCSLFunHelper<string, fstring>.oFun, PCSLFunHelper<string, fstring>.eFun)
 
     //let (Some lock) = csl.RequireLock(None, None) |> Async.RunSynchronously
+
+    //let addTuple = csl.LockableOp(CAdd (SLK "mykey", SLV <| T ("GG", A [|S "Orz"|])), lock)
+
+    //addTuple.Result
+
 
 module PCSLTest = 
     open DefaultHelper
@@ -53,6 +59,7 @@ module PCSLTest =
         printfn "%A" <| pcsl.TryGetValue ("OGC")
 
         printfn "%A" <| pcsl["ORZ2"]
+
     
         printfn "%A" <| pcsl.GenerateKeyHash "ORZ"
         printfn "%A" <| pcsl.GetOrNewKeyHash "ORZ2"

@@ -223,7 +223,7 @@ module DefaultHelper =
             , PCSLFunHelper<string, fstring>.oFun
             , PCSLFunHelper<string, fstring>.eFun)
         
-        printfn "%A" pcsl.InfoPrint
+        printfn "InfoPrint: %A" pcsl.InfoPrint
 
         pcsl
 

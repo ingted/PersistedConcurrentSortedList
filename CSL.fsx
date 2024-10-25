@@ -106,6 +106,7 @@ module CSL =
     | Unlock of Guid
     | SysLock
     | SysUnlock of Guid
+    | StepForward
 
     type QueueProcessorStatus =
     | Locked of Guid
@@ -115,23 +116,50 @@ module CSL =
 
         // 定義一個 MailboxProcessor 來處理操作任務
         let opProcessor = FActor.Start(fun (inbox:FActor<QueueProcessorCmd<'OpResult>>) ->
-            let messageQueue = Queue<QueueProcessorCmd<'OpResult>>()
+            let mutable messageQueue = Queue<QueueProcessorCmd<'OpResult>>()
+            let mutable messageQueueTmp = Queue<QueueProcessorCmd<'OpResult>>()
             let mutable status = Listenning
             let mutable _receiveTimeout = _receiveTimeoutDefault
             //let mutable curLockGuid = Guid.Empty
             let rec loop () =
                 async {
                     let! taskOpt = inbox.TryReceive(_receiveTimeout)
-    #if DEBUG1
-                    printfn "[%A] dequeued %A" slId task
-    #endif
                     if taskOpt.IsSome then
+                        let mutable ifSwitched = false
+    #if DEBUG
+                        printfn "[%A] dequeued %A, messageQueue count: %d" slId task messageQueue.Count
+    #endif
+                        printfn "Cmd received: %A" taskOpt.Value
                     //| Some qpCmd when status = Listenning ->
-                        let rec goAhead _status =
-                            status <- _status
+                        //let rec getCmdAndProceed (latestCmdToAppendOpt: _ option) =
+                        //    let ifD, m = messageQueue.TryDequeue () 
+                        //    if ifD then
+                        //        if latestCmdToAppendOpt.IsSome then
+                        //            messageQueue.Enqueue latestCmdToAppendOpt.Value
+                        //        procCmd m
+                        //    else
+                        //        if latestCmdToAppendOpt.IsSome then
+                        //            procCmd latestCmdToAppendOpt.Value
+
+                        let rec getCmdAndProceed () =
                             let ifD, m = messageQueue.TryDequeue () 
                             if ifD then
                                 procCmd m
+
+                        and getCmdAndProceedBeforeLatestCmdProceed latestCmdToAppend =
+                            let ifD, m = messageQueue.TryDequeue () 
+                            if ifD then
+                                printfn "Enqueue latestCmd first: %A" latestCmdToAppend
+                                messageQueue.Enqueue latestCmdToAppend
+                                procCmd m
+                                
+                            else
+                                procCmd latestCmdToAppend
+                        
+                        and goAhead _status =
+                            status <- _status
+                            getCmdAndProceed ()
+
                         and execute (task:Task<'OpResult>) =
                             task.Start ()
                             let tr = task |> Async.AwaitTask |> Async.Catch |> Async.RunSynchronously // 同步執行任務
@@ -144,21 +172,34 @@ module CSL =
                                 ()
                             | Choice2Of2 exn -> 
                                 printfn "Failed: %A" exn.Message
-                            goAhead Listenning
+                            
 
                         and procCmd cmd =
+                            printfn "cmd proceeding: %A" cmd
                             match status with
                             | Locked curLockGuid ->
+                                printfn "Current lock context: %A" curLockGuid
                                 match cmd with
                                 | SysUnlock g 
                                 | Unlock g when g = curLockGuid -> 
+                                    printfn "Unlocked! context:%A" g
                                     goAhead Listenning
+
                                 | Tsk (task, (Some g)) when g = curLockGuid ->
+                                    printfn "Execute task in same lockId context! context:%A, cmd:%A" curLockGuid g
                                     execute task
+                                    getCmdAndProceed ()
+                                | _ when ifSwitched = false ->
+                                    printfn "Enqueue task in different context firstTime! context:%A" curLockGuid
+                                    ifSwitched <- true
+                                    messageQueueTmp.Enqueue cmd
+                                    getCmdAndProceed ()
                                 | _ ->
-                                    messageQueue.Enqueue cmd
-                            
+                                    printfn "Enqueue task in different context! context:%A" curLockGuid
+                                    messageQueueTmp.Enqueue cmd
+                                    getCmdAndProceed ()
                             | Listenning ->
+                                printfn "Listenning, no lock context."
                                 match cmd with
                                 | Tsk (_, (Some g)) ->
                                     execute (task {
@@ -167,6 +208,7 @@ module CSL =
 
                                 | Tsk (task, None) ->
                                     execute task
+                                    getCmdAndProceed ()
 
                                 | Lock (replyLockId, timeoutTimeSpanOpt) -> // 處理 lock 並加入 timeout
                                     let g = Guid.NewGuid()
@@ -181,13 +223,19 @@ module CSL =
                                         }
                                         |> Async.Start
                                 | _ ->
-                                    ()
+                                    printfn "Cmd handler haven't yet implemented or ignored! %A" cmd
 
-                        let ifD, m = messageQueue.TryDequeue () 
-                        if ifD then
-                            procCmd m
-                        procCmd taskOpt.Value
-
+                        if taskOpt.Value = StepForward then
+                            getCmdAndProceed ()
+                        else
+                            getCmdAndProceedBeforeLatestCmdProceed taskOpt.Value
+                        if ifSwitched then
+                            printfn "queue switched"
+                            messageQueue <- messageQueueTmp
+                            messageQueueTmp <- Queue<QueueProcessorCmd<'OpResult>>()
+                        if messageQueue.Count > 0 && status = Listenning then 
+                            //if locked and queue not empty means we need to wait unlock, so no need to StepForward
+                            inbox.Post StepForward
                     else
                         ()
                     return! loop() // 繼續處理下一個任務
@@ -217,6 +265,10 @@ module CSL =
                 opProcessor.PostAndTryAsyncReply (arcFun, requireTimeoutOption.Value)
             else
                 opProcessor.PostAndTryAsyncReply arcFun
+
+        member this.UnLock (lockId) =
+            opProcessor.Post (Unlock lockId)
+
 
     type ConcurrentSortedList<'Key, 'Value, 'OpResult, 'ID
         when 'Key : comparison
@@ -354,6 +406,9 @@ module CSL =
         member this.LockableOps (op: Op<'Key, 'Value>) =
             this.LockableOps (op, None)
 
+        member this.LockableOp (op: Op<'Key, 'Value>, lockId: Guid) =
+            this.LockableOps (op, Some lockId) |> Seq.item 0
+
         member this.LockableOp (op: Op<'Key, 'Value>) =
             this.LockableOps op |> Seq.item 0
 
@@ -483,6 +538,9 @@ module CSL =
 
         member this.RequireLock (rtoOpt, ltoOpt) =
             this.OpQueue.RequireLock(rtoOpt, ltoOpt)
+
+        member this.UnLock (lockId) =
+            this.OpQueue.UnLock lockId
 
         new (slId, outFun, extractFunBase) =
             new ConcurrentSortedList<_, _, _, _>(slId, outFun, extractFunBase, obj(), 30000)
