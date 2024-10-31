@@ -6,9 +6,59 @@ module CSL =
     open System.Collections.Generic
     open System.Collections.Concurrent
     open System.Threading.Tasks
+    open System.Reflection
+    open System.Runtime.InteropServices
 
     let createTask (fn: unit -> 'T) : Task<'T> =
         new Task<'T>(fun () -> fn())
+
+    let inline createMemoryFromArr<'T> start (tLength: int) (arr: 'T []) : Memory<'T> =
+        // 直接創建 Memory，指向指定的陣列區段
+        Memory<'T>(arr, start, tLength)
+
+    let inline getKeys (sl: SortedList<'k, _>) =
+        let fi = sl.GetType().GetField("keys", BindingFlags.Instance ||| BindingFlags.NonPublic)
+        fi.GetValue sl |> unbox<'k[]>
+
+    let inline getValues (sl: SortedList<_, 'v>) =
+        let fi = sl.GetType().GetField("values", BindingFlags.Instance ||| BindingFlags.NonPublic)
+        fi.GetValue sl |> unbox<'v[]>
+
+    
+    type SortedListCache<'k, 'v>() =
+        // ConcurrentDictionary，用於緩存不同 SortedList 實例的 keys 和 values
+        static let kCache = ConcurrentDictionary<SortedList<'k, 'v>, 'k[]>()
+        static let vCache = ConcurrentDictionary<SortedList<'k, 'v>, 'v[]>()
+
+        // cache 函數，將 SortedList 的 keys 和 values 緩存到 ConcurrentDictionary
+        static member Cache(sl: SortedList<'k, 'v>) =
+            kCache.GetOrAdd(sl, fun slInstance ->
+                let keys = getKeys slInstance
+                keys
+            ) |> ignore
+            
+            vCache.GetOrAdd(sl, fun slInstance ->
+                let values = getValues slInstance
+                values
+            ) |> ignore
+
+        // 從緩存中獲取 keys，如果不存在則拋出錯誤
+        static member GetKeysCached(sl: SortedList<'k, 'v>) =
+            match kCache.TryGetValue(sl) with
+            | true, keys -> keys
+            | _ -> failwith "Keys have not been cached for this instance. Call Cache() first."
+
+        // 從緩存中獲取 values，如果不存在則拋出錯誤
+        static member GetValuesCached(sl: SortedList<'k, 'v>) =
+            match vCache.TryGetValue(sl) with
+            | true, values -> values
+            | _ -> failwith "Values have not been cached for this instance. Call Cache() first."
+
+
+
+    
+    type Layer = int
+    type Tag = string
 
     type Op<'Key, 'Value when 'Key : comparison> =
     | CAdd of 'Key * 'Value
@@ -22,6 +72,10 @@ module CSL =
     | CKeys
     | CClean
     | SeqOp of Op<'Key, 'Value> seq
+    | FoldOp of Op<'Key, 'Value> seq
+    | KeysOp of Tag option * int * int * (Memory<'Key> -> ResultWrapper<'Key, 'Value>[] -> Task<OpResult<'Key, 'Value>> option -> OpResult<'Key, 'Value>)
+    | ValuesOp of Tag option * int * int * (Memory<'Value> -> ResultWrapper<'Key, 'Value>[] -> Task<OpResult<'Key, 'Value>> option -> OpResult<'Key, 'Value>)
+    | KeyValuesOp of Tag option * int * int * (Memory<'Key> -> Memory<'Value> -> ResultWrapper<'Key, 'Value>[] -> Task<OpResult<'Key, 'Value>> option -> OpResult<'Key, 'Value>)
 
     //type OpResultTyp = 
     //| TUnit         
@@ -31,13 +85,39 @@ module CSL =
     //| TKeyList     
     //| TValueList   
     
-    type OpResult<'Key, 'Value when 'Key : comparison> =
+    and ResultWrapper<'Key, 'Value when 'Key : comparison>(layer: Layer, ?tag: Tag, ?kMemory: Memory<'Key>, ?vMemory: Memory<'Value>, ?opResult: Task<OpResult<'Key, 'Value>>) = 
+        // 屬性初始化
+        member val Layer = layer with get, set
+        member val Tag = tag with get, set
+        member val OpResult = opResult with get, set
+        member val KMemory = kMemory with get, set
+        member val VMemory = vMemory with get, set
+
+        // 預設建構子
+        new(layer: Layer) = ResultWrapper(layer)
+
+        // 提供不同參數組合的建構子
+        new(layer: Layer, tag: Tag, opResult: OpResult<'Key, 'Value>) = ResultWrapper(layer, tag, opResult = Task.FromResult opResult)
+        new(layer: Layer, opResult: OpResult<'Key, 'Value>) = ResultWrapper(layer, opResult = Task.FromResult opResult)
+
+        new(layer: Layer, tag: Tag, vmemory: Memory<'Value>) = ResultWrapper(layer, tag, vMemory = vmemory)
+        new(layer: Layer, tag: Tag, kmemory: Memory<'Key>) = ResultWrapper(layer, tag, kMemory = kmemory)
+
+        new(layer: Layer, kmemory: Memory<'Key>) = ResultWrapper(layer, kMemory = kmemory)
+        new(layer: Layer, vmemory: Memory<'Value>) = ResultWrapper(layer, vMemory = vmemory)
+        new(layer: Layer, kmemory: Memory<'Key>, vmemory: Memory<'Value>) = ResultWrapper(layer, kMemory = kmemory, vMemory = vmemory)
+        new(layer: Layer, tag: Tag, kmemory: Memory<'Key>, vmemory: Memory<'Value>) = ResultWrapper(layer, tag, kMemory = kmemory, vMemory = vmemory)
+
+
+    and OpResult<'Key, 'Value when 'Key : comparison> =
     | CUnit
     | CBool         of bool
     | COptionValue  of (bool * 'Value option)
     | CInt          of int
     | CKeyList      of IList<'Key>
     | CValueList    of IList<'Value>
+    | FoldResult    of //(Layer * Tag option * OpResult<'Key, 'Value> option * Memory<'Value> option)[]
+        ResultWrapper<'Key, 'Value>[]
         with
        
             member this.Bool =
@@ -95,6 +175,7 @@ module CSL =
         else
             t.Name
 
+    
     type SLId = string
 
     type FActor<'T> = MailboxProcessor<'T>
@@ -162,20 +243,23 @@ module CSL =
 
                         and execute (task:Task<'OpResult>) =
                             task.Start ()
-                            let tr = task |> Async.AwaitTask |> Async.Catch |> Async.RunSynchronously // 同步執行任務
+                            printfn "Task %A started" task.Id
+                            let tr = task |> Async.AwaitTask |> Async.Catch |> Async.StartAsTask // 同步執行任務
 
-                            match tr with
+                            match tr.Result with
                             | Choice1Of2 s -> 
+                                printfn "Task %A IsCompleted: %A" task.Id task.IsCompleted
 #if DEBUG1
                                 printfn "Successfully: %A" s
 #endif
                                 ()
                             | Choice2Of2 exn -> 
+                                printfn "Task %A IsCompleted: %A" task.Id task.IsCompleted
                                 printfn "Failed: %A" exn.Message
-                            
+      
 
                         and procCmd cmd =
-                            printfn "cmd proceeding: %A" cmd
+                            printfn "Cmd proceeding: %A" cmd
                             match status with
                             | Locked curLockGuid ->
                                 printfn "Current lock context: %A" curLockGuid
@@ -339,16 +423,78 @@ module CSL =
 
         /// 封装操作并添加到任务队列，执行后返回 Task
         member this.LockableOps (op: Op<'Key, 'Value>, lockIdOpt: Guid option) =
-            
-            let rec taskToEnqueue op = 
+            // `processFoldOp` 函數實現，接收一個 `Op<'Key, 'Value> seq` 序列並返回一個 `FoldResult`
+            let rec processOp layer arr (preResultTask: Task<OpResult<_,_>> option) (op: Op<'Key, 'Value>) (baseInstance: ConcurrentSortedList<'Key, 'Value, 'OpResult, 'ID>) =
+                let results =
+                    match op with
+                    | KeysOp (tagOpt, start, length, f) ->
+                        let keysMemory = SortedListCache<'Key, 'Value>.GetKeysCached(baseInstance._base) |> createMemoryFromArr<'Key> start length
+                        let curResult = task {return f keysMemory arr preResultTask}
+                        if tagOpt.IsSome then
+                            ResultWrapper(layer, tagOpt.Value, kMemory=keysMemory, opResult = curResult), curResult
+                        else
+                            ResultWrapper(layer, opResult = curResult), curResult
+
+                    | ValuesOp (tagOpt, start, length, f) ->
+                        // 從緩存中取得 values 並創建 Memory
+                        let valuesMemory = SortedListCache<'Key, 'Value>.GetValuesCached(baseInstance._base) |> createMemoryFromArr<'Value> start length
+                        let curResult = task {return f valuesMemory arr preResultTask}
+                        if tagOpt.IsSome then
+                            ResultWrapper(layer, tagOpt.Value, vMemory = valuesMemory, opResult = curResult), curResult
+                        else
+                            ResultWrapper(layer, vMemory = valuesMemory, opResult = curResult), curResult
+
+                    | KeyValuesOp (tagOpt, start, length, f) ->
+                        // 從緩存中取得 keys 和 values 並創建 Memory
+                        let keysMemory = SortedListCache<'Key, 'Value>.GetKeysCached(baseInstance._base) |> createMemoryFromArr<'Key> start length
+                        let valuesMemory = SortedListCache<'Key, 'Value>.GetValuesCached(baseInstance._base) |> createMemoryFromArr<'Value> start length
+                        let curResult = task {return f keysMemory valuesMemory arr preResultTask}
+                        if tagOpt.IsSome then
+                            ResultWrapper(layer, tagOpt.Value, kMemory = keysMemory, vMemory = valuesMemory, opResult = curResult), curResult
+                        else
+                            ResultWrapper(layer, kMemory = keysMemory, vMemory = valuesMemory, opResult = curResult), curResult
+
+                    | SeqOp s ->
+                        failwith "SeqOp is not supported in FoldOp"
+                    | _ -> //failwith "Unsupported operation type for processOp"
+                        let f = opToFun op |> Seq.item 0
+                        let oprt = task {return f()}
+                        ResultWrapper(layer, opResult = oprt), oprt
+
+                results
+            and opToFun op : (unit -> OpResult<'Key, 'Value>) seq = 
 #if DEBUG1
                 printfn "%A Current Op: %A, %s, %s" slId op (getTypeName typeof<'Key>) (getTypeName typeof<'Value>)
 #endif
                 match op with
+                | KeysOp (_, _, _, _)
+                | ValuesOp (_, _, _, _)
+                | KeyValuesOp (_, _, _, _) ->
+                    seq [ fun () -> FoldResult [| fst <| processOp 0 [||] None op this |] ]
+                | FoldOp s ->
+                    let f2opr =
+                        fun () ->
+                            // 以初始 `ResultWrapper` 集合為空的方式進行 fold 操作
+                            let initialResultArray = Array.empty<ResultWrapper<'Key, 'Value>>
+    
+                            // 使用 `Seq.fold` 來累加每個操作的結果到 `ResultWrapper` 陣列中
+                            let foldedResults, _ =
+                                s 
+                                |> Seq.indexed
+                                |> Seq.fold (fun (acc, preResultTask) (layer, op) ->
+                                    // 每個 `op` 使用 `processOp` 進行處理
+                                    let result, opROpt = processOp layer acc preResultTask op this
+                                    // 將結果累加到 `acc` 中，擴充 `ResultWrapper` 陣列
+                                    (Array.append acc [| result |], Some opROpt)
+                                ) (initialResultArray, None)
+
+                            // 最後將所有結果封裝為 `FoldResult`
+                            FoldResult foldedResults
+                    seq [f2opr]
                 | SeqOp s ->
                     s
                     |> Seq.collect (fun o ->
-                        taskToEnqueue o
+                        opToFun o
                     )
                 | _ ->
                     match op with
@@ -387,15 +533,18 @@ module CSL =
                         fun () ->
                             sortedList.ContainsKey k |> CBool
                 
-
-
-                    >> (outFun slId)
-                    |> fun t -> seq [createTask t]
+                    |> fun f -> seq [f]
 #if DEBUG1
             printfn "Enqueuing op %A" op
 #endif
             // 将操作添加到队列并运行队列
-            let ts = taskToEnqueue op
+            //let f = Func<Task<OpResult<'Key, 'value>>, 'OpResult> (fun tt ->  tt.Result)
+            //let ts = opToFun op |> Seq.map (fun f -> f >> outFun slId |> createTask)
+            let ts = 
+                opToFun op 
+                |> Seq.map (fun f -> (fun () -> f()|> outFun slId) |> createTask)
+                |> Seq.toArray
+            ts |> Seq.iter (fun task -> printfn "[before starting] Task %A IsCompleted: %A" task.Id task.IsCompleted)
             ts
             |> if lockIdOpt.IsNone then
                 Seq.iter opQueue.Enqueue 
@@ -543,5 +692,5 @@ module CSL =
             this.OpQueue.UnLock lockId
 
         new (slId, outFun, extractFunBase) =
-            new ConcurrentSortedList<_, _, _, _>(slId, outFun, extractFunBase, obj(), 30000)
+            new ConcurrentSortedList<_, _, _, _>(slId, outFun, extractFunBase, obj(), 300000)
 

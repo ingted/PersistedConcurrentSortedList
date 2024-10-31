@@ -429,12 +429,17 @@ module PCSL =
                 else
                     None, false, None //索引無該 key
 
-        let readFromFileBaseAndBuffer (key: 'Key) =
+        let readFromFileBaseAndBuffer (key: 'Key, _toMilli: int) =
             let khOpt, fileExisted, valueOpt = readFromFileBase key
             if khOpt.IsNone then
                 None
             else
-                sortedList.Add(SLK key, SLV valueOpt.Value).Ignore()
+                let (Choice1Of3 _) =
+                    [|
+                        sortedList.Add(SLK key, SLV valueOpt.Value).thisT
+                        sortedListPersistenceStatus.Upsert(SLK key, SLPS Buffered).thisT
+                    |]
+                    |> Task.WaitAllWithTimeout _toMilli
                 valueOpt
 
 
@@ -576,7 +581,7 @@ module PCSL =
 #else
             lock sortedList.LockObj (fun () ->
 #endif
-            removePersistedKeyValue key
+                removePersistedKeyValue key
 #if DEBUG1
 #else                
             )
@@ -618,7 +623,7 @@ module PCSL =
                 if exists then
                     true, value
                 else
-                    match readFromFileBaseAndBuffer key with
+                    match readFromFileBaseAndBuffer (key, _toMilli) with
                     | Some v ->
                         true, Some v
                     | None -> false, None
@@ -654,6 +659,9 @@ module PCSL =
 
         member this.InfoPrint =
             printfn "Info: %A" this.Info
+
+        //member this.GetKeysArray() =
+            
 
         new (maxDoP, basePath, schemaName, oFun, eFun) =
             PersistedConcurrentSortedList<'Key, 'Value>(

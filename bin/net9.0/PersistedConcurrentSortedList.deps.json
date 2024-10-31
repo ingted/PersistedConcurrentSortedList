@@ -12,7 +12,7 @@
           "FAkka.FsPickler.Json": "9.0.4",
           "FAkka.ProtoBuf.FSharp": "1.0.0",
           "FSharp.Collections.ParallelSeq": "1.2.0",
-          "FSharp.Core": "9.0.100-beta.24406.3",
+          "FSharp.Core": "9.0.100-beta.24466.6",
           "protobuf-net-fsharp": "1.0.0.0"
         },
         "runtime": {
@@ -21,7 +21,7 @@
       },
       "FAkka.FsPickler/9.0.4": {
         "dependencies": {
-          "FSharp.Core": "9.0.100-beta.24406.3",
+          "FSharp.Core": "9.0.100-beta.24466.6",
           "System.Reflection.Emit.Lightweight": "4.7.0"
         },
         "runtime": {
@@ -34,7 +34,7 @@
       "FAkka.FsPickler.Json/9.0.4": {
         "dependencies": {
           "FAkka.FsPickler": "9.0.4",
-          "FSharp.Core": "9.0.100-beta.24406.3",
+          "FSharp.Core": "9.0.100-beta.24466.6",
           "Newtonsoft.Json": "13.0.3"
         },
         "runtime": {
@@ -46,7 +46,7 @@
       },
       "FSharp.Collections.ParallelSeq/1.2.0": {
         "dependencies": {
-          "FSharp.Core": "9.0.100-beta.24406.3"
+          "FSharp.Core": "9.0.100-beta.24466.6"
         },
         "runtime": {
           "lib/netstandard2.0/FSharp.Collections.ParallelSeq.dll": {
@@ -55,11 +55,11 @@
           }
         }
       },
-      "FSharp.Core/9.0.100-beta.24406.3": {
+      "FSharp.Core/9.0.100-beta.24466.6": {
         "runtime": {
           "lib/netstandard2.1/FSharp.Core.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.1.24.40603"
+            "fileVersion": "9.1.24.46606"
           }
         },
         "resources": {
@@ -144,7 +144,7 @@
       "System.Runtime.CompilerServices.Unsafe/6.0.0": {},
       "FAkka.ProtoBuf.FSharp/1.0.0": {
         "dependencies": {
-          "FSharp.Core": "9.0.100-beta.24406.3",
+          "FSharp.Core": "9.0.100-beta.24466.6",
           "System.Buffers": "4.5.1",
           "System.Collections.Immutable": "7.0.0",
           "System.Memory": "4.5.5",
@@ -200,12 +200,12 @@
       "path": "fsharp.collections.parallelseq/1.2.0",
       "hashPath": "fsharp.collections.parallelseq.1.2.0.nupkg.sha512"
     },
-    "FSharp.Core/9.0.100-beta.24406.3": {
+    "FSharp.Core/9.0.100-beta.24466.6": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-w3q+hTyiwyVHPvq3mAvlCWj1LUsP3kWmmpnX/VOOAaC8SKeeGLBFbBks7NWnnZ35Qn2YgNyDEHP5f7LEkdMFWA==",
-      "path": "fsharp.core/9.0.100-beta.24406.3",
-      "hashPath": "fsharp.core.9.0.100-beta.24406.3.nupkg.sha512"
+      "sha512": "sha512-VdkJ1cUa55TK4T+ewwtZA3un369qbI8VtbWL6SoeenX/phA0xsMHNlTHtmACUOAD5Ul2AqippqM4DP859holFg==",
+      "path": "fsharp.core/9.0.100-beta.24466.6",
+      "hashPath": "fsharp.core.9.0.100-beta.24466.6.nupkg.sha512"
     },
     "Newtonsoft.Json/13.0.3": {
       "type": "package",
