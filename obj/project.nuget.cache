@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "p58cxqUNDOY=",
+  "dgSpecHash": "d1BqXgUT5GM=",
   "success": true,
   "projectFilePath": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\PersistedConcurrentSortedList.fsproj",
   "expectedPackageFiles": [
     "C:\\Users\\Administrator\\.nuget\\packages\\fakka.fspickler\\9.0.4\\fakka.fspickler.9.0.4.nupkg.sha512",
     "C:\\Users\\Administrator\\.nuget\\packages\\fakka.fspickler.json\\9.0.4\\fakka.fspickler.json.9.0.4.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\fakka.protobuf.fsharp\\1.0.0\\fakka.protobuf.fsharp.1.0.0.nupkg.sha512",
     "C:\\Users\\Administrator\\.nuget\\packages\\fsharp.collections.parallelseq\\1.2.0\\fsharp.collections.parallelseq.1.2.0.nupkg.sha512",
     "C:\\Users\\Administrator\\.nuget\\packages\\fsharp.core\\9.0.100-beta.24466.6\\fsharp.core.9.0.100-beta.24466.6.nupkg.sha512",
     "C:\\Users\\Administrator\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512",

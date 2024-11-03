@@ -6,7 +6,7 @@
     <authors>PersistedConcurrentSortedList</authors>
     <projectUrl>https://github.com/ingted/PersistedConcurrentSortedList</projectUrl>
     <description>SortedList with persistency and threadsafty.</description>
-    <repository type="git" commit="a3bbf62453ebf432fbde9e1c74ce4ec787a8f54d" />
+    <repository type="git" commit="99b9163cb0ce8be5c072cc0ce64b0bae4f5d5679" />
     <dependencies>
       <group targetFramework="net9.0">
         <dependency id="FAkka.ProtoBuf.FSharp" version="1.0.0" exclude="Build,Analyzers" />

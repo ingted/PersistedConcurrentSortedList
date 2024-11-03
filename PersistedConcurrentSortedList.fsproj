@@ -22,6 +22,7 @@
 	  <None Include="README.md" />
 	  <None Include="PostBuildEvent.ps1" />
 	  <Compile Include="Compression.fsx" />
+	  <Compile Include="Memory.fsx" />
 	  <Compile Include="PB.fsx" />
 	  <Compile Include="CSL.fsx" />
 	  <Compile Include="Task.fsx" />

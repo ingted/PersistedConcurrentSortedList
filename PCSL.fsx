@@ -87,16 +87,13 @@ module PCSL =
     | Idx of OpResult<'Key, KeyHash>
     | IdxR of OpResult<KeyHash, 'Key>
     | PS of OpResult<'Key, SortedListPersistenceStatus>
+    | FoldOpR of OpResult<PCSLKVTyp<'Key, 'Value>, PCSLKVTyp<'Key, 'Value>>
     | UtilOp
     with
                 // KV 的成員處理
         member this.kvAdded =
             let (KV (CBool a)) = this
             a
-
-        member this.kvUpdated =
-            let (KV CUpdated) = this
-            true
 
         member this.kvBool =
             let (KV (CBool b)) = this
@@ -122,9 +119,6 @@ module PCSL =
             let (Idx (CBool a)) = this
             a
 
-        member this.idxUpdated =
-            let (Idx CUpdated) = this
-            true
 
         member this.idxBool =
             let (Idx (CBool b)) = this
@@ -150,9 +144,6 @@ module PCSL =
             let (IdxR (CBool a)) = this
             a
 
-        member this.idxRUpdated =
-            let (IdxR CUpdated) = this
-            true
 
         member this.idxRBool =
             let (IdxR (CBool b)) = this
@@ -178,9 +169,6 @@ module PCSL =
             let (PS (CBool a)) = this
             a
 
-        member this.psUpdated =
-            let (PS CUpdated) = this
-            true
 
         member this.psBool =
             let (PS (CBool b)) = this
@@ -202,7 +190,30 @@ module PCSL =
             let (PS (CInt i)) = this
             i
 
-    type PCSLKVTyp<'Key, 'Value
+        member this.foldOpRWArr =
+            let (FoldOpR (FoldResult keyOpTask)) = this
+            keyOpTask
+
+        member this.foldOpRestValKList i =
+            let (FoldOpR (FoldResult keyOpTask)) = this
+            keyOpTask[i].OpResult |> Option.bind (fun o -> o.Result.KeyList)
+
+        member this.foldOpRestValVList i =
+            let (FoldOpR (FoldResult keyOpTask)) = this
+            keyOpTask[i].OpResult |> Option.bind (fun o -> o.Result.ValueList)
+
+        member this.foldOpRestValKVList i =
+            let (FoldOpR (FoldResult keyOpTask)) = this
+            keyOpTask[i].OpResult |> Option.bind (fun o -> o.Result.KVList)
+            
+        member this.foldOpRestValOpt i =
+            let (FoldOpR (FoldResult keyOpTask)) = this
+            keyOpTask[i].OpResult |> Option.bind (fun o -> o.Result.OptionValue) |> Option.bind snd
+
+            
+
+
+    and PCSLKVTyp<'Key, 'Value
         when 'Key : comparison
         and 'Value: comparison
         > =

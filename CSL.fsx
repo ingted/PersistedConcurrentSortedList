@@ -31,15 +31,25 @@ module CSL =
         static let vCache = ConcurrentDictionary<SortedList<'k, 'v>, 'v[]>()
 
         // cache 函數，將 SortedList 的 keys 和 values 緩存到 ConcurrentDictionary
-        static member Cache(sl: SortedList<'k, 'v>) =
-            kCache.GetOrAdd(sl, fun slInstance ->
-                let keys = getKeys slInstance
-                keys
+        static member CacheChange(sl: SortedList<'k, 'v>) =
+            kCache.AddOrUpdate(
+                sl
+                , (fun slInstance ->
+                    let keys = getKeys slInstance
+                    keys)
+                , (fun slInstance _ ->
+                    let keys = getKeys slInstance
+                    keys)
             ) |> ignore
             
-            vCache.GetOrAdd(sl, fun slInstance ->
-                let values = getValues slInstance
-                values
+            vCache.AddOrUpdate(
+                sl
+                , (fun slInstance ->
+                    let values = getValues slInstance
+                    values)
+                , (fun slInstance _ ->
+                    let values = getValues slInstance
+                    values)
             ) |> ignore
 
         // 從緩存中獲取 keys，如果不存在則拋出錯誤
@@ -70,6 +80,7 @@ module CSL =
     | CCount
     | CValues
     | CKeys
+    | CKV 
     | CClean
     | SeqOp of Op<'Key, 'Value> seq
     | FoldOp of Op<'Key, 'Value> seq
@@ -114,8 +125,10 @@ module CSL =
     | CBool         of bool
     | COptionValue  of (bool * 'Value option)
     | CInt          of int
+    | CDecimal      of decimal
     | CKeyList      of IList<'Key>
     | CValueList    of IList<'Value>
+    | CKVList       of ('Key * 'Value)[]
     | FoldResult    of //(Layer * Tag option * OpResult<'Key, 'Value> option * Memory<'Value> option)[]
         ResultWrapper<'Key, 'Value>[]
         with
@@ -130,6 +143,11 @@ module CSL =
                 | COptionValue (b, v) -> Some (b, v)
                 | _ -> None
         
+            member this.Decimal =
+                match this with
+                | CDecimal v -> Some v
+                | _ -> None
+
             member this.Int =
                 match this with
                 | CInt v -> Some v
@@ -143,6 +161,11 @@ module CSL =
             member this.ValueList =
                 match this with
                 | CValueList valueList -> Some valueList
+                | _ -> None
+
+            member this.KVList =
+                match this with
+                | CKVList valueList -> Some valueList
                 | _ -> None
 
     type Task<'T> with
@@ -381,6 +404,7 @@ module CSL =
             
             try
                 let added = sortedList.TryAdd(key, value)
+                SortedListCache<_, _>.CacheChange sortedList
 #if DEBUG1
                 printfn "[%A] %A, %A added" slId key value
 #endif
@@ -391,7 +415,9 @@ module CSL =
         /// 基础的 Remove 操作
         member this.TryRemoveBase(key: 'Key) =
             try
-                sortedList.Remove(key)
+                let removed = sortedList.Remove(key)
+                SortedListCache<_, _>.CacheChange sortedList
+                removed
             with
             | _ -> false
 
@@ -409,6 +435,7 @@ module CSL =
                 2
             else
                 if sortedList.TryAdd (key, newValue) then
+                    SortedListCache<_, _>.CacheChange sortedList
                     1
                 else
                     0
@@ -525,6 +552,9 @@ module CSL =
                     | CKeys ->
                         fun () -> 
                             sortedList.Keys |> CKeyList
+                    | CKV ->
+                        fun () -> 
+                            sortedList |> Seq.map (fun kvp -> kvp.Key, kvp.Value) |> Seq.toArray |> CKVList
                     | CClean ->
                         fun () ->
                             sortedList.Clear()
@@ -542,8 +572,9 @@ module CSL =
             //let ts = opToFun op |> Seq.map (fun f -> f >> outFun slId |> createTask)
             let ts = 
                 opToFun op 
-                |> Seq.map (fun f -> (fun () -> f()|> outFun slId) |> createTask)
-                |> Seq.toArray
+                //|> Seq.map (fun f -> (fun () -> f()|> outFun slId) |> createTask)
+                |> Seq.map (fun f -> f >> outFun slId |> createTask)
+                |> Seq.toArray //沒有 toArray 會出現 task id 不同的症狀，也就是跑的 task 跟回傳的 task 不同 (seq map 的 lazy evaluation 特性造成)
             ts |> Seq.iter (fun task -> printfn "[before starting] Task %A IsCompleted: %A" task.Id task.IsCompleted)
             ts
             |> if lockIdOpt.IsNone then

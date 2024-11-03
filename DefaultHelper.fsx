@@ -41,8 +41,6 @@ module DefaultHelper =
         //static let kht = typeof<KeyHash>
         //static let pst = typeof<SortedListPersistenceStatus>
 
-
-
         static member oFun (id: SLTyp) (opResult: OpResult<PCSLKVTyp<'Key, 'Value>, PCSLKVTyp<'Key, 'Value>>):PCSLTaskTyp<'Key, 'Value> = 
 #if DEBUG1
             printfn $"SLId: {id}: oFun"
@@ -137,9 +135,12 @@ module DefaultHelper =
                     let vs = values |> Seq.map (fun (SLPS v) -> v)|> (fun s -> List<_>(s)) :> IList<SortedListPersistenceStatus>
                     PS (CValueList vs)
                 | _ -> failwith "Unsupported type in CValueList"
+            | FoldResult rwArr ->
+                match id with
+                | TSL -> 
+                    FoldOpR opResult
 
-
-
+                | _ -> failwith "Unsupported type in CValueList"
 
         static member eFun (id: SLTyp) (taskResult: PCSLTaskTyp<'Key, 'Value>): OpResult<PCSLKVTyp<'Key, 'Value>, PCSLKVTyp<'Key, 'Value>> =
 #if DEBUG1            
@@ -163,6 +164,7 @@ module DefaultHelper =
                 | CValueList values -> 
                     let vs = values |> Seq.map (fun v -> SLV v) |> fun l -> List<_> l :> IList<_>
                     CValueList vs
+                
             | Idx (o:OpResult<'Key, KeyHash>) ->
                 match o with
                 | CUnit -> 
@@ -216,6 +218,14 @@ module DefaultHelper =
                     let vs = values |> Seq.map (fun v -> SLPS v) |> fun l -> List<_> l :> IList<_>
                     CValueList vs
 
+        static member kvExtract (opr: OpResult<PCSLKVTyp<'Key, 'Value>, PCSLKVTyp<'Key, 'Value>>) =
+            match opr with
+            | CKVList kvArr ->
+                kvArr |> Array.map (fun (SLK k, SLV v) -> k, v) |> CKVList
+            | CKeyList kl ->
+                kl |> Seq.map (fun (SLK k) -> k) |> Seq.toArray :> IList<_> |> CKeyList
+            | CValueList kl ->
+                kl |> Seq.map (fun (SLV k) -> k) |> Seq.toArray :> IList<_> |> CValueList
 
     let testPCSL () = 
         let pcsl = PersistedConcurrentSortedList<string, fstring>(
