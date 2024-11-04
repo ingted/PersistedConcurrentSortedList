@@ -11,7 +11,7 @@ open System.Reflection
 [<assembly: System.Reflection.AssemblyConfigurationAttribute("Release")>]
 [<assembly: System.Reflection.AssemblyDescriptionAttribute("SortedList with persistency and threadsafty.")>]
 [<assembly: System.Reflection.AssemblyFileVersionAttribute("9.0.5.0")>]
-[<assembly: System.Reflection.AssemblyInformationalVersionAttribute("9.0.5+99b9163cb0ce8be5c072cc0ce64b0bae4f5d5679")>]
+[<assembly: System.Reflection.AssemblyInformationalVersionAttribute("9.0.5+87437f9232c7e6e95745bf2c0c0cf7706b43e5c9")>]
 [<assembly: System.Reflection.AssemblyProductAttribute("PersistedConcurrentSortedList")>]
 [<assembly: System.Reflection.AssemblyTitleAttribute("PersistedConcurrentSortedList")>]
 [<assembly: System.Reflection.AssemblyVersionAttribute("9.0.5.0")>]

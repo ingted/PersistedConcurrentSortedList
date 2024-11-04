@@ -47,10 +47,10 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
     <PackageReference Include="FAkka.FsPickler">
-      <Version>9.0.4</Version>
+      <Version>9.0.5</Version>
     </PackageReference>
     <PackageReference Include="FAkka.FsPickler.Json">
-      <Version>9.0.4</Version>
+      <Version>9.0.5</Version>
     </PackageReference>
   </ItemGroup>
 	<PropertyGroup>

@@ -6,14 +6,14 @@
     <authors>PersistedConcurrentSortedList</authors>
     <projectUrl>https://github.com/ingted/PersistedConcurrentSortedList</projectUrl>
     <description>SortedList with persistency and threadsafty.</description>
-    <repository type="git" commit="51cdd3126b3a4fef35ad0928b6f59b8ee30634e1" />
+    <repository type="git" commit="87437f9232c7e6e95745bf2c0c0cf7706b43e5c9" />
     <dependencies>
       <group targetFramework="net9.0">
-        <dependency id="FAkka.FsPickler" version="9.0.4" exclude="Build,Analyzers" />
-        <dependency id="FAkka.FsPickler.Json" version="9.0.4" exclude="Build,Analyzers" />
+        <dependency id="FAkka.FsPickler" version="9.0.5" exclude="Build,Analyzers" />
+        <dependency id="FAkka.FsPickler.Json" version="9.0.5" exclude="Build,Analyzers" />
         <dependency id="FAkka.ProtoBuf.FSharp" version="1.0.0" exclude="Build,Analyzers" />
         <dependency id="FSharp.Collections.ParallelSeq" version="1.2.0" exclude="Build,Analyzers" />
-        <dependency id="FSharp.Core" version="9.0.100-beta.24406.3" exclude="Build,Analyzers" />
+        <dependency id="FSharp.Core" version="9.0.100-beta.24466.6" exclude="Build,Analyzers" />
       </group>
     </dependencies>
   </metadata>

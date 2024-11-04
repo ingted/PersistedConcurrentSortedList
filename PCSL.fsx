@@ -19,7 +19,7 @@
 #r @"../../../Libs/FsPickler/bin/net9.0/FsPickler.dll"
 #r @"../../../Libs/FsPickler.Json/bin/net9.0/FsPickler.Json.dll"
 #r @"nuget: protobuf-net"
-#r @"G:\coldfar_py\sharftrade9\Libs5\KServer\protobuf-net-fsharp\src\ProtoBuf.FSharp\bin\netstandard2.0\protobuf-net-fsharp.dll"
+#r @"..\..\..\Libs5\KServer\protobuf-net-fsharp\src\ProtoBuf.FSharp\bin\netstandard2.0\protobuf-net-fsharp.dll"
 #load @"Compression.fsx"
 #r "nuget: FSharp.Collections.ParallelSeq, 1.2.0"
 #endif
@@ -30,9 +30,9 @@ open System.Collections.Generic
 #if KATZEBASE
 open NTDLS.Katzebase.Parsers.Interfaces
 #endif
-open Newtonsoft.Json
+//open Newtonsoft.Json
 
-open MBrace.FsPickler
+open MBrace.FsPickler.Json
 open MBrace.FsPickler.Combinators 
 open ProtoBuf
 open ProtoBuf.FSharp
@@ -194,23 +194,25 @@ module PCSL =
             let (FoldOpR (FoldResult keyOpTask)) = this
             keyOpTask
 
-        member this.foldOpRestValKList i =
+        member this.foldOpResultValKList i =
             let (FoldOpR (FoldResult keyOpTask)) = this
             keyOpTask[i].OpResult |> Option.bind (fun o -> o.Result.KeyList)
 
-        member this.foldOpRestValVList i =
+        member this.foldOpResultValVList i =
             let (FoldOpR (FoldResult keyOpTask)) = this
             keyOpTask[i].OpResult |> Option.bind (fun o -> o.Result.ValueList)
 
-        member this.foldOpRestValKVList i =
+        member this.foldOpResultValKVList i =
             let (FoldOpR (FoldResult keyOpTask)) = this
             keyOpTask[i].OpResult |> Option.bind (fun o -> o.Result.KVList)
             
-        member this.foldOpRestValOpt i =
+        member this.foldOpResultValOpt i =
             let (FoldOpR (FoldResult keyOpTask)) = this
             keyOpTask[i].OpResult |> Option.bind (fun o -> o.Result.OptionValue) |> Option.bind snd
 
-            
+        member this.foldOpResultValOpR =
+            let (FoldOpR (FoldResult keyOpTask)) = this
+            keyOpTask |> Array.map (fun opr -> opr.OpResult |> Option.map _.Result)// |> Option.map (fun o -> o.Result)
 
 
     and PCSLKVTyp<'Key, 'Value

@@ -13,21 +13,10 @@
     <SourceRoot Include="C:\Users\Administrator\.nuget\packages\" />
     <SourceRoot Include="C:\Program Files (x86)\Microsoft Visual Studio\Shared\NuGetPackages\" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net9.0' AND '$(ExcludeRestorePackageImports)' != 'true' ">
-    <Content Include="$(NuGetPackageRoot)fakka.protobuf.fsharp\1.0.0\contentFiles\any\netstandard2.0\app.config" Condition="Exists('$(NuGetPackageRoot)fakka.protobuf.fsharp\1.0.0\contentFiles\any\netstandard2.0\app.config')">
-      <NuGetPackageId>FAkka.ProtoBuf.FSharp</NuGetPackageId>
-      <NuGetPackageVersion>1.0.0</NuGetPackageVersion>
-      <NuGetItemType>Content</NuGetItemType>
-      <Pack>false</Pack>
-      <Private>False</Private>
-      <Link>app.config</Link>
-    </Content>
-  </ItemGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net9.0' AND '$(ExcludeRestorePackageImports)' != 'true' ">
     <PkgFSharp_Core Condition=" '$(PkgFSharp_Core)' == '' ">C:\Users\Administrator\.nuget\packages\fsharp.core\9.0.100-beta.24466.6</PkgFSharp_Core>
     <PkgFSharp_Collections_ParallelSeq Condition=" '$(PkgFSharp_Collections_ParallelSeq)' == '' ">C:\Users\Administrator\.nuget\packages\fsharp.collections.parallelseq\1.2.0</PkgFSharp_Collections_ParallelSeq>
-    <PkgFAkka_ProtoBuf_FSharp Condition=" '$(PkgFAkka_ProtoBuf_FSharp)' == '' ">C:\Users\Administrator\.nuget\packages\fakka.protobuf.fsharp\1.0.0</PkgFAkka_ProtoBuf_FSharp>
-    <PkgFAkka_FsPickler Condition=" '$(PkgFAkka_FsPickler)' == '' ">C:\Users\Administrator\.nuget\packages\fakka.fspickler\9.0.4</PkgFAkka_FsPickler>
-    <PkgFAkka_FsPickler_Json Condition=" '$(PkgFAkka_FsPickler_Json)' == '' ">C:\Users\Administrator\.nuget\packages\fakka.fspickler.json\9.0.4</PkgFAkka_FsPickler_Json>
+    <PkgFAkka_FsPickler Condition=" '$(PkgFAkka_FsPickler)' == '' ">C:\Users\Administrator\.nuget\packages\fakka.fspickler\9.0.5</PkgFAkka_FsPickler>
+    <PkgFAkka_FsPickler_Json Condition=" '$(PkgFAkka_FsPickler_Json)' == '' ">C:\Users\Administrator\.nuget\packages\fakka.fspickler.json\9.0.5</PkgFAkka_FsPickler_Json>
   </PropertyGroup>
 </Project>

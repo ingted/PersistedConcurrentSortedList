@@ -1,3 +1,4 @@
+G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\net9.0\PersistedConcurrentSortedList.dll.config
 G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\net9.0\PersistedConcurrentSortedList.deps.json
 G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\net9.0\PersistedConcurrentSortedList.dll
 G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\net9.0\PersistedConcurrentSortedList.pdb
@@ -12,4 +13,3 @@ G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\obj\Release\net9.0\refint\Persis
 G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\obj\Release\net9.0\PersistedConcurrentSortedList.xml
 G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\obj\Release\net9.0\PersistedConcurrentSortedList.pdb
 G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\obj\Release\net9.0\ref\PersistedConcurrentSortedList.dll
-G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\net9.0\PersistedConcurrentSortedList.dll.config
