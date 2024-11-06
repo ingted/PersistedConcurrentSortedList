@@ -55,7 +55,7 @@
   </ItemGroup>
 	<PropertyGroup>
 		
-		<Version>9.0.7</Version>
+		<Version>9.0.8</Version>
 	</PropertyGroup>
 
 	<Target Name="PostPackNugetDeployWindows" AfterTargets="Pack" Condition="'$(Configuration)' == 'Release'">
