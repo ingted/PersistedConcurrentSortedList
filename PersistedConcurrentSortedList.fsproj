@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net9.0</TargetFrameworks>
+    <TargetFramework>net9.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 	  <EnablePackageValidation>false</EnablePackageValidation>
 	  <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -55,7 +55,7 @@
   </ItemGroup>
 	<PropertyGroup>
 		
-		<Version>9.0.5</Version>
+		<Version>9.0.7</Version>
 	</PropertyGroup>
 
 	<Target Name="PostPackNugetDeployWindows" AfterTargets="Pack" Condition="'$(Configuration)' == 'Release'">

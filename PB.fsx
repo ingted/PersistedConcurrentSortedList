@@ -41,7 +41,7 @@ open FSharp.Reflection
 [<ProtoBuf.ProtoContract>]
 type fstring =
 | S of string
-| D of double
+| D of decimal
 | A of fstring []
 | T of string * fstring
     member this.toJsonString() =
@@ -218,16 +218,16 @@ module ExtensionsString =
 [<Extension>]
 module ExtensionsDecimal =
     [<Extension>]
-    let toF(d : decimal) = D (double d)
+    let toF(d : decimal) = D d
 [<Extension>]
 module ExtensionsDouble =
     [<Extension>]
-    let toF(d : double) = D d
+    let toF(d : double) = D (decimal d)
 
 [<Extension>]
 module ExtensionsInt =
     [<Extension>]
-    let toF(d : int) = D (double d)
+    let toF(d : int) = D (decimal d)
 
 module PB =
     open System.IO

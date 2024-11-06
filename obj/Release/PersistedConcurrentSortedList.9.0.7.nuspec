@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>PersistedConcurrentSortedList</id>
+    <version>9.0.7</version>
+    <authors>PersistedConcurrentSortedList</authors>
+    <projectUrl>https://github.com/ingted/PersistedConcurrentSortedList</projectUrl>
+    <description>SortedList with persistency and threadsafty.</description>
+    <repository type="git" commit="b626ba56f7df4bc1680ffbe14fc75c7c85832f3c" />
+    <dependencies>
+      <group targetFramework="net9.0">
+        <dependency id="FAkka.FsPickler" version="9.0.5" exclude="Build,Analyzers" />
+        <dependency id="FAkka.FsPickler.Json" version="9.0.5" exclude="Build,Analyzers" />
+        <dependency id="FAkka.ProtoBuf.FSharp" version="1.0.0" exclude="Build,Analyzers" />
+        <dependency id="FSharp.Collections.ParallelSeq" version="1.2.0" exclude="Build,Analyzers" />
+        <dependency id="FSharp.Core" version="9.0.100-beta.24466.6" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\net9.0\PersistedConcurrentSortedList.dll" target="lib\net9.0\PersistedConcurrentSortedList.dll" />
+    <file src="G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\net9.0\PersistedConcurrentSortedList.xml" target="lib\net9.0\PersistedConcurrentSortedList.xml" />
+  </files>
+</package>
