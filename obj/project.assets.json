@@ -772,7 +772,7 @@
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
-    "version": "9.0.8",
+    "version": "9.0.10",
     "restore": {
       "projectUniqueName": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\PersistedConcurrentSortedList.fsproj",
       "projectName": "PersistedConcurrentSortedList",
@@ -807,8 +807,7 @@
         "enableAudit": "true",
         "auditLevel": "low",
         "auditMode": "all"
-      },
-      "SdkAnalysisLevel": "9.0.100"
+      }
     },
     "frameworks": {
       "net9.0": {

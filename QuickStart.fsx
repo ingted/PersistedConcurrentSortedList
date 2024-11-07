@@ -18,7 +18,7 @@ module CSLTest =
     open DefaultHelper
     open CSL
     open PCSL
-    let csl = PCSL<string, fstring, SLTyp>(TSL, PCSLFunHelper<string, fstring>.oFun, PCSLFunHelper<string, fstring>.eFun)
+    let csl () = PCSL<string, fstring, SLTyp>(TSL, PCSLFunHelper<string, fstring>.oFun, PCSLFunHelper<string, fstring>.eFun)
 
     //let (Some lock) = csl.RequireLock(None, None) |> Async.RunSynchronously
 

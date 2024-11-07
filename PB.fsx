@@ -38,14 +38,16 @@ open ProtoBuf
 open ProtoBuf.FSharp
 open FSharp.Reflection
 
+
+
 [<ProtoBuf.ProtoContract>]
-type fstring =
+type fstring_legacy =
 | S of string
 | D of decimal
-| A of fstring []
-| T of string * fstring
+| A of fstring_legacy []
+| T of string * fstring_legacy
     member this.toJsonString() =
-        let rec toJson (f: fstring) =
+        let rec toJson (f: fstring_legacy) =
             match f with
             | S s -> sprintf "%s" s
             | D d -> sprintf "%f" d
@@ -58,19 +60,19 @@ type fstring =
                 sprintf "%s: %s" keyStr valueStr
         toJson this
 
-    static member compareArrays (arr1: fstring array) (arr2: fstring array): int =
+    static member compareArrays (arr1: fstring_legacy array) (arr2: fstring_legacy array): int =
         Seq.zip arr1 arr2
         |> Seq.tryPick (fun (x, y) ->
             let res = compare x y
             if res = 0 then None else Some res)
         |> Option.defaultValue 0
 
-    static member compareLength (arr1: fstring array) (arr2: fstring array): int =
+    static member compareLength (arr1: fstring_legacy array) (arr2: fstring_legacy array): int =
         let a1l = if arr1 = null then 0 else arr1.Length
         let a2l = if arr2 = null then 0 else arr2.Length
         compare a1l a2l
 
-    static member Compare (x: fstring, y: fstring): int =
+    static member Compare (x: fstring_legacy, y: fstring_legacy): int =
         match box x, box y with
         | null, null -> 0
         | _, null -> 
@@ -82,13 +84,13 @@ type fstring =
             | (D d1, D d2) -> Decimal.Compare(decimal d1, decimal d2)
             | (S s1, S s2) -> String.Compare(s1, s2, StringComparison.OrdinalIgnoreCase)
             | (A arr1, A arr2) ->
-                let lenComp = fstring.compareLength arr1 arr2
+                let lenComp = fstring_legacy.compareLength arr1 arr2
                 if lenComp <> 0 then lenComp
-                else fstring.compareArrays arr1 arr2
+                else fstring_legacy.compareArrays arr1 arr2
             | (T (tag1, f1), T (tag2, f2)) ->
                 let tagComp = String.Compare(tag1, tag2, StringComparison.OrdinalIgnoreCase)
                 if tagComp <> 0 then tagComp
-                else fstring.Compare(f1, f2)
+                else fstring_legacy.Compare(f1, f2)
             | (D _, _) -> -1
             | (_, D _) -> 1
             | (S _, (A _ | T _)) -> -1
@@ -96,28 +98,28 @@ type fstring =
             | (A _, T _) -> -1
             | (T _, A _) -> 1
 
-    interface IComparer<fstring> with
-        override this.Compare(x: fstring, y: fstring): int =
-            fstring.Compare(x, y)
+    interface IComparer<fstring_legacy> with
+        override this.Compare(x: fstring_legacy, y: fstring_legacy): int =
+            fstring_legacy.Compare(x, y)
 
     member this.s =
         match this with
         | S s -> s
-        | _ -> failwith "Not fstring.S."
+        | _ -> failwith "Not fstring_legacy.S."
 
     member this.d =
         match this with
         | D d -> d
-        | _ -> failwith "Not fstring.D."
+        | _ -> failwith "Not fstring_legacy.D."
 
     member this.ToLowerInvariant () =
         match this with
-        | S "" -> fstring.SNull
+        | S "" -> fstring_legacy.SNull
         | S s -> s.ToLowerInvariant() |> S
-        | _ -> failwith "Not fstring.S."
+        | _ -> failwith "Not fstring_legacy.S."
 
-    static member val CompareFunc : Func<fstring, fstring, bool> = 
-        FuncConvert.FromFunc(fun (x: fstring) (y: fstring) -> fstring.Compare(x, y) = 0)
+    static member val CompareFunc : Func<fstring_legacy, fstring_legacy, bool> = 
+        FuncConvert.FromFunc(fun (x: fstring_legacy) (y: fstring_legacy) -> fstring_legacy.Compare(x, y) = 0)
 
     static member aFromStringArr (sArr) =
         sArr
@@ -132,12 +134,12 @@ type fstring =
     static member val AEmpty        = A [||]                        with get
     static member val SNull         = S null                        with get
     static member val ANull         = A null                        with get
-    static member val Unassigned    = Unchecked.defaultof<fstring>  with get
+    static member val Unassigned    = Unchecked.defaultof<fstring_legacy>  with get
 
-    static member SIsNullOrEmpty (o:fstring) = if box o = null || o = fstring.SEmpty || o = fstring.SNull then true else false
-    static member AIsNullOrEmpty (o:fstring) = if box o = null || o = fstring.AEmpty || o = fstring.ANull then true else false
-    static member IsNull (o:fstring) = 
-        if box o = null || o = fstring.ANull || o = fstring.SNull then true else false
+    static member SIsNullOrEmpty (o:fstring_legacy) = if box o = null || o = fstring_legacy.SEmpty || o = fstring_legacy.SNull then true else false
+    static member AIsNullOrEmpty (o:fstring_legacy) = if box o = null || o = fstring_legacy.AEmpty || o = fstring_legacy.ANull then true else false
+    static member IsNull (o:fstring_legacy) = 
+        if box o = null || o = fstring_legacy.ANull || o = fstring_legacy.SNull then true else false
 
     // 加入 IStringable 接口的實作
 #if KATZEBASE
@@ -178,8 +180,150 @@ type fstring =
         | T (key, value) -> sprintf "%s: %s" key value.me
 
     member this.Value = this.me
+[<ProtoBuf.ProtoContract>]
+type fCell<'CellTupleKey when 'CellTupleKey: comparison> =
+| S of string
+| D of decimal
+| A of fCell<'CellTupleKey> []
+| T of 'CellTupleKey * fCell<'CellTupleKey>
+    member this.toJsonString() =
+        let rec toJson (f: fCell<'CellTupleKey>) =
+            match f with
+            | S s -> sprintf "%s" s
+            | D d -> sprintf "%f" d
+            | A arr -> 
+                let elements = arr |> Array.map toJson |> String.concat ", "
+                sprintf "[%s]" elements
+            | T (key, value) ->
+                let keyStr = sprintf "%A" key
+                let valueStr = toJson value
+                sprintf "%A: %s" keyStr valueStr
+        toJson this
+
+    static member compareArrays (arr1: fCell<'CellTupleKey> array) (arr2: fCell<'CellTupleKey> array): int =
+        Seq.zip arr1 arr2
+        |> Seq.tryPick (fun (x, y) ->
+            let res = compare x y
+            if res = 0 then None else Some res)
+        |> Option.defaultValue 0
+
+    static member compareLength (arr1: fCell<'CellTupleKey> array) (arr2: fCell<'CellTupleKey> array): int =
+        let a1l = if arr1 = null then 0 else arr1.Length
+        let a2l = if arr2 = null then 0 else arr2.Length
+        compare a1l a2l
+
+    static member Compare (x: fCell<'CellTupleKey>, y: fCell<'CellTupleKey>): int =
+        match box x, box y with
+        | null, null -> 0
+        | _, null -> 
+            if x = S null then 0 else 1
+        | null, _ ->
+            if y = S null then 0 else -1
+        | _ ->
+            match (x, y) with
+            | (D d1, D d2) -> Decimal.Compare(d1, d2)
+            | (S s1, S s2) -> String.Compare(s1, s2, StringComparison.OrdinalIgnoreCase)
+            | (A arr1, A arr2) ->
+                let lenComp = fCell.compareLength arr1 arr2
+                if lenComp <> 0 then lenComp
+                else fCell.compareArrays arr1 arr2
+            | (T (tag1, f1), T (tag2, f2)) ->
+                let tagComp = compare tag1 tag2
+                if tagComp <> 0 then tagComp
+                else fCell.Compare(f1, f2)
+            | (D _, _) -> -1
+            | (_, D _) -> 1
+            | (S _, (A _ | T _)) -> -1
+            | ((A _ | T _), S _) -> 1
+            | (A _, T _) -> -1
+            | (T _, A _) -> 1
+
+    interface IComparer<fCell<'CellTupleKey>> with
+        override this.Compare(x: fCell<'CellTupleKey>, y: fCell<'CellTupleKey>): int =
+            fCell.Compare(x, y)
+
+    member this.s =
+        match this with
+        | S s -> s
+        | _ -> failwith "Not fstring.S."
+
+    member this.d =
+        match this with
+        | D d -> d
+        | _ -> failwith "Not fstring.D."
+
+    member this.ToLowerInvariant () =
+        match this with
+        | S "" -> fCell<'CellTupleKey>.SNull
+        | S s -> s.ToLowerInvariant() |> S
+        | _ -> failwith "Not fstring.S."
+
+    static member val CompareFunc : Func<fCell<'CellTupleKey>, fCell<'CellTupleKey>, bool> = 
+        FuncConvert.FromFunc(fun (x: fCell<'CellTupleKey>) (y: fCell<'CellTupleKey>) -> fCell.Compare(x, y) = 0)
+
+    static member aFromStringArr (sArr) =
+        sArr
+        |> Array.map S
+        |> A
+
+    static member fromStringArr (sArr) =
+        sArr
+        |> Array.map S
+
+    static member val SEmpty        = S ""                          with get
+    static member val AEmpty        = A [||]                        with get
+    static member val SNull         = S null                        with get
+    static member val ANull         = A null                        with get
+    static member val Unassigned    = Unchecked.defaultof<fCell<'CellTupleKey>>  with get
+
+    static member SIsNullOrEmpty (o:fCell<'CellTupleKey>) = if box o = null || o = fCell<'CellTupleKey>.SEmpty || o = fCell<'CellTupleKey>.SNull then true else false
+    static member AIsNullOrEmpty (o:fCell<'CellTupleKey>) = if box o = null || o = fCell<'CellTupleKey>.AEmpty || o = fCell<'CellTupleKey>.ANull then true else false
+    static member IsNull (o:fCell<'CellTupleKey>) = 
+        if box o = null || o = fCell.ANull || o = fCell<'CellTupleKey>.SNull then true else false
+
+    // 加入 IStringable 接口的實作
+#if KATZEBASE
+    interface IStringable with
+        override this.GetKey () = this.s
+        override this.IsNullOrEmpty () = this.s = null || this.s = ""
+        override this.ToLowerInvariant () = this.ToLowerInvariant()
+        override this.ToT<'T> () =
+            match typeof<'T> with
+            | t when t = typeof<string> -> box this.s :?> 'T
+            | t when t = typeof<double> -> box (Double.Parse this.s) :?> 'T
+            | t when t = typeof<int> -> box (Int32.Parse this.s) :?> 'T
+            | t when t = typeof<bool> -> box (Boolean.Parse this.s) :?> 'T
+            | t -> failwithf "type %s not supported" t.Name
+
+        override this.ToT (t: Type) =
+            match t with
+            | t when t = typeof<string> -> box this.s
+            | t when t = typeof<double> -> box (Double.Parse this.s)
+            | t when t = typeof<int> -> box (Int32.Parse this.s)
+            | t when t = typeof<bool> -> box (Boolean.Parse this.s)
+            | _ -> failwithf "type %s not supported" t.Name
+
+        override this.ToNullableT<'T> () =
+            match typeof<'T> with
+            | t when t = typeof<string> -> box this.s :?> 'T
+            | t when t = typeof<double> -> box (Double.Parse this.s) :?> 'T
+            | t when t = typeof<int> -> box (Int32.Parse this.s) :?> 'T
+            | t when t = typeof<bool> -> box (Boolean.Parse this.s) :?> 'T
+            | _ -> failwithf "type %s not supported" typeof<'T>.Name
+#endif
+
+    member this.me =
+        match this with
+        | S s -> s
+        | D d -> d.ToString()
+        | A arr -> arr |> Array.map (fun f -> f.me) |> String.concat ", "
+        | T (key, value) -> sprintf "%A: %s" key value.me
+
+    member this.Value = this.me
 
 
+[<ProtoBuf.ProtoContract>]
+type fstring = fCell<string>
 
 open System.Runtime.CompilerServices
 

@@ -409,6 +409,7 @@ module CSL =
         , extractFunBase:'ID -> 'OpResult -> OpResult<'Key, 'Value>
         , lockObj: obj
         , timeoutDefault
+        , ?autoCacheChange:int 
         ) =
         let sortedList = SortedList<'Key, 'Value>()
         //let lockObj = obj()
@@ -426,7 +427,8 @@ module CSL =
             
             try
                 let added = sortedList.TryAdd(key, value)
-                SortedListCache<_, _>.CacheChange sortedList
+                if autoCacheChange.IsSome then
+                    SortedListCache<_, _>.CacheChange sortedList
 #if DEBUG1
                 printfn "[%A] %A, %A added" slId key value
 #endif
@@ -438,7 +440,8 @@ module CSL =
         member this.TryRemoveBase(key: 'Key) =
             try
                 let removed = sortedList.Remove(key)
-                SortedListCache<_, _>.CacheChange sortedList
+                if autoCacheChange.IsSome then
+                    SortedListCache<_, _>.CacheChange sortedList
                 removed
             with
             | _ -> false
@@ -457,7 +460,8 @@ module CSL =
                 2
             else
                 if sortedList.TryAdd (key, newValue) then
-                    SortedListCache<_, _>.CacheChange sortedList
+                    if autoCacheChange.IsSome then
+                        SortedListCache<_, _>.CacheChange sortedList
                     1
                 else
                     0
