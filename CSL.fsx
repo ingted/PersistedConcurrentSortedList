@@ -16,11 +16,19 @@ module CSL =
         // 直接創建 Memory，指向指定的陣列區段
         Memory<'T>(arr, start, tLength)
 
-    let inline getKeys (sl: SortedList<'k, _>) =
+    let 
+#if RELEASE
+        inline 
+#endif
+        getKeys (sl: SortedList<'k, _>) =
         let fi = sl.GetType().GetField("keys", BindingFlags.Instance ||| BindingFlags.NonPublic)
         fi.GetValue sl |> unbox<'k[]>
 
-    let inline getValues (sl: SortedList<_, 'v>) =
+    let 
+#if RELEASE
+        inline 
+#endif 
+        getValues (sl: SortedList<_, 'v>) =
         let fi = sl.GetType().GetField("values", BindingFlags.Instance ||| BindingFlags.NonPublic)
         fi.GetValue sl |> unbox<'v[]>
 
@@ -749,6 +757,9 @@ module CSL =
 
         member this.UnLock (lockId) =
             this.OpQueue.UnLock lockId
+
+        new (slId, outFun, extractFunBase, (autoCache: int)) =
+            new ConcurrentSortedList<_, _, _, _>(slId, outFun, extractFunBase, obj(), 300000, autoCacheChange = autoCache)
 
         new (slId, outFun, extractFunBase) =
             new ConcurrentSortedList<_, _, _, _>(slId, outFun, extractFunBase, obj(), 300000)

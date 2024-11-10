@@ -8,9 +8,14 @@
 	  <OutputPath>./bin</OutputPath>
 	  <Description>SortedList with persistency and threadsafty.</Description>
 	  <PackageProjectUrl>https://github.com/ingted/PersistedConcurrentSortedList</PackageProjectUrl>
+	  <Configurations>Debug;Release;DebugWithNoDep</Configurations>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0|AnyCPU'">
+    <DefineConstants>$(DefineConstants);ASYNC</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='DebugWithNoDep|net9.0|AnyCPU'">
     <DefineConstants>$(DefineConstants);ASYNC</DefineConstants>
   </PropertyGroup>
 
@@ -36,7 +41,8 @@
 
   <ItemGroup>
     <PackageReference Include="FSharp.Collections.ParallelSeq" Version="1.2.0" />
-    <PackageReference Include="FAkka.ProtoBuf.FSharp" Version="1.0.0" Condition="'$(Configuration)'=='Release'" />
+    <PackageReference Include="FAkka.ProtoBuf.FSharp" Version="9.0.11" Condition="'$(Configuration)'=='Release'" />
+	<PackageReference Include="FAkka.ProtoBuf.FSharp" Version="9.0.11" Condition="'$(Configuration)'=='DebugWithNoDep'" />
   </ItemGroup>
 
   <ItemGroup>
@@ -47,15 +53,15 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
     <PackageReference Include="FAkka.FsPickler">
-      <Version>9.0.5</Version>
+      <Version>9.0.6</Version>
     </PackageReference>
     <PackageReference Include="FAkka.FsPickler.Json">
-      <Version>9.0.5</Version>
+      <Version>9.0.6</Version>
     </PackageReference>
   </ItemGroup>
 	<PropertyGroup>
 		
-		<Version>9.0.10</Version>
+		<Version>9.0.11</Version>
 	</PropertyGroup>
 
 	<Target Name="PostPackNugetDeployWindows" AfterTargets="Pack" Condition="'$(Configuration)' == 'Release'">

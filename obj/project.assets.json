@@ -2,7 +2,7 @@
   "version": 3,
   "targets": {
     "net9.0": {
-      "FAkka.FsPickler/9.0.5": {
+      "FAkka.FsPickler/9.0.6": {
         "type": "package",
         "dependencies": {
           "FSharp.Core": "9.0.100-beta.24466.6",
@@ -15,10 +15,10 @@
           "lib/net9.0/FsPickler.dll": {}
         }
       },
-      "FAkka.FsPickler.Json/9.0.5": {
+      "FAkka.FsPickler.Json/9.0.6": {
         "type": "package",
         "dependencies": {
-          "FAkka.FsPickler": "9.0.5",
+          "FAkka.FsPickler": "9.0.6",
           "FSharp.Core": "9.0.100-beta.24466.6",
           "Newtonsoft.Json": "13.0.3"
         },
@@ -29,20 +29,13 @@
           "lib/net9.0/FsPickler.Json.dll": {}
         }
       },
-      "FAkka.ProtoBuf.FSharp/1.0.0": {
+      "FAkka.ProtoBuf.FSharp/9.0.11": {
         "type": "package",
         "dependencies": {
-          "FSharp.Core": "7.0.400",
+          "FSharp.Core": "9.0.100-beta.24466.6",
           "System.Buffers": "4.5.1",
-          "System.Collections.Immutable": "7.0.0",
-          "System.Memory": "4.5.5",
-          "System.Numerics.Vectors": "4.5.0",
-          "System.Reflection.Emit": "4.7.0",
-          "System.Reflection.Emit.ILGeneration": "4.7.0",
-          "System.Reflection.Emit.Lightweight": "4.7.0",
-          "System.Runtime.CompilerServices.Unsafe": "6.0.0",
-          "protobuf-net": "3.2.26",
-          "protobuf-net.Core": "3.2.26"
+          "protobuf-net": "3.2.45",
+          "protobuf-net.Core": "3.2.45"
         },
         "compile": {
           "lib/netstandard2.0/protobuf-net-fsharp.dll": {
@@ -145,10 +138,10 @@
           }
         }
       },
-      "protobuf-net/3.2.26": {
+      "protobuf-net/3.2.45": {
         "type": "package",
         "dependencies": {
-          "protobuf-net.Core": "3.2.26"
+          "protobuf-net.Core": "3.2.45"
         },
         "compile": {
           "lib/net6.0/protobuf-net.dll": {
@@ -161,7 +154,7 @@
           }
         }
       },
-      "protobuf-net.Core/3.2.26": {
+      "protobuf-net.Core/3.2.45": {
         "type": "package",
         "dependencies": {
           "System.Collections.Immutable": "7.0.0"
@@ -202,42 +195,6 @@
           "buildTransitive/net6.0/_._": {}
         }
       },
-      "System.Memory/4.5.5": {
-        "type": "package",
-        "compile": {
-          "ref/netcoreapp2.1/_._": {}
-        },
-        "runtime": {
-          "lib/netcoreapp2.1/_._": {}
-        }
-      },
-      "System.Numerics.Vectors/4.5.0": {
-        "type": "package",
-        "compile": {
-          "ref/netcoreapp2.0/_._": {}
-        },
-        "runtime": {
-          "lib/netcoreapp2.0/_._": {}
-        }
-      },
-      "System.Reflection.Emit/4.7.0": {
-        "type": "package",
-        "compile": {
-          "ref/netcoreapp2.0/_._": {}
-        },
-        "runtime": {
-          "lib/netcoreapp2.0/_._": {}
-        }
-      },
-      "System.Reflection.Emit.ILGeneration/4.7.0": {
-        "type": "package",
-        "compile": {
-          "ref/netcoreapp2.0/_._": {}
-        },
-        "runtime": {
-          "lib/netcoreapp2.0/_._": {}
-        }
-      },
       "System.Reflection.Emit.Lightweight/4.7.0": {
         "type": "package",
         "compile": {
@@ -246,62 +203,45 @@
         "runtime": {
           "lib/netcoreapp2.0/_._": {}
         }
-      },
-      "System.Runtime.CompilerServices.Unsafe/6.0.0": {
-        "type": "package",
-        "compile": {
-          "lib/net6.0/System.Runtime.CompilerServices.Unsafe.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net6.0/System.Runtime.CompilerServices.Unsafe.dll": {
-            "related": ".xml"
-          }
-        },
-        "build": {
-          "buildTransitive/netcoreapp3.1/_._": {}
-        }
       }
     }
   },
   "libraries": {
-    "FAkka.FsPickler/9.0.5": {
-      "sha512": "/cDZ473RTQC1dOGEGR0Wbx9Hb+WRjIWMWKZhFosNE272vxk0GCQrULJ+WygRffkhiorMIFOVo+/DTVto0ZmYpA==",
+    "FAkka.FsPickler/9.0.6": {
+      "sha512": "99U4DVOmCqhlJu9l/bLfTHsXvfs6hdEwbooNnIPydYTJ0DbHtLb4f1ZrS/9+MXrR8AsHhGuswoNKluPpPz46jg==",
       "type": "package",
-      "path": "fakka.fspickler/9.0.5",
+      "path": "fakka.fspickler/9.0.6",
       "files": [
         ".nupkg.metadata",
         "LICENSE.txt",
         "README.md",
-        "fakka.fspickler.9.0.5.nupkg.sha512",
+        "fakka.fspickler.9.0.6.nupkg.sha512",
         "fakka.fspickler.nuspec",
         "lib/net9.0/FsPickler.dll"
       ]
     },
-    "FAkka.FsPickler.Json/9.0.5": {
-      "sha512": "1NIDiNX5MqhbxcPyxS3aTY25hJU05B9qnxlpfUadm6ERItzoyE1dO8vaNW2SkZ6aYbeJq0aPu11KF64spF4J2g==",
+    "FAkka.FsPickler.Json/9.0.6": {
+      "sha512": "pHl1r26O0yGYH/bktv56r1qiX/WEStWYgdnWV/p1r2WqYyVI+vOBymA9PSYKtwgYpTl7ZUBqDeHIA7+ELBFOkA==",
       "type": "package",
-      "path": "fakka.fspickler.json/9.0.5",
+      "path": "fakka.fspickler.json/9.0.6",
       "files": [
         ".nupkg.metadata",
         "LICENSE.txt",
         "README.md",
-        "fakka.fspickler.json.9.0.5.nupkg.sha512",
+        "fakka.fspickler.json.9.0.6.nupkg.sha512",
         "fakka.fspickler.json.nuspec",
         "lib/net9.0/FsPickler.Json.dll"
       ]
     },
-    "FAkka.ProtoBuf.FSharp/1.0.0": {
-      "sha512": "atYnPnZJG6+uzqAt9WDKQP0TX3/TYsThMzzZ9hIoiIbWqpIESCIjGFEtu0fX6meQs4DAkwqZ44KYx9+d9yFfBQ==",
+    "FAkka.ProtoBuf.FSharp/9.0.11": {
+      "sha512": "KgL7o2QyDmefmki8TGcF1Go/IA4hyktux7BwalGFBIP2/ya1Dm+C7VCBaQK2zhjs+0NtJUy55whpH0ocTRD4oA==",
       "type": "package",
-      "path": "fakka.protobuf.fsharp/1.0.0",
+      "path": "fakka.protobuf.fsharp/9.0.11",
       "files": [
         ".nupkg.metadata",
-        ".signature.p7s",
         "content/app.config",
         "contentFiles/any/netstandard2.0/app.config",
-        "fakka.protobuf.fsharp.1.0.0.nupkg.sha512",
+        "fakka.protobuf.fsharp.9.0.11.nupkg.sha512",
         "fakka.protobuf.fsharp.nuspec",
         "lib/netstandard2.0/protobuf-net-fsharp.dll",
         "lib/netstandard2.0/protobuf-net-fsharp.xml"
@@ -393,10 +333,10 @@
         "packageIcon.png"
       ]
     },
-    "protobuf-net/3.2.26": {
-      "sha512": "zBzBiKs4yP+tzQOsRA5WbI/zayS6eFv8g0KIKNPI7/RUY1nk9Oe+STmtbUYkNUkO3T3SidEoZv+tF1nmgTSutQ==",
+    "protobuf-net/3.2.45": {
+      "sha512": "5UZ/ukUHcGbFSl7vNMrHsfjqdxusdd9w7w0fCEXzf3UUtsrGNVCzV5SmF+sCHAbnRV2qPcD1ixiDP7Aj8lX/HA==",
       "type": "package",
-      "path": "protobuf-net/3.2.26",
+      "path": "protobuf-net/3.2.45",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -408,15 +348,16 @@
         "lib/netstandard2.0/protobuf-net.xml",
         "lib/netstandard2.1/protobuf-net.dll",
         "lib/netstandard2.1/protobuf-net.xml",
-        "protobuf-net.3.2.26.nupkg.sha512",
+        "protobuf-net.3.2.45.nupkg.sha512",
         "protobuf-net.nuspec",
-        "protobuf-net.png"
+        "protobuf-net.png",
+        "readme.md"
       ]
     },
-    "protobuf-net.Core/3.2.26": {
-      "sha512": "s8oJW9dBVxix4p8uqMbeG++DIGjgzOFAKoP2i5wayeeFOKBqG+cCBO2S/CAC4MAFlb5m1Os2m/miLcqRCgqJ7Q==",
+    "protobuf-net.Core/3.2.45": {
+      "sha512": "PMWatW2NrT1uTXD7etJ4VdQ0wWZLFrIfdRGppD2QX7nzZ0+kIzqhq551u6ZiXJHWJgG4hWFEkSnUnt2aB6posg==",
       "type": "package",
-      "path": "protobuf-net.core/3.2.26",
+      "path": "protobuf-net.core/3.2.45",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -428,9 +369,10 @@
         "lib/netstandard2.0/protobuf-net.Core.xml",
         "lib/netstandard2.1/protobuf-net.Core.dll",
         "lib/netstandard2.1/protobuf-net.Core.xml",
-        "protobuf-net.core.3.2.26.nupkg.sha512",
+        "protobuf-net.core.3.2.45.nupkg.sha512",
         "protobuf-net.core.nuspec",
-        "protobuf-net.png"
+        "protobuf-net.png",
+        "readme.md"
       ]
     },
     "System.Buffers/4.5.1": {
@@ -492,188 +434,6 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "System.Memory/4.5.5": {
-      "sha512": "XIWiDvKPXaTveaB7HVganDlOCRoj03l+jrwNvcge/t8vhGYKvqV+dMv6G4SAX2NoNmN0wZfVPTAlFwZcZvVOUw==",
-      "type": "package",
-      "path": "system.memory/4.5.5",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "LICENSE.TXT",
-        "THIRD-PARTY-NOTICES.TXT",
-        "lib/net461/System.Memory.dll",
-        "lib/net461/System.Memory.xml",
-        "lib/netcoreapp2.1/_._",
-        "lib/netstandard1.1/System.Memory.dll",
-        "lib/netstandard1.1/System.Memory.xml",
-        "lib/netstandard2.0/System.Memory.dll",
-        "lib/netstandard2.0/System.Memory.xml",
-        "ref/netcoreapp2.1/_._",
-        "system.memory.4.5.5.nupkg.sha512",
-        "system.memory.nuspec",
-        "useSharedDesignerContext.txt",
-        "version.txt"
-      ]
-    },
-    "System.Numerics.Vectors/4.5.0": {
-      "sha512": "QQTlPTl06J/iiDbJCiepZ4H//BVraReU4O4EoRw1U02H5TLUIT7xn3GnDp9AXPSlJUDyFs4uWjWafNX6WrAojQ==",
-      "type": "package",
-      "path": "system.numerics.vectors/4.5.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "LICENSE.TXT",
-        "THIRD-PARTY-NOTICES.TXT",
-        "lib/MonoAndroid10/_._",
-        "lib/MonoTouch10/_._",
-        "lib/net46/System.Numerics.Vectors.dll",
-        "lib/net46/System.Numerics.Vectors.xml",
-        "lib/netcoreapp2.0/_._",
-        "lib/netstandard1.0/System.Numerics.Vectors.dll",
-        "lib/netstandard1.0/System.Numerics.Vectors.xml",
-        "lib/netstandard2.0/System.Numerics.Vectors.dll",
-        "lib/netstandard2.0/System.Numerics.Vectors.xml",
-        "lib/portable-net45+win8+wp8+wpa81/System.Numerics.Vectors.dll",
-        "lib/portable-net45+win8+wp8+wpa81/System.Numerics.Vectors.xml",
-        "lib/uap10.0.16299/_._",
-        "lib/xamarinios10/_._",
-        "lib/xamarinmac20/_._",
-        "lib/xamarintvos10/_._",
-        "lib/xamarinwatchos10/_._",
-        "ref/MonoAndroid10/_._",
-        "ref/MonoTouch10/_._",
-        "ref/net45/System.Numerics.Vectors.dll",
-        "ref/net45/System.Numerics.Vectors.xml",
-        "ref/net46/System.Numerics.Vectors.dll",
-        "ref/net46/System.Numerics.Vectors.xml",
-        "ref/netcoreapp2.0/_._",
-        "ref/netstandard1.0/System.Numerics.Vectors.dll",
-        "ref/netstandard1.0/System.Numerics.Vectors.xml",
-        "ref/netstandard2.0/System.Numerics.Vectors.dll",
-        "ref/netstandard2.0/System.Numerics.Vectors.xml",
-        "ref/uap10.0.16299/_._",
-        "ref/xamarinios10/_._",
-        "ref/xamarinmac20/_._",
-        "ref/xamarintvos10/_._",
-        "ref/xamarinwatchos10/_._",
-        "system.numerics.vectors.4.5.0.nupkg.sha512",
-        "system.numerics.vectors.nuspec",
-        "useSharedDesignerContext.txt",
-        "version.txt"
-      ]
-    },
-    "System.Reflection.Emit/4.7.0": {
-      "sha512": "VR4kk8XLKebQ4MZuKuIni/7oh+QGFmZW3qORd1GvBq/8026OpW501SzT/oypwiQl4TvT8ErnReh/NzY9u+C6wQ==",
-      "type": "package",
-      "path": "system.reflection.emit/4.7.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "LICENSE.TXT",
-        "THIRD-PARTY-NOTICES.TXT",
-        "lib/MonoAndroid10/_._",
-        "lib/MonoTouch10/_._",
-        "lib/net45/_._",
-        "lib/netcore50/System.Reflection.Emit.dll",
-        "lib/netcoreapp2.0/_._",
-        "lib/netstandard1.1/System.Reflection.Emit.dll",
-        "lib/netstandard1.1/System.Reflection.Emit.xml",
-        "lib/netstandard1.3/System.Reflection.Emit.dll",
-        "lib/netstandard2.0/System.Reflection.Emit.dll",
-        "lib/netstandard2.0/System.Reflection.Emit.xml",
-        "lib/netstandard2.1/_._",
-        "lib/xamarinios10/_._",
-        "lib/xamarinmac20/_._",
-        "lib/xamarintvos10/_._",
-        "lib/xamarinwatchos10/_._",
-        "ref/MonoAndroid10/_._",
-        "ref/MonoTouch10/_._",
-        "ref/net45/_._",
-        "ref/netcoreapp2.0/_._",
-        "ref/netstandard1.1/System.Reflection.Emit.dll",
-        "ref/netstandard1.1/System.Reflection.Emit.xml",
-        "ref/netstandard1.1/de/System.Reflection.Emit.xml",
-        "ref/netstandard1.1/es/System.Reflection.Emit.xml",
-        "ref/netstandard1.1/fr/System.Reflection.Emit.xml",
-        "ref/netstandard1.1/it/System.Reflection.Emit.xml",
-        "ref/netstandard1.1/ja/System.Reflection.Emit.xml",
-        "ref/netstandard1.1/ko/System.Reflection.Emit.xml",
-        "ref/netstandard1.1/ru/System.Reflection.Emit.xml",
-        "ref/netstandard1.1/zh-hans/System.Reflection.Emit.xml",
-        "ref/netstandard1.1/zh-hant/System.Reflection.Emit.xml",
-        "ref/netstandard2.0/System.Reflection.Emit.dll",
-        "ref/netstandard2.0/System.Reflection.Emit.xml",
-        "ref/netstandard2.1/_._",
-        "ref/xamarinios10/_._",
-        "ref/xamarinmac20/_._",
-        "ref/xamarintvos10/_._",
-        "ref/xamarinwatchos10/_._",
-        "runtimes/aot/lib/netcore50/System.Reflection.Emit.dll",
-        "runtimes/aot/lib/netcore50/System.Reflection.Emit.xml",
-        "system.reflection.emit.4.7.0.nupkg.sha512",
-        "system.reflection.emit.nuspec",
-        "useSharedDesignerContext.txt",
-        "version.txt"
-      ]
-    },
-    "System.Reflection.Emit.ILGeneration/4.7.0": {
-      "sha512": "AucBYo3DSI0IDxdUjKksBcQJXPHyoPyrCXYURW1WDsLI4M65Ar/goSHjdnHOAY9MiYDNKqDlIgaYm+zL2hA1KA==",
-      "type": "package",
-      "path": "system.reflection.emit.ilgeneration/4.7.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "LICENSE.TXT",
-        "THIRD-PARTY-NOTICES.TXT",
-        "lib/MonoAndroid10/_._",
-        "lib/MonoTouch10/_._",
-        "lib/net45/_._",
-        "lib/netcore50/System.Reflection.Emit.ILGeneration.dll",
-        "lib/netcoreapp2.0/_._",
-        "lib/netstandard1.0/System.Reflection.Emit.ILGeneration.dll",
-        "lib/netstandard1.0/System.Reflection.Emit.ILGeneration.xml",
-        "lib/netstandard1.3/System.Reflection.Emit.ILGeneration.dll",
-        "lib/netstandard2.0/System.Reflection.Emit.ILGeneration.dll",
-        "lib/netstandard2.0/System.Reflection.Emit.ILGeneration.xml",
-        "lib/netstandard2.1/_._",
-        "lib/portable-net45+wp8/_._",
-        "lib/wp80/_._",
-        "lib/xamarinios10/_._",
-        "lib/xamarinmac20/_._",
-        "lib/xamarintvos10/_._",
-        "lib/xamarinwatchos10/_._",
-        "ref/MonoAndroid10/_._",
-        "ref/MonoTouch10/_._",
-        "ref/net45/_._",
-        "ref/netcoreapp2.0/_._",
-        "ref/netstandard1.0/System.Reflection.Emit.ILGeneration.dll",
-        "ref/netstandard1.0/System.Reflection.Emit.ILGeneration.xml",
-        "ref/netstandard1.0/de/System.Reflection.Emit.ILGeneration.xml",
-        "ref/netstandard1.0/es/System.Reflection.Emit.ILGeneration.xml",
-        "ref/netstandard1.0/fr/System.Reflection.Emit.ILGeneration.xml",
-        "ref/netstandard1.0/it/System.Reflection.Emit.ILGeneration.xml",
-        "ref/netstandard1.0/ja/System.Reflection.Emit.ILGeneration.xml",
-        "ref/netstandard1.0/ko/System.Reflection.Emit.ILGeneration.xml",
-        "ref/netstandard1.0/ru/System.Reflection.Emit.ILGeneration.xml",
-        "ref/netstandard1.0/zh-hans/System.Reflection.Emit.ILGeneration.xml",
-        "ref/netstandard1.0/zh-hant/System.Reflection.Emit.ILGeneration.xml",
-        "ref/netstandard2.0/System.Reflection.Emit.ILGeneration.dll",
-        "ref/netstandard2.0/System.Reflection.Emit.ILGeneration.xml",
-        "ref/netstandard2.1/_._",
-        "ref/portable-net45+wp8/_._",
-        "ref/wp80/_._",
-        "ref/xamarinios10/_._",
-        "ref/xamarinmac20/_._",
-        "ref/xamarintvos10/_._",
-        "ref/xamarinwatchos10/_._",
-        "runtimes/aot/lib/netcore50/System.Reflection.Emit.ILGeneration.dll",
-        "runtimes/aot/lib/netcore50/System.Reflection.Emit.ILGeneration.xml",
-        "system.reflection.emit.ilgeneration.4.7.0.nupkg.sha512",
-        "system.reflection.emit.ilgeneration.nuspec",
-        "useSharedDesignerContext.txt",
-        "version.txt"
-      ]
-    },
     "System.Reflection.Emit.Lightweight/4.7.0": {
       "sha512": "a4OLB4IITxAXJeV74MDx49Oq2+PsF6Sml54XAFv+2RyWwtDBcabzoxiiJRhdhx+gaohLh4hEGCLQyBozXoQPqA==",
       "type": "package",
@@ -731,38 +491,13 @@
         "useSharedDesignerContext.txt",
         "version.txt"
       ]
-    },
-    "System.Runtime.CompilerServices.Unsafe/6.0.0": {
-      "sha512": "/iUeP3tq1S0XdNNoMz5C9twLSrM/TH+qElHkXWaPvuNOt+99G75NrV0OS2EqHx5wMN7popYjpc8oTjC1y16DLg==",
-      "type": "package",
-      "path": "system.runtime.compilerservices.unsafe/6.0.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "Icon.png",
-        "LICENSE.TXT",
-        "THIRD-PARTY-NOTICES.TXT",
-        "buildTransitive/netcoreapp2.0/System.Runtime.CompilerServices.Unsafe.targets",
-        "buildTransitive/netcoreapp3.1/_._",
-        "lib/net461/System.Runtime.CompilerServices.Unsafe.dll",
-        "lib/net461/System.Runtime.CompilerServices.Unsafe.xml",
-        "lib/net6.0/System.Runtime.CompilerServices.Unsafe.dll",
-        "lib/net6.0/System.Runtime.CompilerServices.Unsafe.xml",
-        "lib/netcoreapp3.1/System.Runtime.CompilerServices.Unsafe.dll",
-        "lib/netcoreapp3.1/System.Runtime.CompilerServices.Unsafe.xml",
-        "lib/netstandard2.0/System.Runtime.CompilerServices.Unsafe.dll",
-        "lib/netstandard2.0/System.Runtime.CompilerServices.Unsafe.xml",
-        "system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
-        "system.runtime.compilerservices.unsafe.nuspec",
-        "useSharedDesignerContext.txt"
-      ]
     }
   },
   "projectFileDependencyGroups": {
     "net9.0": [
-      "FAkka.FsPickler >= 9.0.5",
-      "FAkka.FsPickler.Json >= 9.0.5",
-      "FAkka.ProtoBuf.FSharp >= 1.0.0",
+      "FAkka.FsPickler >= 9.0.6",
+      "FAkka.FsPickler.Json >= 9.0.6",
+      "FAkka.ProtoBuf.FSharp >= 9.0.11",
       "FSharp.Collections.ParallelSeq >= 1.2.0",
       "FSharp.Core >= 9.0.100-beta.24466.6"
     ]
@@ -772,7 +507,7 @@
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
-    "version": "9.0.10",
+    "version": "9.0.11",
     "restore": {
       "projectUniqueName": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\PersistedConcurrentSortedList.fsproj",
       "projectName": "PersistedConcurrentSortedList",
@@ -815,17 +550,17 @@
         "dependencies": {
           "FAkka.FsPickler": {
             "target": "Package",
-            "version": "[9.0.5, )",
+            "version": "[9.0.6, )",
             "generatePathProperty": true
           },
           "FAkka.FsPickler.Json": {
             "target": "Package",
-            "version": "[9.0.5, )",
+            "version": "[9.0.6, )",
             "generatePathProperty": true
           },
           "FAkka.ProtoBuf.FSharp": {
             "target": "Package",
-            "version": "[1.0.0, )",
+            "version": "[9.0.11, )",
             "generatePathProperty": true
           },
           "FSharp.Collections.ParallelSeq": {

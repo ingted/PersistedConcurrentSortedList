@@ -5,7 +5,7 @@
   },
   "projects": {
     "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\PersistedConcurrentSortedList.fsproj": {
-      "version": "9.0.10",
+      "version": "9.0.11",
       "restore": {
         "projectUniqueName": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\PersistedConcurrentSortedList.fsproj",
         "projectName": "PersistedConcurrentSortedList",
@@ -48,17 +48,17 @@
           "dependencies": {
             "FAkka.FsPickler": {
               "target": "Package",
-              "version": "[9.0.5, )",
+              "version": "[9.0.6, )",
               "generatePathProperty": true
             },
             "FAkka.FsPickler.Json": {
               "target": "Package",
-              "version": "[9.0.5, )",
+              "version": "[9.0.6, )",
               "generatePathProperty": true
             },
             "FAkka.ProtoBuf.FSharp": {
               "target": "Package",
-              "version": "[1.0.0, )",
+              "version": "[9.0.11, )",
               "generatePathProperty": true
             },
             "FSharp.Collections.ParallelSeq": {

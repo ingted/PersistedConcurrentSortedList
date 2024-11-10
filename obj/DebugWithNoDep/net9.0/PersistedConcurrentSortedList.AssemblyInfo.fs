@@ -8,7 +8,7 @@ open System.Reflection
 
 
 [<assembly: System.Reflection.AssemblyCompanyAttribute("PersistedConcurrentSortedList")>]
-[<assembly: System.Reflection.AssemblyConfigurationAttribute("Release")>]
+[<assembly: System.Reflection.AssemblyConfigurationAttribute("DebugWithNoDep")>]
 [<assembly: System.Reflection.AssemblyDescriptionAttribute("SortedList with persistency and threadsafty.")>]
 [<assembly: System.Reflection.AssemblyFileVersionAttribute("9.0.11.0")>]
 [<assembly: System.Reflection.AssemblyInformationalVersionAttribute("9.0.11+09fbb7e6af413e4066908016dd9bcf67139c0c3f")>]
