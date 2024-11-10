@@ -417,13 +417,15 @@ module CSL =
         , extractFunBase:'ID -> 'OpResult -> OpResult<'Key, 'Value>
         , lockObj: obj
         , timeoutDefault
-        , ?autoCacheChange:int 
+        , ?autoCacheChangeOpt:int 
         ) =
         let sortedList = SortedList<'Key, 'Value>()
         //let lockObj = obj()
         let opQueue = QueueProcessor<'ID, 'OpResult>(slId, timeoutDefault)
         let extractFun = extractFunBase slId
         let extractOpResult (opt:Task<'OpResult>) = extractFun opt.Result
+
+        member val autoCacheChange = autoCacheChangeOpt with get, set
 
         member this.Id = slId
         member this.LockObj = lockObj
@@ -435,7 +437,7 @@ module CSL =
             
             try
                 let added = sortedList.TryAdd(key, value)
-                if autoCacheChange.IsSome then
+                if this.autoCacheChange.IsSome && this.autoCacheChange.Value <> 0 then
                     SortedListCache<_, _>.CacheChange sortedList
 #if DEBUG1
                 printfn "[%A] %A, %A added" slId key value
@@ -448,7 +450,7 @@ module CSL =
         member this.TryRemoveBase(key: 'Key) =
             try
                 let removed = sortedList.Remove(key)
-                if autoCacheChange.IsSome then
+                if this.autoCacheChange.IsSome && this.autoCacheChange.Value <> 0 then
                     SortedListCache<_, _>.CacheChange sortedList
                 removed
             with
@@ -468,7 +470,7 @@ module CSL =
                 2
             else
                 if sortedList.TryAdd (key, newValue) then
-                    if autoCacheChange.IsSome then
+                    if this.autoCacheChange.IsSome && this.autoCacheChange.Value <> 0 then
                         SortedListCache<_, _>.CacheChange sortedList
                     1
                 else
@@ -759,7 +761,7 @@ module CSL =
             this.OpQueue.UnLock lockId
 
         new (slId, outFun, extractFunBase, (autoCache: int)) =
-            new ConcurrentSortedList<_, _, _, _>(slId, outFun, extractFunBase, obj(), 300000, autoCacheChange = autoCache)
+            new ConcurrentSortedList<_, _, _, _>(slId, outFun, extractFunBase, obj(), 300000, autoCacheChangeOpt = autoCache)
 
         new (slId, outFun, extractFunBase) =
             new ConcurrentSortedList<_, _, _, _>(slId, outFun, extractFunBase, obj(), 300000)

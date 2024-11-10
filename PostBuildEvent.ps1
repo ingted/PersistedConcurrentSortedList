@@ -16,11 +16,28 @@ function Get-VersionFromFileName {
     }
 }
 
+function Get-LibPacksContent {
+    $currentDir = Get-Location
+
+    while ($currentDir -ne [System.IO.Path]::GetPathRoot($currentDir)) {
+        $libPacksPath = Join-Path -Path $currentDir -ChildPath 'lib-packs.txt'
+        if (Test-Path $libPacksPath) {
+            return Get-Content -Path $libPacksPath -Raw
+        }
+        $currentDir = (Get-Item $currentDir).Parent.FullName
+    }
+
+    Write-Host "lib-packs.txt not found in any parent directory." -ForegroundColor Red
+    return $null
+}
+
 write-host ($assembly + ': Current path: ' + (pwd).path)
 cd ./bin
 try {
-    $pkg = (dir "$($assembly)*.nupkg" | Sort-Object -Property { Get-VersionFromFileName $_.Name } -Descending)[0].Name
-    invoke-expression "dotnet nuget push $pkg --api-key $(gc G:\Nuget\apikey.txt) --source https://api.nuget.org/v3/index.json  --skip-duplicate"
+    $pkg = (dir "$($assembly)*.nupkg" | Sort-Object -Property { Get-VersionFromFileName $_.Name } -Descending)
+    $pkgName = $pkg[0].Name
+    invoke-expression "dotnet nuget push $pkgName --api-key $(gc G:\Nuget\apikey.txt) --source https://api.nuget.org/v3/index.json  --skip-duplicate"
+    copy   $pkg.FullName $(Get-LibPacksContent) -force
 }
 catch {
     write-host "=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+="

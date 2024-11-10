@@ -270,10 +270,17 @@ module PCSL =
         and 'Value: comparison
         >(
         maxDoP: int, basePath: string, schemaName: string
-        , defaultTimeout, oFun, eFun
+        , defaultTimeout
+        , oFun: SLTyp -> OpResult<PCSLKVTyp<'Key, 'Value>, PCSLKVTyp<'Key, 'Value>> -> PCSLTaskTyp<'Key, 'Value>
+        , eFun: SLTyp -> PCSLTaskTyp<'Key, 'Value> -> OpResult<PCSLKVTyp<'Key, 'Value>, PCSLKVTyp<'Key, 'Value>>
+        , ?autoCache:int
         ) =
         let js = JsonSerializer()
-        let sortedList = PCSL<'Key, 'Value, SLTyp>(TSL, oFun, eFun)
+        let sortedList = 
+            if autoCache.IsNone then
+                PCSL<'Key, 'Value, SLTyp>(TSL, oFun, eFun)
+            else
+                PCSL<'Key, 'Value, SLTyp>(TSL, oFun, eFun, autoCache.Value)
         let sortedListStatus = PCSL<'Key, 'Value, SLTyp>(TSLSts, oFun, eFun, sortedList.LockObj, defaultTimeout)
         let sortedListPersistenceStatus = PCSL<'Key, 'Value, SLTyp>(TSLPSts, oFun, eFun, sortedList.LockObj, defaultTimeout)
         let sortedListIndexReversed = PCSL<'Key, 'Value, SLTyp>(TSLIdxR, oFun, eFun, sortedList.LockObj, defaultTimeout)
@@ -680,4 +687,12 @@ module PCSL =
             PersistedConcurrentSortedList<'Key, 'Value>(
                 maxDoP, basePath, schemaName
                 , 30000, oFun, eFun)
+
+        new (maxDoP, basePath, schemaName
+            , oFun: SLTyp -> OpResult<PCSLKVTyp<'Key, 'Value>, PCSLKVTyp<'Key, 'Value>> -> PCSLTaskTyp<'Key, 'Value>
+            , eFun: SLTyp -> PCSLTaskTyp<'Key, 'Value> -> OpResult<PCSLKVTyp<'Key, 'Value>, PCSLKVTyp<'Key, 'Value>>
+            , autoCache) =
+            PersistedConcurrentSortedList<'Key, 'Value>(
+                maxDoP, basePath, schemaName
+                , 30000, oFun = oFun, eFun = eFun, autoCache = autoCache)
 
