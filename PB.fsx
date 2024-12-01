@@ -250,7 +250,52 @@ type fCell<'CellTupleKey when 'CellTupleKey: comparison> =
     member this.d =
         match this with
         | D d -> d
-        | _ -> failwith "Not fstring.D."
+        | _ -> failwith "Not fCell.D."
+
+    member this.a =
+        match this with
+        | A a -> a
+        | _ -> failwith "Not fCell.A."
+
+    member this.aa =
+        match this with
+        | A a -> a |> Array.map _.a
+        | _ -> failwith "Not fCell.AA."
+
+    member this.at =
+        match this with
+        | A a -> a |> Array.map _.t
+        | _ -> failwith "Not fCell.AT."
+
+    member this.``as`` =
+        match this with
+        | A a -> a |> Array.map _.s
+        | _ -> failwith "Not fCell.AS."
+
+    member this.ad =
+        match this with
+        | A a -> a |> Array.map _.d
+        | _ -> failwith "Not fCell.AD."
+
+    member this.t =
+        match this with
+        | T (k, v) -> k, v
+        | _ -> failwith "Not fCell.T."
+
+    member this.ta =
+        match this with
+        | T (k, A a) -> k, a
+        | _ -> failwith "Not fCell.TA."
+
+    member this.ts =
+        match this with
+        | T (k, S s) -> k, s
+        | _ -> failwith "Not fCell.TS."
+
+    member this.td =
+        match this with
+        | T (k, D d) -> k, d
+        | _ -> failwith "Not fCell.TD."
 
     member this.ToLowerInvariant () =
         match this with

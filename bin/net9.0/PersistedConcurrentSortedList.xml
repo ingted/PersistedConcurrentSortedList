@@ -42,7 +42,7 @@
  获取 Count 版本
 </summary>
 </member>
-<member name="M:PersistedConcurrentSortedList.CSL.ConcurrentSortedList`4.Update(`0,`1)">
+<member name="M:PersistedConcurrentSortedList.CSL.ConcurrentSortedList`4.Update(`0,`1,System.Boolean)">
 <summary>
  TryUpdate 方法：将更新操作封装为任务并执行
 </summary>
@@ -72,7 +72,7 @@
  封装操作并添加到任务队列，执行后返回 Task
 </summary>
 </member>
-<member name="M:PersistedConcurrentSortedList.CSL.ConcurrentSortedList`4.GetValue(`0)">
+<member name="M:PersistedConcurrentSortedList.CSL.ConcurrentSortedList`4.GetValue(`0,System.Boolean)">
 <summary>
  TryGetValue 同步获取值，不需要队列
 </summary>
@@ -92,7 +92,7 @@
  清空列表 版本
 </summary>
 </member>
-<member name="M:PersistedConcurrentSortedList.CSL.ConcurrentSortedList`4.Add(`0,`1)">
+<member name="M:PersistedConcurrentSortedList.CSL.ConcurrentSortedList`4.Add(`0,`1,System.Boolean)">
 <summary>
  Add 方法：将添加操作封装为任务并执行
 </summary>
@@ -102,14 +102,19 @@
 [DEPRECATED]
 </summary>
 </member>
-<member name="P:PersistedConcurrentSortedList.PCSL.PersistedConcurrentSortedList`2.PersistKeyValues">
+<member name="P:PersistedConcurrentSortedList.PCSL.PersistedConcurrentSortedList`2.PersistKeyValueRemove">
+<summary>
+persist 之後移出 buffer (不涉及寫入 base sortedList)
+</summary>
+</member>
+<member name="P:PersistedConcurrentSortedList.PCSL.PersistedConcurrentSortedList`2.InitTask">
 <summary>
 persist 之後留在 buffer (不涉及寫入 base sortedList)
 </summary>
 </member>
-<member name="P:PersistedConcurrentSortedList.PCSL.PersistedConcurrentSortedList`2.PersistKeyValueRemove">
+<member name="T:PersistedConcurrentSortedList.PCSL.PCSL`3">
 <summary>
-persist 之後移出 buffer (不涉及寫入 base sortedList)
+其實是 CSL
 </summary>
 </member>
 </members>

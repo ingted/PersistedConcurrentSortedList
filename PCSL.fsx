@@ -256,7 +256,7 @@ module PCSL =
             >(this: Task<PCSLTaskTyp<'Key>>) : TResult<'Key> =
             TResult<'Key>(this)
     *)
-
+    ///其實是 CSL
     type PCSL<'Key, 'Value, 'ID
         when 'Key : comparison
         and 'Value: comparison
@@ -274,13 +274,16 @@ module PCSL =
         , oFun: SLTyp -> OpResult<PCSLKVTyp<'Key, 'Value>, PCSLKVTyp<'Key, 'Value>> -> PCSLTaskTyp<'Key, 'Value>
         , eFun: SLTyp -> PCSLTaskTyp<'Key, 'Value> -> OpResult<PCSLKVTyp<'Key, 'Value>, PCSLKVTyp<'Key, 'Value>>
         , ?autoCache:int
-        ) =
+        , ?autoInitialize:int
+        ///使用上要小心，有新刪修的話要小心覆蓋，盡可能唯獨情況下使用
+        , ?fileNameFilter:string->bool
+        ) as this =
         let js = JsonSerializer()
         let sortedList = 
             if autoCache.IsNone then
-                PCSL<'Key, 'Value, SLTyp>(TSL, oFun, eFun)
+                PCSL<'Key, 'Value, SLTyp>(TSL, oFun, eFun, defaultTimeout, 0)
             else
-                PCSL<'Key, 'Value, SLTyp>(TSL, oFun, eFun, autoCache.Value)
+                PCSL<'Key, 'Value, SLTyp>(TSL, oFun, eFun, defaultTimeout, autoCache.Value)
         let sortedListStatus = PCSL<'Key, 'Value, SLTyp>(TSLSts, oFun, eFun, sortedList.LockObj, defaultTimeout)
         let sortedListPersistenceStatus = PCSL<'Key, 'Value, SLTyp>(TSLPSts, oFun, eFun, sortedList.LockObj, defaultTimeout)
         let sortedListIndexReversed = PCSL<'Key, 'Value, SLTyp>(TSLIdxR, oFun, eFun, sortedList.LockObj, defaultTimeout)
@@ -296,7 +299,7 @@ module PCSL =
                 Directory.CreateDirectory p |> ignore
 
 
-        let indexInitialization () =
+        let indexInitialize () =
             [|
                 sortedListIndex.Clean().thisT
                 sortedListIndexReversed.Clean().thisT
@@ -304,9 +307,15 @@ module PCSL =
             |] |> Task.WaitAll
             let di = DirectoryInfo keysPath
             di.GetFiles()
+            
 #if ASYNC
             |> PSeq.ordered
             |> PSeq.withDegreeOfParallelism maxDoP
+            |> PSeq.filter (fun fi ->
+                if fileNameFilter.IsNone then true
+                else
+                    fileNameFilter.Value fi.FullName 
+            )
             |> PSeq.iter (
 #else
             |> Seq.iter (
@@ -323,7 +332,7 @@ module PCSL =
                             idxR.thisT //索引跟 key 必須是一致的
                             ps.thisT
                         |]
-                        |> Task.WaitAllWithTimeout 30000
+                        |> Task.WaitAllWithTimeout defaultTimeout
                     try
                         let (Choice1Of3 _) = ts
                         ()
@@ -331,44 +340,67 @@ module PCSL =
                     | exn ->
                         printfn "indexInitialization failed for %s %s" fi.FullName exn.Message
             )
+
+        let valueInitialize maxDop =
+            let (Some lockId) = sortedListIndex.RequireLock(None, None) |> Async.RunSynchronously
+            //printfn "Required lockId: %A" lockId
+            let idxs = 
+                sortedListIndex.LockableOp(CKeys, lockId).Result.idxKeyList
+            //printfn "Idx: %A" idxs
+            let getValueTasks =
+                //|> PSeq.ordered
+                idxs
+                |> PSeq.withDegreeOfParallelism maxDop
+                |> PSeq.map (fun idx -> this.TryGetValueNoThreadLock(idx, defaultTimeout, true))
+                |> PSeq.toArray
+            sortedListIndex.UnLock lockId
+            getValueTasks
+
         let mutable write2File = ModelContainer<'Value>.write2File
-
-
+        let mutable readFromFile = ModelContainer<'Value>.readFromFile
+        // 生成 SHA-256 哈希
+        let mutable generateKeyHash : 'Key -> KeyHash = fun (key: 'Key) ->
+            ModelContainer<'Key>.getHashStr key
+        let mutable initTask = Unchecked.defaultof<Task<unit>>
         do 
             createPath schemaPath
             createPath keysPath
-            indexInitialization ()
-            initialized <- true
+            if autoInitialize.IsSome && autoInitialize.Value <> 0 then
+                initTask <- task {
+                    indexInitialize ()
+                    initialized <- true
+                }
 
-        // 生成 SHA-256 哈希
-        let generateKeyHash (key: 'Key) : KeyHash =
-            ModelContainer<'Key>.getHashStr key
 
-        let getOrNewKeyHash (key: 'Key) =
+        let tryGetKeyHash (key: 'Key, ifIgnoreQ) =
 #if DEBUG1
             printfn "Query Idx"
 #endif
-            sortedListIndex.TryGetValueSafeTo(SLK key, 1000)
+            if ifIgnoreQ then
+                let (COptionValue r) = sortedListIndex.GetValue(SLK key, true).Result |> eFun TSLIdxR
+                r
+            else
+                sortedListIndex.TryGetValueSafeTo(SLK key, defaultTimeout)
 
-        let getOrNewAndPersistKeyHash (key: 'Key) : KeyHash =
+        let getOrNewAndPersistKeyHash (key: 'Key, ifIgnoreQ) : KeyHash =
 #if DEBUG1
             printfn "getOrNewAndPersistKeyHash getOrNewKeyHash"
 #endif
             let kh = 
-                match getOrNewKeyHash key with
+                match tryGetKeyHash (key, ifIgnoreQ) with
                 | true, (Some k) -> k
                 | _ ->
                     //假設初始化的時候有把全部 KEY 載入，所以後續不會再從 keyPath 讀 index，頂多新增寫入
                     generateKeyHash key |> SLKH
             [|
-                sortedListIndex.Add(SLK key, kh).thisT
-                sortedListIndexReversed.Add(kh, SLK key).thisT
+                sortedListIndex.Add(SLK key, kh, ifIgnoreQ).thisT
+                sortedListIndexReversed.Add(kh, SLK key, ifIgnoreQ).thisT
                 task {
                     let filePath = Path.Combine(keysPath, kh.slkHash + ".index") //js.UnPickleOfString<A>
                     File.WriteAllText(filePath, (js.PickleToString key))
                 } :> Task
             |] 
-            |> Task.WaitAllWithTimeout 30000
+            |> Task.WaitAllWithTimeout defaultTimeout
             //|> Task.RunSynchronously
             |> fun c ->
 #if DEBUG1
@@ -378,9 +410,9 @@ module PCSL =
             |> fun (Choice1Of3 success) -> ()
             kh.slkHash
         // 存储 value 到文件
-        let persistKeyValueBase ifRemoveFromBuffer =
+        let persistKeyValueBase ifRemoveFromBuffer ifIgnoreQ =
             let inline write (key: 'Key, value: 'Value) =
-                let hashKey = getOrNewAndPersistKeyHash key
+                let hashKey = getOrNewAndPersistKeyHash (key, ifIgnoreQ)
                 let filePath = Path.Combine(schemaPath, hashKey + ".val")
                 write2File filePath value
                 key
@@ -393,9 +425,9 @@ module PCSL =
                 fun key ->
                     sortedListPersistenceStatus.Upsert (SLK key, SLPS Buffered)
 
-        let removePersistedKeyValue (key: 'Key) =
+        let removePersistedKeyValue (key: 'Key, ifIgnoreQ) =
             let hashKey = 
-                match getOrNewKeyHash key with
+                match tryGetKeyHash (key, ifIgnoreQ) with
                 | true, (Some (SLKH k)) -> k
                 | _ ->
                     //假設初始化的時候有把全部 KEY 載入，所以後續不會再從 keyPath 讀 index，頂多新增寫入
@@ -422,9 +454,9 @@ module PCSL =
         let persistKeyValueNoRemove = persistKeyValueBase false
         let persistKeyValueRemove = persistKeyValueBase true
         // 存储 value 到文件
-        let persistKeyValues ifRemoveFromBuffer maxDoP (keyValueSeq: ('Key * 'Value) seq) =
+        let persistKeyValues ifRemoveFromBuffer maxDoP (keyValueSeq: ('Key * 'Value) seq) ifIgnoreQ =
             
-            let persistKeyValue = persistKeyValueBase ifRemoveFromBuffer
+            let persistKeyValue = persistKeyValueBase ifRemoveFromBuffer ifIgnoreQ
             keyValueSeq
             |> PSeq.ordered
             |> PSeq.withDegreeOfParallelism maxDoP
@@ -432,16 +464,16 @@ module PCSL =
 
 
         
-        let readFromFileBase (key: 'Key) : KeyHash option * bool * 'Value option =
+        let readFromFileBase (key: 'Key, ifIgnoreQ) : KeyHash option * bool * 'Value option =
             //從 sortedListIndex 
 #if DEBUG1
             printfn "readFromFileBase getOrNewKeyHash"
 #endif
-            match getOrNewKeyHash key with
+            match tryGetKeyHash (key, ifIgnoreQ) with
             | true, (Some keyHash) ->
                 let kh = keyHash.slkHash
                 let filePath = Path.Combine(schemaPath, kh + ".val")
-                (Some kh), true, ModelContainer<'Value>.readFromFile filePath //None means file not existed
+                (Some kh), true, readFromFile filePath //None means file not existed
             | _ ->
                 let filePath = Path.Combine(schemaPath, generateKeyHash key + ".val")
                 if (FileInfo filePath).Exists then
@@ -449,15 +481,15 @@ module PCSL =
                 else
                     None, false, None //索引無該 key
 
-        let readFromFileBaseAndBuffer (key: 'Key, _toMilli: int) =
-            let khOpt, fileExisted, valueOpt = readFromFileBase key
+        let readFromFileBaseAndBuffer (key: 'Key, _toMilli: int, ifIgnoreQ) =
+            let khOpt, fileExisted, valueOpt = readFromFileBase (key, ifIgnoreQ)
             if khOpt.IsNone then
                 None
             else
                 let (Choice1Of3 _) =
                     [|
-                        sortedList.Add(SLK key, SLV valueOpt.Value).thisT
-                        sortedListPersistenceStatus.Upsert(SLK key, SLPS Buffered).thisT
+                        sortedList.Add(SLK key, SLV valueOpt.Value, ifIgnoreQ).thisT
+                        sortedListPersistenceStatus.Upsert(SLK key, SLPS Buffered, ifIgnoreQ).thisT
                     |]
                     |> Task.WaitAllWithTimeout _toMilli
                 valueOpt
@@ -483,8 +515,7 @@ module PCSL =
             else
                 defaultValue
 
-        member this.GenerateKeyHash = generateKeyHash
-        member this.GetOrNewKeyHash = getOrNewKeyHash
+        member this.TryGetKeyHash = tryGetKeyHash
         member this.GetOrNewAndPersistKeyHash = getOrNewAndPersistKeyHash
         member this.PersistKeyValueNoRemove = persistKeyValueNoRemove
         ///persist 之後移出 buffer (不涉及寫入 base sortedList)
@@ -492,35 +523,57 @@ module PCSL =
         member this.RemovePersistKeyValue = removePersistedKeyValue
         
         ///persist 之後留在 buffer (不涉及寫入 base sortedList)
+        member this.InitTask = initTask
         member this.PersistKeyValues = persistKeyValues
+        member this.Write2File 
+            with get () = write2File
+            and set (v) = write2File <- v
 
-        member this.Initialized = initialized
+        member this.GenerateKeyHash 
+            with get () = generateKeyHash
+            and set (v) = generateKeyHash <- v
+
+        member this.ReadFromFile 
+            with get () = readFromFile
+            and set (v) = readFromFile <- v
+            
+        member this.Initialized
+            with get () = initialized
+            and set (v) = initialized <- v
+
+        member this.IndexInitialization = indexInitialize
+        member this.ValueInitialization = valueInitialize
+
         // 添加 key-value 对
-        member this.AddAsync(key: 'Key, value: 'Value, ifRemoveFromBuffer) =
+        member this.AddAsync(key: 'Key, value: 'Value, ifRemoveFromBuffer, ifIgnoreQ) =
 #if DEBUG1
 #else
             lock sortedList.LockObj (fun () ->
 #endif
-            if sortedListIndex.ContainsKeySafe (SLK key) then
-                [||]
-            else
-                [|                
-                    sortedList.Add(SLK key, SLV value)
-                    //sortedList.LockableOps (SeqOp [                    
-                    //    CAdd (SLK key, SLV value)
-                    //]) |> Seq.last
-                    if ifRemoveFromBuffer then
-                        persistKeyValueRemove(key,  value)
-                    else
-                        persistKeyValueNoRemove(key,  value)
-                |]
+                if sortedListIndex.ContainsKeySafe (SLK key) then
+                    [||]
+                else
+                    [|                
+                        sortedList.Add(SLK key, SLV value)
+                        //sortedList.LockableOps (SeqOp [                    
+                        //    CAdd (SLK key, SLV value)
+                        //]) |> Seq.last
+                        if ifRemoveFromBuffer then
+                            persistKeyValueRemove ifIgnoreQ (key,  value)
+                        else
+                            persistKeyValueNoRemove ifIgnoreQ (key,  value)
+                    |]
 #if DEBUG1
 #else                
             )
 #endif
-        member this.Add(key: 'Key, value: 'Value, _toMilli:int) =
+        
+        member this.AddAsync(key: 'Key, value: 'Value, ifRemoveFromBuffer) =
+            this.AddAsync(key, value, ifRemoveFromBuffer, false)
+
+        member this.Add(key: 'Key, value: 'Value, _toMilli:int, ifIgnoreQ) =
             
-            let ts = this.AddAsync(key, value, false) 
+            let ts = this.AddAsync(key, value, false, ifIgnoreQ) 
             nonEmptyArrayResultBool ts _toMilli false 0
             //if ts.Length > 0 then
             //    Task.WaitAll(
@@ -531,29 +584,37 @@ module PCSL =
             //else
             //    false
 
+        member this.Add(key: 'Key, value: 'Value, _toMilli:int) =
+            this.Add(key, value, _toMilli, false)
+
+        member this.Add(key, value, ifIgnoreQ) =
+            this.Add(key, value, defaultTimeout, ifIgnoreQ)
+
         member this.Add(key, value) =
-            this.Add(key, value, defaultTimeout)
+            this.Add(key, value, false)
 
-
-        member this.UpdateAsync(key: 'Key, value: 'Value, ifRemoveFromBuffer) =
+        member this.UpdateAsync(key: 'Key, value: 'Value, ifRemoveFromBuffer, ifIgnoreQ) =
 #if DEBUG1
 #else
             lock sortedList.LockObj (fun () ->
 #endif
-            if not <| sortedListIndex.ContainsKeySafe (SLK key) then
-                [||]
-            else
-                [|
-                    sortedList.Update(SLK key, SLV value)
-                    if ifRemoveFromBuffer then
-                        persistKeyValueRemove(key,  value)
-                    else
-                        persistKeyValueNoRemove(key,  value)
-                |]
+                if not <| sortedListIndex.ContainsKeySafe (SLK key) then
+                    [||]
+                else
+                    [|
+                        sortedList.Update(SLK key, SLV value, ifIgnoreQ)
+                        if ifRemoveFromBuffer then
+                            persistKeyValueRemove ifIgnoreQ (key,  value)
+                        else
+                            persistKeyValueNoRemove ifIgnoreQ (key,  value)
+                    |]
 #if DEBUG1
 #else                
             )
 #endif
+        member this.UpdateAsync(key: 'Key, value: 'Value, ifRemoveFromBuffer) =
+            this.UpdateAsync(key, value, ifRemoveFromBuffer, false)
+
         member this.Update(key: 'Key, value: 'Value, _toMilli:int) =
             let ts = this.UpdateAsync(key, value, false)
             nonEmptyArrayResultBool ts _toMilli false 0
@@ -569,50 +630,62 @@ module PCSL =
         member this.Update(key, value) =
             this.Update(key, value, defaultTimeout)
 
-        member this.UpsertAsync(key: 'Key, value: 'Value, ifRemoveFromBuffer) =
+        member this.UpsertAsync(key: 'Key, value: 'Value, ifRemoveFromBuffer, ifIgnoreQ) =
 #if DEBUG1
 #else
             lock sortedList.LockObj (fun () ->
 #endif
             [|
-                sortedList.Upsert(SLK key, SLV value)
+                sortedList.Upsert(SLK key, SLV value, ifIgnoreQ)
                 if ifRemoveFromBuffer then
-                    persistKeyValueRemove(key,  value)
+                    persistKeyValueRemove ifIgnoreQ  (key,  value)
                 else
-                    persistKeyValueNoRemove(key,  value)
+                    persistKeyValueNoRemove ifIgnoreQ (key,  value)
             |]
 #if DEBUG1
 #else                
             )
 #endif
-        member this.Upsert(key: 'Key, value: 'Value, _toMilli:int) =
-            let ts = this.UpsertAsync(key, value, false)
+        member this.UpsertAsync(key: 'Key, value: 'Value, ifRemoveFromBuffer) =
+            this.UpsertAsync(key, value, ifRemoveFromBuffer, false)
+
+        member this.Upsert(key: 'Key, value: 'Value, _toMilli:int, ifIgnoreQ) =
+            let ts = this.UpsertAsync(key, value, false, ifIgnoreQ)
             nonEmptyArrayResultInt ts _toMilli 0 0
             //Task.WaitAll(
             //    this.UpsertAsync(key, value, false) |> Array.map (fun t -> t.thisT)
             //    , _toMilli
             //)
+        member this.Upsert(key: 'Key, value: 'Value, _toMilli:int) =
+            this.Upsert(key, value, _toMilli, false)
 
         member this.Upsert(key, value) =
             this.Upsert(key, value, defaultTimeout)
 
-        member this.RemoveAsync(key: 'Key) =
+        member this.RemoveAsync(key: 'Key, ifIgnoreQ) =
 #if DEBUG1
 #else
             lock sortedList.LockObj (fun () ->
 #endif
-                removePersistedKeyValue key
+                removePersistedKeyValue (key, ifIgnoreQ)
 #if DEBUG1
 #else                
             )
 #endif
-        member this.Remove(key: 'Key, _toMilli:int) =
-            let ts = this.RemoveAsync(key)
+        member this.RemoveAsync(key: 'Key) =
+            this.RemoveAsync(key, false)
+
+        member this.Remove(key: 'Key, _toMilli:int, ifIgnoreQ) =
+            let ts = this.RemoveAsync(key, ifIgnoreQ)
             nonEmptyArrayResultBool ts _toMilli false 0 
             //Task.WaitAll(
             //    this.RemoveAsync(key) |> Array.map (fun t -> t.thisT)
             //    , _toMilli
             //)
+
+        member this.Remove(key: 'Key, _toMilli:int) =
+            this.Remove(key, _toMilli, false)
+
         member this.Remove(key) =
             this.Remove(key, defaultTimeout)
 
@@ -626,29 +699,37 @@ module PCSL =
         //    this.AddWithPersistenceAsync(key, value).WaitAsync(_toMilli).Result
 
         // 获取 value，如果 ConcurrentSortedList 中不存在则从文件系统中读取
-        member this.TryGetValue(key: 'Key, _toMilli:int) = //: bool * 'Value option =
-            lock sortedList.LockObj (fun () ->
+        member this.TryGetValueNoThreadLock (key: 'Key, _toMilli:int, ifIgnoreQ) = //: bool * 'Value option =
+            
 #if DEBUG1
-                printfn "Query KV"
+            printfn "Query KV"
 #endif
-                let gr = sortedList.GetValue(SLK key)
-                let (Choice1Of3 _) =
-                    [|
-                        gr.thisT
-                        sortedListPersistenceStatus.Upsert(SLK key, SLPS Buffered).thisT
-                    |]
-                    |> Task.WaitAllWithTimeout _toMilli
-                let exists, value = gr.Result.kvOptionValue
+            let gr = sortedList.GetValue(SLK key, ifIgnoreQ)
+            //printfn "[TryGetValueNoThreadLock.GetValue] value task: %A" gr
+            //let (Choice1Of3 _) =
+            //    [|
+            //        gr.thisT
+            //        //us.thisT
+            //    |]
+            //    |> Task.WaitAllWithTimeout _toMilli
+            let exists, value = gr.Result.kvOptionValue
+            //printfn "[TryGetValueNoThreadLock.kvOptionValue] exists: %A, value: %A" exists value
 
-                if exists then
-                    true, value
-                else
-                    match readFromFileBaseAndBuffer (key, _toMilli) with
-                    | Some v ->
-                        true, Some v
-                    | None -> false, None
+            if exists then
+                let us = sortedListPersistenceStatus.Upsert(SLK key, SLPS Buffered, ifIgnoreQ).Result
+                //printfn "[TryGetValueNoThreadLock.Upsert] value task: %A" us
+                true, value
+            else
+                match readFromFileBaseAndBuffer (key, _toMilli, ifIgnoreQ) with
+                | Some v ->
+                    true, Some v
+                | None -> false, None
+            
+
+        member this.TryGetValue(key: 'Key, _toMilli:int) = 
+            lock sortedList.LockObj (fun () ->
+                this.TryGetValueNoThreadLock (key, _toMilli, false)
             )
-
         member this.TryGetValue(key) =
             this.TryGetValue(key, defaultTimeout)
 

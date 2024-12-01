@@ -35,6 +35,12 @@ module DefaultHelper =
     open PCSL
     open System.Collections.Generic
 
+    type DefKVOpFun<'Key, 'Value when 'Key : comparison and 'Value: comparison> = KVOpFun<PCSLKVTyp<'Key, 'Value>, PCSLKVTyp<'Key, 'Value>>
+
+    type DefKOpFun<'Key, 'Value when 'Key : comparison and 'Value: comparison> = KOpFun<PCSLKVTyp<'Key, 'Value>, PCSLKVTyp<'Key, 'Value>>
+
+    type DefVOpFun<'Key, 'Value when 'Key : comparison and 'Value: comparison> = VOpFun<PCSLKVTyp<'Key, 'Value>, PCSLKVTyp<'Key, 'Value>>
+
     type PCSLFunHelper<'Key, 'Value when 'Key: comparison and 'Value: comparison> =
         //static let kvkt = typeof<'Key>
         //static let kvvt = typeof<'Value>

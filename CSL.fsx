@@ -71,14 +71,21 @@ module CSL =
             match vCache.TryGetValue(sl) with
             | true, values -> values
             | _ -> failwith "Values have not been cached for this instance. Call Cache() first."
-
+        static member KCache = kCache
+        static member VCache = vCache
 
 
     
     type Layer = int
     type Tag = string
 
-    type Op<'Key, 'Value when 'Key : comparison> =
+    type KVOpFun<'Key, 'Value when 'Key : comparison> = Memory<'Key> -> Memory<'Value> -> ResultWrapper<'Key, 'Value>[] -> Task<OpResult<'Key, 'Value>> option -> OpResult<'Key, 'Value>
+
+    and KOpFun<'Key, 'Value when 'Key : comparison> = Memory<'Key> -> ResultWrapper<'Key, 'Value>[] -> Task<OpResult<'Key, 'Value>> option -> OpResult<'Key, 'Value>
+
+    and VOpFun<'Key, 'Value when 'Key : comparison> = Memory<'Value> -> ResultWrapper<'Key, 'Value>[] -> Task<OpResult<'Key, 'Value>> option -> OpResult<'Key, 'Value>
+
+    and Op<'Key, 'Value when 'Key : comparison> =
     | CAdd of 'Key * 'Value
     | CRemove of 'Key
     | CUpdate of 'Key * 'Value
@@ -90,11 +97,12 @@ module CSL =
     | CKeys
     | CKV 
     | CClean
+    | IgnoreQ of Op<'Key, 'Value>
     | SeqOp of Op<'Key, 'Value> seq
     | FoldOp of Op<'Key, 'Value> seq
-    | KeysOp of Tag option * int * int * (Memory<'Key> -> ResultWrapper<'Key, 'Value>[] -> Task<OpResult<'Key, 'Value>> option -> OpResult<'Key, 'Value>)
-    | ValuesOp of Tag option * int * int * (Memory<'Value> -> ResultWrapper<'Key, 'Value>[] -> Task<OpResult<'Key, 'Value>> option -> OpResult<'Key, 'Value>)
-    | KeyValuesOp of Tag option * int * int * (Memory<'Key> -> Memory<'Value> -> ResultWrapper<'Key, 'Value>[] -> Task<OpResult<'Key, 'Value>> option -> OpResult<'Key, 'Value>)
+    | KeysOp of Tag option * int * int * KOpFun<'Key, 'Value>
+    | ValuesOp of Tag option * int * int * VOpFun<'Key, 'Value>
+    | KeyValuesOp of Tag option * int * int * KVOpFun<'Key, 'Value>
 
     //type OpResultTyp = 
     //| TUnit         
@@ -174,6 +182,11 @@ module CSL =
             member this.KVList =
                 match this with
                 | CKVList valueList -> Some valueList
+                | _ -> None
+            
+            member this.FoldResultRWArr =
+                match this with
+                | FoldResult rwArr -> Some rwArr
                 | _ -> None
 
     type Task<'T> with
@@ -418,8 +431,13 @@ module CSL =
         , lockObj: obj
         , timeoutDefault
         , ?autoCacheChangeOpt:int 
+        , ?sortedListOpt:SortedList<'Key, 'Value>
         ) =
-        let sortedList = SortedList<'Key, 'Value>()
+        let sortedList = 
+            if sortedListOpt.IsNone then
+                SortedList<'Key, 'Value>()
+            else
+                sortedListOpt.Value
         //let lockObj = obj()
         let opQueue = QueueProcessor<'ID, 'OpResult>(slId, timeoutDefault)
         let extractFun = extractFunBase slId
@@ -485,7 +503,7 @@ module CSL =
 
 
         /// 封装操作并添加到任务队列，执行后返回 Task
-        member this.LockableOps (op: Op<'Key, 'Value>, lockIdOpt: Guid option) =
+        member this.LockableOps (_op: Op<'Key, 'Value>, lockIdOpt: Guid option) =
             // `processFoldOp` 函數實現，接收一個 `Op<'Key, 'Value> seq` 序列並返回一個 `FoldResult`
             let rec processOp layer arr (preResultTask: Task<OpResult<_,_>> option) (op: Op<'Key, 'Value>) (baseInstance: ConcurrentSortedList<'Key, 'Value, 'OpResult, 'ID>) =
                 let results =
@@ -606,20 +624,35 @@ module CSL =
             // 将操作添加到队列并运行队列
             //let f = Func<Task<OpResult<'Key, 'value>>, 'OpResult> (fun tt ->  tt.Result)
             //let ts = opToFun op |> Seq.map (fun f -> f >> outFun slId |> createTask)
-            let ts = 
+            
+            let op, ifBypassQ =
+                match _op with
+                | IgnoreQ v ->  v, true
+                | _ -> _op, false
+            if ifBypassQ then
                 opToFun op 
-                //|> Seq.map (fun f -> (fun () -> f()|> outFun slId) |> createTask)
-                |> Seq.map (fun f -> f >> outFun slId |> createTask)
-                |> Seq.toArray //沒有 toArray 會出現 task id 不同的症狀，也就是跑的 task 跟回傳的 task 不同 (seq map 的 lazy evaluation 特性造成)
-#if DEBUG
-            ts |> Seq.iter (fun task -> printfn "[before starting] Task %A IsCompleted: %A" task.Id task.IsCompleted)
-#endif
-            ts
-            |> if lockIdOpt.IsNone then
-                Seq.iter opQueue.Enqueue 
-               else
-                Seq.iter (fun t -> opQueue.EnqueueWithLock(t, lockIdOpt.Value))
-            ts
+                |> Seq.map (fun f -> 
+                    task {
+                        return (f >> outFun slId)()
+                    }
+                )
+                |> Seq.toArray
+
+            else
+                let ts = 
+                    opToFun op 
+                    //|> Seq.map (fun f -> (fun () -> f()|> outFun slId) |> createTask)
+                    |> Seq.map (fun f -> f >> outFun slId |> createTask)
+                    |> Seq.toArray //沒有 toArray 會出現 task id 不同的症狀，也就是跑的 task 跟回傳的 task 不同 (seq map 的 lazy evaluation 特性造成)
+    #if DEBUG
+                ts |> Seq.iter (fun task -> printfn "[before starting] Task %A IsCompleted: %A" task.Id task.IsCompleted)
+    #endif
+                ts
+                |> if lockIdOpt.IsNone then
+                    Seq.iter opQueue.Enqueue 
+                   else
+                    Seq.iter (fun t -> opQueue.EnqueueWithLock(t, lockIdOpt.Value))
+                ts
 
         member this.LockableOps (op: Op<'Key, 'Value>) =
             this.LockableOps (op, None)
@@ -631,20 +664,35 @@ module CSL =
             this.LockableOps op |> Seq.item 0
 
         /// Add 方法：将添加操作封装为任务并执行
+        member this.Add(k, v, ifIgnoreQ) =
+            if ifIgnoreQ then
+                this.LockableOp(IgnoreQ (CAdd(k, v)))
+            else
+                this.LockableOp(CAdd(k, v))
+
         member this.Add(k, v) =
-            this.LockableOp(CAdd(k, v))
+            this.Add(k, v, false)
 
+        member this.Upsert(k, v, ifIgnoreQ) =
+            if ifIgnoreQ then
+                this.LockableOp(IgnoreQ (CUpsert(k, v)))
+            else
+                this.LockableOp(CUpsert(k, v))
         member this.Upsert(k, v) =
-            this.LockableOp(CUpsert(k, v))
-
+            this.Upsert(k, v, false)
         /// Remove 方法：将移除操作封装为任务并执行
         member this.Remove(k) =
             this.LockableOp(CRemove(k))
 
         /// TryUpdate 方法：将更新操作封装为任务并执行
-        member this.Update(k, v) =
-            this.LockableOp(CUpdate(k, v))
+        member this.Update(k, v, ifIgnoreQ) =
+            if ifIgnoreQ then
+                this.LockableOp(IgnoreQ (CUpdate(k, v)))
+            else
+                this.LockableOp(CUpdate(k, v))
 
+        member this.Update(k, v) =
+            this.Update(k, v, false)
         /// TryGetValue 同步获取值，不需要队列
 #if UNSAFE
         member this.TryGetValueUnsafe(key: 'Key) : bool * 'Value option =
@@ -657,11 +705,17 @@ module CSL =
             )
 #endif
 
-        member this.GetValue(key: 'Key) =
+        member this.GetValue(key: 'Key, ifIgnoreQ) =
 #if DEBUG1            
             printfn "TryGetValue"
 #endif
-            this.LockableOp(CGet key)
+            if ifIgnoreQ then
+                this.LockableOp(IgnoreQ (CGet key))
+            else
+                this.LockableOp(CGet key)
+
+        member this.GetValue(key: 'Key) =
+            this.GetValue(key, false)
 
         member this.GetValueSafe(key: 'Key) : bool * 'Value option =
 #if DEBUG1
@@ -761,7 +815,10 @@ module CSL =
             this.OpQueue.UnLock lockId
 
         new (slId, outFun, extractFunBase, (autoCache: int)) =
-            new ConcurrentSortedList<_, _, _, _>(slId, outFun, extractFunBase, obj(), 300000, autoCacheChangeOpt = autoCache)
+            new ConcurrentSortedList<_, _, _, _>(slId, outFun, extractFunBase, obj(), (autoCache: int))
+
+        new (slId, outFun, extractFunBase, (timeout:int), (autoCache: int)) =
+            new ConcurrentSortedList<_, _, _, _>(slId, outFun, extractFunBase, obj(), timeout, autoCacheChangeOpt = autoCache)
 
         new (slId, outFun, extractFunBase) =
             new ConcurrentSortedList<_, _, _, _>(slId, outFun, extractFunBase, obj(), 300000)
