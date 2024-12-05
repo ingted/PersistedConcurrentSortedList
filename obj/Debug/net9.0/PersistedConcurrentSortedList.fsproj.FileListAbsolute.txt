@@ -17,3 +17,6 @@ G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\obj\Debug\net9.0\refint\Persiste
 G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\obj\Debug\net9.0\PersistedConcurrentSortedList.xml
 G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\obj\Debug\net9.0\PersistedConcurrentSortedList.pdb
 G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\obj\Debug\net9.0\ref\PersistedConcurrentSortedList.dll
+G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\net9.0\FSharp.Collections.ParallelSeq.dll
+G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\net9.0\FSharp.Collections.ParallelSeq.pdb
+G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\net9.0\FSharp.Collections.ParallelSeq.xml

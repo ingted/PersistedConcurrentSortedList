@@ -6,10 +6,10 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v9.0": {
-      "PersistedConcurrentSortedList/9.0.23": {
+      "PersistedConcurrentSortedList/9.0.25": {
         "dependencies": {
-          "FAkka.FsPickler": "9.0.6",
-          "FAkka.FsPickler.Json": "9.0.6",
+          "FAkka.FsPickler": "9.0.100",
+          "FAkka.FsPickler.Json": "9.0.100",
           "FAkka.ProtoBuf.FSharp": "9.0.11",
           "FSharp.Collections.ParallelSeq": "1.2.0",
           "FSharp.Core": "9.0.100"
@@ -18,28 +18,28 @@
           "PersistedConcurrentSortedList.dll": {}
         }
       },
-      "FAkka.FsPickler/9.0.6": {
+      "FAkka.FsPickler/9.0.100": {
         "dependencies": {
           "FSharp.Core": "9.0.100",
           "System.Reflection.Emit.Lightweight": "4.7.0"
         },
         "runtime": {
           "lib/net9.0/FsPickler.dll": {
-            "assemblyVersion": "9.0.6.0",
-            "fileVersion": "9.0.6.0"
+            "assemblyVersion": "9.0.100.0",
+            "fileVersion": "9.0.100.0"
           }
         }
       },
-      "FAkka.FsPickler.Json/9.0.6": {
+      "FAkka.FsPickler.Json/9.0.100": {
         "dependencies": {
-          "FAkka.FsPickler": "9.0.6",
+          "FAkka.FsPickler": "9.0.100",
           "FSharp.Core": "9.0.100",
           "Newtonsoft.Json": "13.0.3"
         },
         "runtime": {
           "lib/net9.0/FsPickler.Json.dll": {
-            "assemblyVersion": "9.0.6.0",
-            "fileVersion": "9.0.6.0"
+            "assemblyVersion": "9.0.100.0",
+            "fileVersion": "9.0.100.0"
           }
         }
       },
@@ -54,17 +54,6 @@
           "lib/netstandard2.0/protobuf-net-fsharp.dll": {
             "assemblyVersion": "9.0.11.0",
             "fileVersion": "9.0.11.0"
-          }
-        }
-      },
-      "FSharp.Collections.ParallelSeq/1.2.0": {
-        "dependencies": {
-          "FSharp.Core": "9.0.100"
-        },
-        "runtime": {
-          "lib/netstandard2.0/FSharp.Collections.ParallelSeq.dll": {
-            "assemblyVersion": "1.2.0.0",
-            "fileVersion": "1.2.0.0"
           }
         }
       },
@@ -149,28 +138,39 @@
       },
       "System.Buffers/4.5.1": {},
       "System.Collections.Immutable/7.0.0": {},
-      "System.Reflection.Emit.Lightweight/4.7.0": {}
+      "System.Reflection.Emit.Lightweight/4.7.0": {},
+      "FSharp.Collections.ParallelSeq/1.2.0": {
+        "dependencies": {
+          "FSharp.Core": "9.0.100"
+        },
+        "runtime": {
+          "FSharp.Collections.ParallelSeq.dll": {
+            "assemblyVersion": "1.2.0",
+            "fileVersion": "1.2.0.0"
+          }
+        }
+      }
     }
   },
   "libraries": {
-    "PersistedConcurrentSortedList/9.0.23": {
+    "PersistedConcurrentSortedList/9.0.25": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "FAkka.FsPickler/9.0.6": {
+    "FAkka.FsPickler/9.0.100": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-99U4DVOmCqhlJu9l/bLfTHsXvfs6hdEwbooNnIPydYTJ0DbHtLb4f1ZrS/9+MXrR8AsHhGuswoNKluPpPz46jg==",
-      "path": "fakka.fspickler/9.0.6",
-      "hashPath": "fakka.fspickler.9.0.6.nupkg.sha512"
+      "sha512": "sha512-4hQaZyw/H6mGGwUSPP930oJdjSGcxErzCsV4YnvfwnEe+moIOqwlTtYUlVx0swoF93ppcW7BboZagJjPUO4SKQ==",
+      "path": "fakka.fspickler/9.0.100",
+      "hashPath": "fakka.fspickler.9.0.100.nupkg.sha512"
     },
-    "FAkka.FsPickler.Json/9.0.6": {
+    "FAkka.FsPickler.Json/9.0.100": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-pHl1r26O0yGYH/bktv56r1qiX/WEStWYgdnWV/p1r2WqYyVI+vOBymA9PSYKtwgYpTl7ZUBqDeHIA7+ELBFOkA==",
-      "path": "fakka.fspickler.json/9.0.6",
-      "hashPath": "fakka.fspickler.json.9.0.6.nupkg.sha512"
+      "sha512": "sha512-bb7h7tuW4+h80W55LUX2vBsVsBWt5dNDnWgHbWeAWMOC+90vxc+e57YsDaeYy1unVSbdBrPYDEzwPsgvtersWA==",
+      "path": "fakka.fspickler.json/9.0.100",
+      "hashPath": "fakka.fspickler.json.9.0.100.nupkg.sha512"
     },
     "FAkka.ProtoBuf.FSharp/9.0.11": {
       "type": "package",
@@ -178,13 +178,6 @@
       "sha512": "sha512-KgL7o2QyDmefmki8TGcF1Go/IA4hyktux7BwalGFBIP2/ya1Dm+C7VCBaQK2zhjs+0NtJUy55whpH0ocTRD4oA==",
       "path": "fakka.protobuf.fsharp/9.0.11",
       "hashPath": "fakka.protobuf.fsharp.9.0.11.nupkg.sha512"
-    },
-    "FSharp.Collections.ParallelSeq/1.2.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-NoMSS6RHyAVixqAENqSWVNqQPYAHbU0WVVkr1M5ZoVmD1spM92SN4Fa+9+P7YjoQJJf2GYg9ENukjbmxGpQPag==",
-      "path": "fsharp.collections.parallelseq/1.2.0",
-      "hashPath": "fsharp.collections.parallelseq.1.2.0.nupkg.sha512"
     },
     "FSharp.Core/9.0.100": {
       "type": "package",
@@ -234,6 +227,11 @@
       "sha512": "sha512-a4OLB4IITxAXJeV74MDx49Oq2+PsF6Sml54XAFv+2RyWwtDBcabzoxiiJRhdhx+gaohLh4hEGCLQyBozXoQPqA==",
       "path": "system.reflection.emit.lightweight/4.7.0",
       "hashPath": "system.reflection.emit.lightweight.4.7.0.nupkg.sha512"
+    },
+    "FSharp.Collections.ParallelSeq/1.2.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     }
   }
 }

@@ -2,10 +2,10 @@
   "version": 3,
   "targets": {
     "net9.0": {
-      "FAkka.FsPickler/9.0.6": {
+      "FAkka.FsPickler/9.0.100": {
         "type": "package",
         "dependencies": {
-          "FSharp.Core": "9.0.100-beta.24466.6",
+          "FSharp.Core": "9.0.100",
           "System.Reflection.Emit.Lightweight": "4.7.0"
         },
         "compile": {
@@ -15,11 +15,11 @@
           "lib/net9.0/FsPickler.dll": {}
         }
       },
-      "FAkka.FsPickler.Json/9.0.6": {
+      "FAkka.FsPickler.Json/9.0.100": {
         "type": "package",
         "dependencies": {
-          "FAkka.FsPickler": "9.0.6",
-          "FSharp.Core": "9.0.100-beta.24466.6",
+          "FAkka.FsPickler": "9.0.100",
+          "FSharp.Core": "9.0.100",
           "Newtonsoft.Json": "13.0.3"
         },
         "compile": {
@@ -52,22 +52,6 @@
             "buildAction": "Content",
             "codeLanguage": "any",
             "copyToOutput": false
-          }
-        }
-      },
-      "FSharp.Collections.ParallelSeq/1.2.0": {
-        "type": "package",
-        "dependencies": {
-          "FSharp.Core": "5.0.0"
-        },
-        "compile": {
-          "lib/netstandard2.0/FSharp.Collections.ParallelSeq.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/netstandard2.0/FSharp.Collections.ParallelSeq.dll": {
-            "related": ".xml"
           }
         }
       },
@@ -203,32 +187,45 @@
         "runtime": {
           "lib/netcoreapp2.0/_._": {}
         }
+      },
+      "FSharp.Collections.ParallelSeq/1.2.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.0",
+        "dependencies": {
+          "FSharp.Core": "9.0.100"
+        },
+        "compile": {
+          "bin/placeholder/FSharp.Collections.ParallelSeq.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/FSharp.Collections.ParallelSeq.dll": {}
+        }
       }
     }
   },
   "libraries": {
-    "FAkka.FsPickler/9.0.6": {
-      "sha512": "99U4DVOmCqhlJu9l/bLfTHsXvfs6hdEwbooNnIPydYTJ0DbHtLb4f1ZrS/9+MXrR8AsHhGuswoNKluPpPz46jg==",
+    "FAkka.FsPickler/9.0.100": {
+      "sha512": "4hQaZyw/H6mGGwUSPP930oJdjSGcxErzCsV4YnvfwnEe+moIOqwlTtYUlVx0swoF93ppcW7BboZagJjPUO4SKQ==",
       "type": "package",
-      "path": "fakka.fspickler/9.0.6",
+      "path": "fakka.fspickler/9.0.100",
       "files": [
         ".nupkg.metadata",
         "LICENSE.txt",
         "README.md",
-        "fakka.fspickler.9.0.6.nupkg.sha512",
+        "fakka.fspickler.9.0.100.nupkg.sha512",
         "fakka.fspickler.nuspec",
         "lib/net9.0/FsPickler.dll"
       ]
     },
-    "FAkka.FsPickler.Json/9.0.6": {
-      "sha512": "pHl1r26O0yGYH/bktv56r1qiX/WEStWYgdnWV/p1r2WqYyVI+vOBymA9PSYKtwgYpTl7ZUBqDeHIA7+ELBFOkA==",
+    "FAkka.FsPickler.Json/9.0.100": {
+      "sha512": "bb7h7tuW4+h80W55LUX2vBsVsBWt5dNDnWgHbWeAWMOC+90vxc+e57YsDaeYy1unVSbdBrPYDEzwPsgvtersWA==",
       "type": "package",
-      "path": "fakka.fspickler.json/9.0.6",
+      "path": "fakka.fspickler.json/9.0.100",
       "files": [
         ".nupkg.metadata",
         "LICENSE.txt",
         "README.md",
-        "fakka.fspickler.json.9.0.6.nupkg.sha512",
+        "fakka.fspickler.json.9.0.100.nupkg.sha512",
         "fakka.fspickler.json.nuspec",
         "lib/net9.0/FsPickler.Json.dll"
       ]
@@ -245,20 +242,6 @@
         "fakka.protobuf.fsharp.nuspec",
         "lib/netstandard2.0/protobuf-net-fsharp.dll",
         "lib/netstandard2.0/protobuf-net-fsharp.xml"
-      ]
-    },
-    "FSharp.Collections.ParallelSeq/1.2.0": {
-      "sha512": "NoMSS6RHyAVixqAENqSWVNqQPYAHbU0WVVkr1M5ZoVmD1spM92SN4Fa+9+P7YjoQJJf2GYg9ENukjbmxGpQPag==",
-      "type": "package",
-      "path": "fsharp.collections.parallelseq/1.2.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "fsharp.collections.parallelseq.1.2.0.nupkg.sha512",
-        "fsharp.collections.parallelseq.nuspec",
-        "lib/netstandard2.0/FSharp.Collections.ParallelSeq.dll",
-        "lib/netstandard2.0/FSharp.Collections.ParallelSeq.xml",
-        "logo.png"
       ]
     },
     "FSharp.Core/9.0.100": {
@@ -491,12 +474,17 @@
         "useSharedDesignerContext.txt",
         "version.txt"
       ]
+    },
+    "FSharp.Collections.ParallelSeq/1.2.0": {
+      "type": "project",
+      "path": "../../../Libs/FSharp.Collections.ParallelSeq/src/FSharp.Collections.ParallelSeq/FSharp.Collections.ParallelSeq.fsproj",
+      "msbuildProject": "../../../Libs/FSharp.Collections.ParallelSeq/src/FSharp.Collections.ParallelSeq/FSharp.Collections.ParallelSeq.fsproj"
     }
   },
   "projectFileDependencyGroups": {
     "net9.0": [
-      "FAkka.FsPickler >= 9.0.6",
-      "FAkka.FsPickler.Json >= 9.0.6",
+      "FAkka.FsPickler >= 9.0.100",
+      "FAkka.FsPickler.Json >= 9.0.100",
       "FAkka.ProtoBuf.FSharp >= 9.0.11",
       "FSharp.Collections.ParallelSeq >= 1.2.0",
       "FSharp.Core >= 9.0.100"
@@ -507,7 +495,7 @@
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
-    "version": "9.0.24",
+    "version": "9.0.25",
     "restore": {
       "projectUniqueName": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\PersistedConcurrentSortedList.fsproj",
       "projectName": "PersistedConcurrentSortedList",
@@ -535,7 +523,11 @@
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "G:\\coldfar_py\\sharftrade9\\Libs\\FSharp.Collections.ParallelSeq\\src\\FSharp.Collections.ParallelSeq\\FSharp.Collections.ParallelSeq.fsproj": {
+              "projectPath": "G:\\coldfar_py\\sharftrade9\\Libs\\FSharp.Collections.ParallelSeq\\src\\FSharp.Collections.ParallelSeq\\FSharp.Collections.ParallelSeq.fsproj"
+            }
+          }
         }
       },
       "restoreAuditProperties": {
@@ -551,22 +543,17 @@
         "dependencies": {
           "FAkka.FsPickler": {
             "target": "Package",
-            "version": "[9.0.6, )",
+            "version": "[9.0.100, )",
             "generatePathProperty": true
           },
           "FAkka.FsPickler.Json": {
             "target": "Package",
-            "version": "[9.0.6, )",
+            "version": "[9.0.100, )",
             "generatePathProperty": true
           },
           "FAkka.ProtoBuf.FSharp": {
             "target": "Package",
             "version": "[9.0.11, )",
-            "generatePathProperty": true
-          },
-          "FSharp.Collections.ParallelSeq": {
-            "target": "Package",
-            "version": "[1.2.0, )",
             "generatePathProperty": true
           },
           "FSharp.Core": {

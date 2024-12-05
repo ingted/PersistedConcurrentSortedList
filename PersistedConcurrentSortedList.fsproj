@@ -40,12 +40,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FSharp.Collections.ParallelSeq" Version="1.2.0" />
+    <!--<PackageReference Include="FSharp.Collections.ParallelSeq" Version="1.2.0" />-->
     <PackageReference Include="FAkka.ProtoBuf.FSharp" Version="9.0.11" Condition="'$(Configuration)'=='Release'" />
 	<PackageReference Include="FAkka.ProtoBuf.FSharp" Version="9.0.11" Condition="'$(Configuration)'=='DebugWithNoDep'" />
   </ItemGroup>
 
   <ItemGroup>
+	<ProjectReference Include="..\..\..\Libs\FSharp.Collections.ParallelSeq\src\FSharp.Collections.ParallelSeq\FSharp.Collections.ParallelSeq.fsproj" Condition="'$(Configuration)'=='Release'" />
+	<ProjectReference Include="..\..\..\Libs\FSharp.Collections.ParallelSeq\src\FSharp.Collections.ParallelSeq\FSharp.Collections.ParallelSeq.fsproj" Condition="'$(Configuration)'=='Debug'" />
     <ProjectReference Include="..\NTDLS.Katzebase.Parsers.Generic\NTDLS.Katzebase.Parsers.Generic.csproj" Condition="$(DefineConstants.Contains('KATZEBASE'))" />
     <ProjectReference Include="..\protobuf-net-fsharp\src\ProtoBuf.FSharp\ProtoBuf.FSharp.fsproj" Condition="'$(Configuration)'=='Debug'" />
 	
@@ -53,15 +55,21 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
     <PackageReference Include="FAkka.FsPickler">
-      <Version>9.0.6</Version>
+      <Version>9.0.100</Version>
     </PackageReference>
     <PackageReference Include="FAkka.FsPickler.Json">
-      <Version>9.0.6</Version>
+      <Version>9.0.100</Version>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="FSharp.Collections.ParallelSeq"  Condition="'$(Configuration)'=='DebugWithNoDep'">
+      <HintPath>..\..\..\Libs\FSharp.Collections.ParallelSeq\src\FSharp.Collections.ParallelSeq\bin\netstandard2.0\FSharp.Collections.ParallelSeq.dll</HintPath>
+    </Reference>
   </ItemGroup>
 	<PropertyGroup>
 		
-		<Version>9.0.24</Version>
+		<Version>9.0.25</Version>
 	</PropertyGroup>
 
 	<Target Name="PostPackNugetDeployWindows" AfterTargets="Pack" Condition="'$(Configuration)' == 'Release'">

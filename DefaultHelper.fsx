@@ -69,24 +69,34 @@ module DefaultHelper =
                 | _ -> failwith "Unsupported type in CBool"
 
             | COptionValue (exists, value) -> 
+#if DEBUG
                 let vt = typeof<'Value>
-#if DEBUG1
-                printfn "vvvvvvvv: %s %A %A" vt.Name value id
+                try
+#else
+                   let vt = typeof<'Value>
+                
 #endif
-                match id with
-                | TSLIdxR -> 
-                    let vOpt = value |> Option.map (fun (SLK v)  -> v)
-                    IdxR (COptionValue (exists, vOpt))
-                | TSL -> 
-                    let vOpt = value |> Option.map (fun (SLV v)  -> v)
-                    KV   (COptionValue (exists, vOpt))
-                | TSLIdx -> 
-                    let vOpt = value |> Option.map (fun (SLKH v) -> v)
-                    Idx  (COptionValue (exists, vOpt))
-                | TSLPSts -> 
-                    let vOpt = value |> Option.map (fun (SLPS v) -> v)
-                    PS   (COptionValue (exists, vOpt))
-                | _ -> failwith "Unsupported type in COptionValue"
+                   match id with
+                   | TSLIdxR -> 
+                       let vOpt = value |> Option.map (fun (SLK v)  -> v)
+                       IdxR (COptionValue (exists, vOpt))
+                   | TSL -> 
+                       let vOpt = value |> Option.map (fun (SLV v)  -> v)
+                       KV   (COptionValue (exists, vOpt))
+                   | TSLIdx -> 
+                       let vOpt = value |> Option.map (fun (SLKH v) -> v)
+                       Idx  (COptionValue (exists, vOpt))
+                   | TSLPSts -> 
+                       let vOpt = value |> Option.map (fun (SLPS v) -> v)
+                       PS   (COptionValue (exists, vOpt))
+                   | _ -> failwith "Unsupported type in COptionValue"
+#if DEBUG
+                with
+                | exn ->
+                    printfn "vvvvvvvv: %s %A %A" vt.Name value id
+                    reraise ()
+#endif
+
 
             | CInt i -> 
                 match id with

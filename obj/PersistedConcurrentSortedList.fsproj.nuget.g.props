@@ -25,9 +25,8 @@
   </ItemGroup>
   <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
     <PkgFSharp_Core Condition=" '$(PkgFSharp_Core)' == '' ">C:\Users\Administrator\.nuget\packages\fsharp.core\9.0.100</PkgFSharp_Core>
-    <PkgFSharp_Collections_ParallelSeq Condition=" '$(PkgFSharp_Collections_ParallelSeq)' == '' ">C:\Users\Administrator\.nuget\packages\fsharp.collections.parallelseq\1.2.0</PkgFSharp_Collections_ParallelSeq>
     <PkgFAkka_ProtoBuf_FSharp Condition=" '$(PkgFAkka_ProtoBuf_FSharp)' == '' ">C:\Users\Administrator\.nuget\packages\fakka.protobuf.fsharp\9.0.11</PkgFAkka_ProtoBuf_FSharp>
-    <PkgFAkka_FsPickler Condition=" '$(PkgFAkka_FsPickler)' == '' ">C:\Users\Administrator\.nuget\packages\fakka.fspickler\9.0.6</PkgFAkka_FsPickler>
-    <PkgFAkka_FsPickler_Json Condition=" '$(PkgFAkka_FsPickler_Json)' == '' ">C:\Users\Administrator\.nuget\packages\fakka.fspickler.json\9.0.6</PkgFAkka_FsPickler_Json>
+    <PkgFAkka_FsPickler Condition=" '$(PkgFAkka_FsPickler)' == '' ">C:\Users\Administrator\.nuget\packages\fakka.fspickler\9.0.100</PkgFAkka_FsPickler>
+    <PkgFAkka_FsPickler_Json Condition=" '$(PkgFAkka_FsPickler_Json)' == '' ">C:\Users\Administrator\.nuget\packages\fakka.fspickler.json\9.0.100</PkgFAkka_FsPickler_Json>
   </PropertyGroup>
 </Project>

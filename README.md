@@ -1,9 +1,12 @@
 More example here
 https://github.com/ingted/PersistedConcurrentSortedList.Test
 
+
+# 2024-12-01: IgnoreQ mode supported, Ultra fast valueInitialize bug fixed!
 # Supported Array/Struct similar with BigQuery in C# and F#
 # Usage: take a look at QuickStart.fsx (module PCSLTest)
 # ProtoBuf.FSharp mod: (if you don't want to use FAkka.ProtoBuf.FSharp) 
+
 
 Actually you could use the official ProtoBuf.FSharp, just replace deserialiseConcreteType in PB with (adding it yourself)
 

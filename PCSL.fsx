@@ -344,17 +344,44 @@ module PCSL =
         let valueInitialize maxDop =
             let (Some lockId) = sortedListIndex.RequireLock(None, None) |> Async.RunSynchronously
             //printfn "Required lockId: %A" lockId
-            let idxs = 
-                sortedListIndex.LockableOp(CKeys, lockId).Result.idxKeyList
-            //printfn "Idx: %A" idxs
-            let getValueTasks =
-                //|> PSeq.ordered
-                idxs
-                |> PSeq.withDegreeOfParallelism maxDop
-                |> PSeq.map (fun idx -> this.TryGetValueNoThreadLock(idx, defaultTimeout, true))
-                |> PSeq.toArray
-            sortedListIndex.UnLock lockId
-            getValueTasks
+            try
+                let idxs = 
+                    sortedListIndex.LockableOp(CKeys, lockId).Result.idxKeyList
+                printfn "Idx count: %A" idxs.Count
+                let getValueTasks =
+                    idxs
+                    |> PSeq.ordered
+                    |> PSeq.withDegreeOfParallelism maxDop
+                    |> PSeq.map (fun idx -> idx, this.TryGetValueNoThreadLock(idx, defaultTimeout, true))
+                    |> PSeq.toArray
+                sortedListIndex.UnLock lockId
+                getValueTasks
+            with
+            | exn ->
+                sortedListIndex.UnLock lockId
+                printfn "%A" exn.Message
+                reraise ()
+
+
+        let valueInitializeSingleThread () =
+            let (Some lockId) = sortedListIndex.RequireLock(None, None) |> Async.RunSynchronously
+            //printfn "Required lockId: %A" lockId
+            try
+                let idxs = 
+                    sortedListIndex.LockableOp(CKeys, lockId).Result.idxKeyList
+                printfn "Idx count: %A" idxs.Count
+                let getValueTasks =
+                    idxs
+                    |> Seq.map (fun idx -> idx, this.TryGetValueNoThreadLock(idx, defaultTimeout, true))
+                    |> Seq.toArray
+                sortedListIndex.UnLock lockId
+                getValueTasks
+            with
+            | exn ->
+                sortedListIndex.UnLock lockId
+                printfn "%A" exn.Message
+                reraise ()
+
 
         let mutable write2File = ModelContainer<'Value>.write2File
         let mutable readFromFile = ModelContainer<'Value>.readFromFile
@@ -541,8 +568,9 @@ module PCSL =
             with get () = initialized
             and set (v) = initialized <- v
 
-        member this.IndexInitialization = indexInitialize
-        member this.ValueInitialization = valueInitialize
+        member this.IndexInitialize = indexInitialize
+        member this.ValueInitialize = valueInitialize
+        member this.ValueInitializeSingleThread = valueInitializeSingleThread
 
         // 添加 key-value 对
         member this.AddAsync(key: 'Key, value: 'Value, ifRemoveFromBuffer, ifIgnoreQ) =
@@ -701,30 +729,50 @@ module PCSL =
         // 获取 value，如果 ConcurrentSortedList 中不存在则从文件系统中读取
         member this.TryGetValueNoThreadLock (key: 'Key, _toMilli:int, ifIgnoreQ) = //: bool * 'Value option =
             
-#if DEBUG1
-            printfn "Query KV"
+#if DEBUG
+            let mutable trace = 0
+            try
 #endif
-            let gr = sortedList.GetValue(SLK key, ifIgnoreQ)
-            //printfn "[TryGetValueNoThreadLock.GetValue] value task: %A" gr
-            //let (Choice1Of3 _) =
-            //    [|
-            //        gr.thisT
-            //        //us.thisT
-            //    |]
-            //    |> Task.WaitAllWithTimeout _toMilli
-            let exists, value = gr.Result.kvOptionValue
-            //printfn "[TryGetValueNoThreadLock.kvOptionValue] exists: %A, value: %A" exists value
-
-            if exists then
-                let us = sortedListPersistenceStatus.Upsert(SLK key, SLPS Buffered, ifIgnoreQ).Result
-                //printfn "[TryGetValueNoThreadLock.Upsert] value task: %A" us
-                true, value
-            else
-                match readFromFileBaseAndBuffer (key, _toMilli, ifIgnoreQ) with
-                | Some v ->
-                    true, Some v
-                | None -> false, None
+                let gr = sortedList.GetValue(SLK key, false)
+#if DEBUG
+                trace <- 1            
+#endif
+                //printfn "[TryGetValueNoThreadLock.GetValue] value task: %A" gr
+                //let (Choice1Of3 _) =
+                //    [|
+                //        gr.thisT
+                //        //us.thisT
+                //    |]
+                //    |> Task.WaitAllWithTimeout _toMilli
+                let exists, value = gr.Result.kvOptionValue
+                //printfn "[TryGetValueNoThreadLock.kvOptionValue] exists: %A, value: %A" exists value
+#if DEBUG
+                trace <- 2
+#endif
             
+                if exists then
+                    let us = sortedListPersistenceStatus.Upsert(SLK key, SLPS Buffered, ifIgnoreQ).Result
+                    //printfn "[TryGetValueNoThreadLock.Upsert] value task: %A" us
+#if DEBUG
+                    trace <- 3
+#endif
+            
+                    true, value
+                else
+#if DEBUG
+                    trace <- 4
+#endif
+                    match readFromFileBaseAndBuffer (key, _toMilli, ifIgnoreQ) with
+                    | Some v ->
+                        true, Some v
+                    | None -> false, None
+#if DEBUG
+            with
+            | exn ->    
+                printfn "[TryGetValueNoThreadLock] %s" exn.Message
+                printfn "[TryGetValueNoThreadLock][%d] Query KV %A" trace key
+                false, None
+#endif            
 
         member this.TryGetValue(key: 'Key, _toMilli:int) = 
             lock sortedList.LockObj (fun () ->
