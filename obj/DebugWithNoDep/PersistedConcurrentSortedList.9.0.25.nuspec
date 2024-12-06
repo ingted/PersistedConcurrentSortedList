@@ -9,7 +9,6 @@
     <repository type="git" commit="5ae831060a82644134dcbf0cc0eb03f6cc8bed93" />
     <dependencies>
       <group targetFramework="net9.0">
-        <dependency id="FSharp.Collections.ParallelSeq" version="1.2.0" exclude="Build,Analyzers" />
         <dependency id="FAkka.FsPickler" version="9.0.100" exclude="Build,Analyzers" />
         <dependency id="FAkka.FsPickler.Json" version="9.0.100" exclude="Build,Analyzers" />
         <dependency id="FAkka.ProtoBuf.FSharp" version="9.0.11" exclude="Build,Analyzers" />

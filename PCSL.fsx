@@ -284,7 +284,7 @@ module PCSL =
                 PCSL<'Key, 'Value, SLTyp>(TSL, oFun, eFun, defaultTimeout, 0)
             else
                 PCSL<'Key, 'Value, SLTyp>(TSL, oFun, eFun, defaultTimeout, autoCache.Value)
-        let sortedListStatus = PCSL<'Key, 'Value, SLTyp>(TSLSts, oFun, eFun, sortedList.LockObj, defaultTimeout)
+        //let sortedListStatus = PCSL<'Key, 'Value, SLTyp>(TSLSts, oFun, eFun, sortedList.LockObj, defaultTimeout)
         let sortedListPersistenceStatus = PCSL<'Key, 'Value, SLTyp>(TSLPSts, oFun, eFun, sortedList.LockObj, defaultTimeout)
         let sortedListIndexReversed = PCSL<'Key, 'Value, SLTyp>(TSLIdxR, oFun, eFun, sortedList.LockObj, defaultTimeout)
         let sortedListIndex         = PCSL<'Key, 'Value, SLTyp>(TSLIdx, oFun, eFun, sortedList.LockObj, defaultTimeout)
@@ -342,6 +342,15 @@ module PCSL =
             )
 
         let valueInitialize maxDop =
+            let (Choice1Of3 _) =
+                [|
+                    sortedList.Clean().thisT
+                    sortedListIndex.Clean().thisT
+                    sortedListIndexReversed.Clean().thisT
+                    sortedListPersistenceStatus.Clean().thisT
+                |]
+                |> Task.WaitAllWithTimeout 1000
+            indexInitialize ()
             let (Some lockId) = sortedListIndex.RequireLock(None, None) |> Async.RunSynchronously
             //printfn "Required lockId: %A" lockId
             try
@@ -508,15 +517,15 @@ module PCSL =
                 else
                     None, false, None //索引無該 key
 
-        let readFromFileBaseAndBuffer (key: 'Key, _toMilli: int, ifIgnoreQ) =
-            let khOpt, fileExisted, valueOpt = readFromFileBase (key, ifIgnoreQ)
+        let readFromFileBaseAndBuffer (key: 'Key, _toMilli: int, ifIgnoreQSL, ifIgnoreQSLIdx, ifIgnoreQSLPS) =
+            let khOpt, fileExisted, valueOpt = readFromFileBase (key, ifIgnoreQSLIdx)
             if khOpt.IsNone then
                 None
             else
                 let (Choice1Of3 _) =
                     [|
-                        sortedList.Add(SLK key, SLV valueOpt.Value, ifIgnoreQ).thisT
-                        sortedListPersistenceStatus.Upsert(SLK key, SLPS Buffered, ifIgnoreQ).thisT
+                        sortedList.Add(SLK key, SLV valueOpt.Value, ifIgnoreQSL).thisT
+                        sortedListPersistenceStatus.Upsert(SLK key, SLPS Buffered, ifIgnoreQSLPS).thisT
                     |]
                     |> Task.WaitAllWithTimeout _toMilli
                 valueOpt
@@ -733,7 +742,7 @@ module PCSL =
             let mutable trace = 0
             try
 #endif
-                let gr = sortedList.GetValue(SLK key, false)
+                let gr = sortedList.GetValue(SLK key, ifIgnoreQ)
 #if DEBUG
                 trace <- 1            
 #endif
@@ -762,7 +771,7 @@ module PCSL =
 #if DEBUG
                     trace <- 4
 #endif
-                    match readFromFileBaseAndBuffer (key, _toMilli, ifIgnoreQ) with
+                    match readFromFileBaseAndBuffer (key, _toMilli, ifIgnoreQ, ifIgnoreQ, ifIgnoreQ) with
                     | Some v ->
                         true, Some v
                     | None -> false, None
@@ -796,7 +805,7 @@ module PCSL =
         member val _base    = sortedList                    with get
         member val _idx     = sortedListIndex               with get
         member val _idxR    = sortedListIndexReversed       with get
-        member val _status  = sortedListStatus              with get
+        //member val _status  = sortedListStatus              with get
         member val _pstatus = sortedListPersistenceStatus   with get
 
         member this.Info = {|

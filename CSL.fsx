@@ -402,6 +402,8 @@ module CSL =
                                         |> Async.Start
                                     //getCmdAndProceed ()
                                     goAhead (Locked g)
+                                | SysUnlock -> 
+                                    printfn "CSL not in locked state!"
                                 | _ ->
                                     printfn "Cmd handler haven't yet implemented or ignored! %A" cmd
                                     getCmdAndProceed ()
