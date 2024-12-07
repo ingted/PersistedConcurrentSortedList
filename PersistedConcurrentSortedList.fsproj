@@ -30,11 +30,13 @@
 	  <Compile Include="Memory.fsx" />
 	  <Compile Include="PB.fsx" />
 	  <Compile Include="CSL.fsx" />
+	  <Compile Include="CSL2.fsx" />
 	  <Compile Include="Task.fsx" />
 	  <!--<None Include="PB 20241017 before use mailboxprocessor.fsx" />
 	  <None Include="PB 20241014.before_change.fsx" />
 	  <None Include="PB 20241014.fsx" />-->
       <Compile Include="PCSL.fsx" />
+      <Compile Include="PCSL2.fsx" />
       <Compile Include="DefaultHelper.fsx" />
       <Compile Include="QuickStart.fsx" />
   </ItemGroup>
@@ -63,13 +65,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="FSharp.Collections.ParallelSeq"  Condition="'$(Configuration)'=='DebugWithNoDep'">
+    <Reference Include="FSharp.Collections.ParallelSeq" Condition="'$(Configuration)'=='DebugWithNoDep'">
       <HintPath>..\..\..\Libs\FSharp.Collections.ParallelSeq\src\FSharp.Collections.ParallelSeq\bin\netstandard2.0\FSharp.Collections.ParallelSeq.dll</HintPath>
     </Reference>
   </ItemGroup>
 	<PropertyGroup>
 		
-		<Version>9.0.25</Version>
+		<Version>9.0.26</Version>
 	</PropertyGroup>
 
 	<Target Name="PostPackNugetDeployWindows" AfterTargets="Pack" Condition="'$(Configuration)' == 'Release'">

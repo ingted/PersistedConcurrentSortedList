@@ -495,7 +495,7 @@
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
-    "version": "9.0.25",
+    "version": "9.0.26",
     "restore": {
       "projectUniqueName": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\PersistedConcurrentSortedList.fsproj",
       "projectName": "PersistedConcurrentSortedList",
