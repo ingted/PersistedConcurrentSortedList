@@ -6,13 +6,14 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v9.0": {
-      "PersistedConcurrentSortedList/9.0.26": {
+      "PersistedConcurrentSortedList/9.0.27.11": {
         "dependencies": {
           "FAkka.FsPickler": "9.0.100",
           "FAkka.FsPickler.Json": "9.0.100",
           "FAkka.ProtoBuf.FSharp": "9.0.11",
           "FSharp.Collections.ParallelSeq": "1.2.0",
-          "FSharp.Core": "9.0.100"
+          "FSharp.Core": "9.0.201",
+          "protobuf-net-fsharp": "9.0.11.0"
         },
         "runtime": {
           "PersistedConcurrentSortedList.dll": {}
@@ -20,7 +21,7 @@
       },
       "FAkka.FsPickler/9.0.100": {
         "dependencies": {
-          "FSharp.Core": "9.0.100",
+          "FSharp.Core": "9.0.201",
           "System.Reflection.Emit.Lightweight": "4.7.0"
         },
         "runtime": {
@@ -33,7 +34,7 @@
       "FAkka.FsPickler.Json/9.0.100": {
         "dependencies": {
           "FAkka.FsPickler": "9.0.100",
-          "FSharp.Core": "9.0.100",
+          "FSharp.Core": "9.0.201",
           "Newtonsoft.Json": "13.0.3"
         },
         "runtime": {
@@ -43,25 +44,11 @@
           }
         }
       },
-      "FAkka.ProtoBuf.FSharp/9.0.11": {
-        "dependencies": {
-          "FSharp.Core": "9.0.100",
-          "System.Buffers": "4.5.1",
-          "protobuf-net": "3.2.45",
-          "protobuf-net.Core": "3.2.45"
-        },
-        "runtime": {
-          "lib/netstandard2.0/protobuf-net-fsharp.dll": {
-            "assemblyVersion": "9.0.11.0",
-            "fileVersion": "9.0.11.0"
-          }
-        }
-      },
-      "FSharp.Core/9.0.100": {
+      "FSharp.Core/9.0.201": {
         "runtime": {
           "lib/netstandard2.1/FSharp.Core.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.1.24.52202"
+            "fileVersion": "9.2.125.7003"
           }
         },
         "resources": {
@@ -139,21 +126,42 @@
       "System.Buffers/4.5.1": {},
       "System.Collections.Immutable/7.0.0": {},
       "System.Reflection.Emit.Lightweight/4.7.0": {},
+      "FAkka.ProtoBuf.FSharp/9.0.11": {
+        "dependencies": {
+          "FSharp.Core": "9.0.201",
+          "System.Buffers": "4.5.1",
+          "protobuf-net": "3.2.45",
+          "protobuf-net.Core": "3.2.45"
+        },
+        "runtime": {
+          "protobuf-net-fsharp.dll": {
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
       "FSharp.Collections.ParallelSeq/1.2.0": {
         "dependencies": {
-          "FSharp.Core": "9.0.100"
+          "FSharp.Core": "9.0.201"
         },
         "runtime": {
           "FSharp.Collections.ParallelSeq.dll": {
-            "assemblyVersion": "1.2.0",
+            "assemblyVersion": "1.2.0.0",
             "fileVersion": "1.2.0.0"
+          }
+        }
+      },
+      "protobuf-net-fsharp/9.0.11.0": {
+        "runtime": {
+          "protobuf-net-fsharp.dll": {
+            "assemblyVersion": "9.0.11.0",
+            "fileVersion": "9.0.11.0"
           }
         }
       }
     }
   },
   "libraries": {
-    "PersistedConcurrentSortedList/9.0.26": {
+    "PersistedConcurrentSortedList/9.0.27.11": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
@@ -161,7 +169,7 @@
     "FAkka.FsPickler/9.0.100": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-4hQaZyw/H6mGGwUSPP930oJdjSGcxErzCsV4YnvfwnEe+moIOqwlTtYUlVx0swoF93ppcW7BboZagJjPUO4SKQ==",
+      "sha512": "sha512-yYNVeIHGDvpZ8/kWTxL+GkSLfXCaReqmyYmoK2X0AXCzlD6vJZTjl3lQJAFNpI2rCpK6tB+ZPZtYLgkcl4x4Ow==",
       "path": "fakka.fspickler/9.0.100",
       "hashPath": "fakka.fspickler.9.0.100.nupkg.sha512"
     },
@@ -172,19 +180,12 @@
       "path": "fakka.fspickler.json/9.0.100",
       "hashPath": "fakka.fspickler.json.9.0.100.nupkg.sha512"
     },
-    "FAkka.ProtoBuf.FSharp/9.0.11": {
+    "FSharp.Core/9.0.201": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-KgL7o2QyDmefmki8TGcF1Go/IA4hyktux7BwalGFBIP2/ya1Dm+C7VCBaQK2zhjs+0NtJUy55whpH0ocTRD4oA==",
-      "path": "fakka.protobuf.fsharp/9.0.11",
-      "hashPath": "fakka.protobuf.fsharp.9.0.11.nupkg.sha512"
-    },
-    "FSharp.Core/9.0.100": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-ye8yagHGsH08H2Twno5GRWkSbrMtxK/SWiHuPcF+3nODpW65/VJ8RO0aWxp8n9+KQbmahg90wAEL3TEXjF0r6A==",
-      "path": "fsharp.core/9.0.100",
-      "hashPath": "fsharp.core.9.0.100.nupkg.sha512"
+      "sha512": "sha512-Ozq4T0ISTkqTYJ035XW/JkdDDaXofbykvfyVwkjLSqaDZ/4uNXfpf92cjcMI9lf9CxWqmlWHScViPh/4AvnWcw==",
+      "path": "fsharp.core/9.0.201",
+      "hashPath": "fsharp.core.9.0.201.nupkg.sha512"
     },
     "Newtonsoft.Json/13.0.3": {
       "type": "package",
@@ -228,8 +229,18 @@
       "path": "system.reflection.emit.lightweight/4.7.0",
       "hashPath": "system.reflection.emit.lightweight.4.7.0.nupkg.sha512"
     },
+    "FAkka.ProtoBuf.FSharp/9.0.11": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
     "FSharp.Collections.ParallelSeq/1.2.0": {
       "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "protobuf-net-fsharp/9.0.11.0": {
+      "type": "reference",
       "serviceable": false,
       "sha512": ""
     }

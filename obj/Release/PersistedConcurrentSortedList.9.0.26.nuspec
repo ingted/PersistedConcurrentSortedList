@@ -6,7 +6,7 @@
     <authors>PersistedConcurrentSortedList</authors>
     <projectUrl>https://github.com/ingted/PersistedConcurrentSortedList</projectUrl>
     <description>SortedList with persistency and threadsafty.</description>
-    <repository type="git" commit="e4ea5e1cc756bb49a41993bb950bbb62ea9523c6" />
+    <repository type="git" commit="fdb63fda11e1145772f853c4623f54659168e31f" />
     <dependencies>
       <group targetFramework="net9.0">
         <dependency id="FSharp.Collections.ParallelSeq" version="1.2.0" exclude="Build,Analyzers" />

@@ -29,33 +29,7 @@
           "lib/net9.0/FsPickler.Json.dll": {}
         }
       },
-      "FAkka.ProtoBuf.FSharp/9.0.11": {
-        "type": "package",
-        "dependencies": {
-          "FSharp.Core": "9.0.100-beta.24466.6",
-          "System.Buffers": "4.5.1",
-          "protobuf-net": "3.2.45",
-          "protobuf-net.Core": "3.2.45"
-        },
-        "compile": {
-          "lib/netstandard2.0/protobuf-net-fsharp.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/netstandard2.0/protobuf-net-fsharp.dll": {
-            "related": ".xml"
-          }
-        },
-        "contentFiles": {
-          "contentFiles/any/netstandard2.0/app.config": {
-            "buildAction": "Content",
-            "codeLanguage": "any",
-            "copyToOutput": false
-          }
-        }
-      },
-      "FSharp.Core/9.0.100": {
+      "FSharp.Core/9.0.201": {
         "type": "package",
         "compile": {
           "lib/netstandard2.1/FSharp.Core.dll": {
@@ -188,11 +162,27 @@
           "lib/netcoreapp2.0/_._": {}
         }
       },
+      "FAkka.ProtoBuf.FSharp/9.0.11": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.0",
+        "dependencies": {
+          "FSharp.Core": "9.0.201",
+          "System.Buffers": "4.5.1",
+          "protobuf-net": "3.2.45",
+          "protobuf-net.Core": "3.2.45"
+        },
+        "compile": {
+          "bin/placeholder/FAkka.ProtoBuf.FSharp.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/FAkka.ProtoBuf.FSharp.dll": {}
+        }
+      },
       "FSharp.Collections.ParallelSeq/1.2.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
-          "FSharp.Core": "9.0.100"
+          "FSharp.Core": "9.0.201"
         },
         "compile": {
           "bin/placeholder/FSharp.Collections.ParallelSeq.dll": {}
@@ -205,11 +195,12 @@
   },
   "libraries": {
     "FAkka.FsPickler/9.0.100": {
-      "sha512": "4hQaZyw/H6mGGwUSPP930oJdjSGcxErzCsV4YnvfwnEe+moIOqwlTtYUlVx0swoF93ppcW7BboZagJjPUO4SKQ==",
+      "sha512": "yYNVeIHGDvpZ8/kWTxL+GkSLfXCaReqmyYmoK2X0AXCzlD6vJZTjl3lQJAFNpI2rCpK6tB+ZPZtYLgkcl4x4Ow==",
       "type": "package",
       "path": "fakka.fspickler/9.0.100",
       "files": [
         ".nupkg.metadata",
+        ".signature.p7s",
         "LICENSE.txt",
         "README.md",
         "fakka.fspickler.9.0.100.nupkg.sha512",
@@ -230,29 +221,15 @@
         "lib/net9.0/FsPickler.Json.dll"
       ]
     },
-    "FAkka.ProtoBuf.FSharp/9.0.11": {
-      "sha512": "KgL7o2QyDmefmki8TGcF1Go/IA4hyktux7BwalGFBIP2/ya1Dm+C7VCBaQK2zhjs+0NtJUy55whpH0ocTRD4oA==",
+    "FSharp.Core/9.0.201": {
+      "sha512": "Ozq4T0ISTkqTYJ035XW/JkdDDaXofbykvfyVwkjLSqaDZ/4uNXfpf92cjcMI9lf9CxWqmlWHScViPh/4AvnWcw==",
       "type": "package",
-      "path": "fakka.protobuf.fsharp/9.0.11",
-      "files": [
-        ".nupkg.metadata",
-        "content/app.config",
-        "contentFiles/any/netstandard2.0/app.config",
-        "fakka.protobuf.fsharp.9.0.11.nupkg.sha512",
-        "fakka.protobuf.fsharp.nuspec",
-        "lib/netstandard2.0/protobuf-net-fsharp.dll",
-        "lib/netstandard2.0/protobuf-net-fsharp.xml"
-      ]
-    },
-    "FSharp.Core/9.0.100": {
-      "sha512": "ye8yagHGsH08H2Twno5GRWkSbrMtxK/SWiHuPcF+3nODpW65/VJ8RO0aWxp8n9+KQbmahg90wAEL3TEXjF0r6A==",
-      "type": "package",
-      "path": "fsharp.core/9.0.100",
+      "path": "fsharp.core/9.0.201",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "Icon.png",
-        "fsharp.core.9.0.100.nupkg.sha512",
+        "fsharp.core.9.0.201.nupkg.sha512",
         "fsharp.core.nuspec",
         "lib/netstandard2.0/FSharp.Core.dll",
         "lib/netstandard2.0/FSharp.Core.xml",
@@ -475,6 +452,11 @@
         "version.txt"
       ]
     },
+    "FAkka.ProtoBuf.FSharp/9.0.11": {
+      "type": "project",
+      "path": "../protobuf-net-fsharp/src/ProtoBuf.FSharp/ProtoBuf.FSharp.fsproj",
+      "msbuildProject": "../protobuf-net-fsharp/src/ProtoBuf.FSharp/ProtoBuf.FSharp.fsproj"
+    },
     "FSharp.Collections.ParallelSeq/1.2.0": {
       "type": "project",
       "path": "../../../Libs/FSharp.Collections.ParallelSeq/src/FSharp.Collections.ParallelSeq/FSharp.Collections.ParallelSeq.fsproj",
@@ -487,7 +469,7 @@
       "FAkka.FsPickler.Json >= 9.0.100",
       "FAkka.ProtoBuf.FSharp >= 9.0.11",
       "FSharp.Collections.ParallelSeq >= 1.2.0",
-      "FSharp.Core >= 9.0.100"
+      "FSharp.Core >= 9.0.201"
     ]
   },
   "packageFolders": {
@@ -495,7 +477,7 @@
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
-    "version": "9.0.26",
+    "version": "9.0.27.11",
     "restore": {
       "projectUniqueName": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\PersistedConcurrentSortedList.fsproj",
       "projectName": "PersistedConcurrentSortedList",
@@ -516,14 +498,16 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\library-packs": {},
-        "C:\\Program Files\\dotnet\\sdk\\9.0.100\\FSharp\\library-packs": {},
+        "C:\\Program Files\\dotnet\\sdk\\9.0.201\\FSharp\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
+            "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\protobuf-net-fsharp\\src\\ProtoBuf.FSharp\\ProtoBuf.FSharp.fsproj": {
+              "projectPath": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\protobuf-net-fsharp\\src\\ProtoBuf.FSharp\\ProtoBuf.FSharp.fsproj"
+            },
             "G:\\coldfar_py\\sharftrade9\\Libs\\FSharp.Collections.ParallelSeq\\src\\FSharp.Collections.ParallelSeq\\FSharp.Collections.ParallelSeq.fsproj": {
               "projectPath": "G:\\coldfar_py\\sharftrade9\\Libs\\FSharp.Collections.ParallelSeq\\src\\FSharp.Collections.ParallelSeq\\FSharp.Collections.ParallelSeq.fsproj"
             }
@@ -533,9 +517,9 @@
       "restoreAuditProperties": {
         "enableAudit": "true",
         "auditLevel": "low",
-        "auditMode": "all"
+        "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.100"
+      "SdkAnalysisLevel": "9.0.200"
     },
     "frameworks": {
       "net9.0": {
@@ -551,15 +535,10 @@
             "version": "[9.0.100, )",
             "generatePathProperty": true
           },
-          "FAkka.ProtoBuf.FSharp": {
-            "target": "Package",
-            "version": "[9.0.11, )",
-            "generatePathProperty": true
-          },
           "FSharp.Core": {
             "include": "Runtime, Compile, Build, Native, Analyzers, BuildTransitive",
             "target": "Package",
-            "version": "[9.0.100, )",
+            "version": "[9.0.201, )",
             "generatePathProperty": true
           }
         },
@@ -579,7 +558,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.100/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.201/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
