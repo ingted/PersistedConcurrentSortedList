@@ -31,9 +31,13 @@ open System.Collections.Generic
 open NTDLS.Katzebase.Parsers.Interfaces
 #endif
 //open Newtonsoft.Json
-
+#if NET9_0
 open MBrace.FsPickler.Json
 open MBrace.FsPickler.Combinators 
+#else
+open MBrace.FsPickler.nstd20.Json
+open MBrace.FsPickler.nstd20.Combinators 
+#endif
 open ProtoBuf
 open ProtoBuf.FSharp
 open FSharp.Reflection
@@ -50,7 +54,7 @@ module PCSL2 =
     open System.Threading.Tasks
 
     open FSharp.Collections.ParallelSeq
-    open MBrace.FsPickler.Json
+    
 
     
 
@@ -243,6 +247,7 @@ module PCSL2 =
 
         let mutable write2File = ModelContainer<'Value>.write2File
         let mutable readFromFile = ModelContainer<'Value>.readFromFile
+        
         // 生成 SHA-256 哈希
         let mutable generateKeyHash : 'Key -> KeyHash = fun (key: 'Key) ->
             ModelContainer<'Key>.getHashStr key
@@ -436,35 +441,42 @@ module PCSL2 =
         member this.IndexInitialize = indexInitialize
         member this.ValueInitialize = valueInitialize
         member this.ValueInitializeSingleThread = valueInitializeSingleThread
-
+        member this.SetReadFromFile f =
+                    readFromFile <- f
+                    this
+        member this.SetGenerateKeyHash f =
+                    generateKeyHash <- f
+                    this
         // 添加 key-value 对
         member this.AddAsync(key: 'Key, value: 'Value, ifRemoveFromBuffer, ifIgnoreQ) =
 #if DEBUG1
 #else
                 rwLock.EnterWriteLock()
-            //lock sortedList.LockObj (fun () ->
 #endif
-                if sortedListIndex.ContainsKeySafe (key) then
+                try
+                    if sortedListIndex.ContainsKeySafe (key) then
 #if DEBUG
-                    printfn "[AddAsync] Key %A already exists, Value: %A" key value
+                        printfn "[AddAsync] Key %A already exists, Value: %A" key value
 #endif
 #if DEBUG1
 #else
 
-                    rwLock.ExitWriteLock()
+                        //rwLock.ExitWriteLock()
 #endif
-                    [||]
-                else
-                    let rst = [|                
-                            sortedList.Add(key, value).thisT
-                            ((persistKeyValueBase ifRemoveFromBuffer ifIgnoreQ) (key,  value)).thisT
-                        |]
+                        [||]
+                    else
+                        let rst = [|                
+                                sortedList.Add(key, value).thisT
+                                ((persistKeyValueBase ifRemoveFromBuffer ifIgnoreQ) (key,  value)).thisT
+                            |]
 #if DEBUG1
-#else                
-            //)
-                    rwLock.ExitWriteLock()
+#else                    
+
+                        //rwLock.ExitWriteLock()
 #endif
-                    rst
+                        rst
+                finally
+                    rwLock.ExitWriteLock()
         
         member this.AddAsync(key: 'Key, value: 'Value, ifRemoveFromBuffer) =
             this.AddAsync(key, value, ifRemoveFromBuffer, false)
@@ -492,23 +504,24 @@ module PCSL2 =
         member this.UpdateAsync(key: 'Key, value: 'Value, ifRemoveFromBuffer, ifIgnoreQ) =
 #if DEBUG1
 #else
-            //lock sortedList.LockObj (fun () ->
                 rwLock.EnterWriteLock()
 #endif
-                if not <| sortedListIndex.ContainsKeySafe key then
-                    rwLock.ExitWriteLock()
-                    [||]
-                else
-                    let rst = [|
-                            sortedList.Update(key, value, ifIgnoreQ).thisT
-                            ((persistKeyValueBase ifRemoveFromBuffer ifIgnoreQ) (key,  value)).thisT
-                        |]
+                try
+                    if not <| sortedListIndex.ContainsKeySafe key then
+                        //rwLock.ExitWriteLock()
+                        [||]
+                    else
+                        let rst = [|
+                                sortedList.Update(key, value, ifIgnoreQ).thisT
+                                ((persistKeyValueBase ifRemoveFromBuffer ifIgnoreQ) (key,  value)).thisT
+                            |]
 #if DEBUG1
-#else                
-                    rwLock.ExitWriteLock()
-            //)
+#else                    
+                        //rwLock.ExitWriteLock()
 #endif
-                    rst
+                        rst
+                finally
+                    rwLock.ExitWriteLock()
 
         member this.UpdateAsync(key: 'Key, value: 'Value, ifRemoveFromBuffer) =
             this.UpdateAsync(key, value, ifRemoveFromBuffer, false)
@@ -523,20 +536,23 @@ module PCSL2 =
         member this.UpsertAsync(key: 'Key, value: 'Value, ifRemoveFromBuffer, ifIgnoreQ) =
 #if DEBUG1
 #else
-            //lock sortedList.LockObj (fun () ->
             rwLock.EnterWriteLock()
 #endif
-            let rst =
-                [|
-                    sortedList.Upsert(key, value, ifIgnoreQ).thisT
-                    ((persistKeyValueBase ifRemoveFromBuffer ifIgnoreQ) (key,  value)).thisT
-                |]
+            try
+                let rst =
+                    [|
+                        sortedList.Upsert(key, value, ifIgnoreQ).thisT
+                        ((persistKeyValueBase ifRemoveFromBuffer ifIgnoreQ) (key,  value)).thisT
+                    |]
 #if DEBUG1
-#else                
-            rwLock.ExitWriteLock()
-            //)
+#else                    
+                //rwLock.ExitWriteLock()
+
 #endif
-            rst
+                rst
+            finally
+                rwLock.ExitWriteLock()
+
         member this.UpsertAsync(key: 'Key, value: 'Value, ifRemoveFromBuffer) =
             this.UpsertAsync(key, value, ifRemoveFromBuffer, false)
 
@@ -556,16 +572,18 @@ module PCSL2 =
         member this.RemoveAsync(key: 'Key, ifIgnoreQ) =
 #if DEBUG1
 #else
-            //lock sortedList.LockObj (fun () ->
-                rwLock.EnterWriteLock()
+            rwLock.EnterWriteLock()
+            try
 #endif
                 let taskArr = removePersistedKeyValue (key, ifIgnoreQ)
 #if DEBUG1
 #else                
-            //)
-                rwLock.ExitWriteLock()                
+                              
 #endif
                 taskArr
+            finally
+                rwLock.ExitWriteLock()  
+                
         member this.RemoveAsync(key: 'Key) =
             this.RemoveAsync(key, false)
 
@@ -701,16 +719,23 @@ module PCSL2 =
         member this.TryGetValue(key: 'Key, _toMilli:int) = 
             //lock sortedList.LockObj (fun () ->
                 rwLock.EnterReadLock()
-                let rst = this.TryGetValueNoThreadLock (key, _toMilli, false)
-                rwLock.ExitReadLock()
-                rst
+                try
+                    let rst = this.TryGetValueNoThreadLock (key, _toMilli, false)
+                    rst
+                //with
+                //| exn ->
+                finally
+                    rwLock.ExitReadLock()
+                    
             //)
 
         member this.TryGetValues(keys: 'Key seq, _toMilli:int) = 
                 rwLock.EnterReadLock()
-                let rst = this.TryGetValuesNoThreadLock (keys, _toMilli, false)
-                rwLock.ExitReadLock()
-                rst
+                try
+                    let rst = this.TryGetValuesNoThreadLock (keys, _toMilli, false)
+                    rst
+                finally
+                    rwLock.ExitReadLock()
 
         member this.TryGetValue(key) =
             this.TryGetValue(key, defaultTimeout)

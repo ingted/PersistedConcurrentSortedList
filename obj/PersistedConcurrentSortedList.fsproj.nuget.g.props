@@ -7,15 +7,31 @@
     <NuGetPackageRoot Condition=" '$(NuGetPackageRoot)' == '' ">$(UserProfile)\.nuget\packages\</NuGetPackageRoot>
     <NuGetPackageFolders Condition=" '$(NuGetPackageFolders)' == '' ">C:\Users\Administrator\.nuget\packages\;C:\Program Files (x86)\Microsoft Visual Studio\Shared\NuGetPackages</NuGetPackageFolders>
     <NuGetProjectStyle Condition=" '$(NuGetProjectStyle)' == '' ">PackageReference</NuGetProjectStyle>
-    <NuGetToolVersion Condition=" '$(NuGetToolVersion)' == '' ">6.13.2</NuGetToolVersion>
+    <NuGetToolVersion Condition=" '$(NuGetToolVersion)' == '' ">6.14.0</NuGetToolVersion>
   </PropertyGroup>
   <ItemGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
     <SourceRoot Include="C:\Users\Administrator\.nuget\packages\" />
     <SourceRoot Include="C:\Program Files (x86)\Microsoft Visual Studio\Shared\NuGetPackages\" />
   </ItemGroup>
-  <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' AND '$(ExcludeRestorePackageImports)' != 'true' ">
+    <Content Include="$(NuGetPackageRoot)fspickler.nstd20\2.0.9.2\contentFiles\any\netstandard2.0\global.json" Condition="Exists('$(NuGetPackageRoot)fspickler.nstd20\2.0.9.2\contentFiles\any\netstandard2.0\global.json')">
+      <NuGetPackageId>FsPickler.nstd20</NuGetPackageId>
+      <NuGetPackageVersion>2.0.9.2</NuGetPackageVersion>
+      <NuGetItemType>Content</NuGetItemType>
+      <Pack>false</Pack>
+      <Private>False</Private>
+      <Link>global.json</Link>
+    </Content>
+  </ItemGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net9.0' AND '$(ExcludeRestorePackageImports)' != 'true' ">
     <PkgFSharp_Core Condition=" '$(PkgFSharp_Core)' == '' ">C:\Users\Administrator\.nuget\packages\fsharp.core\9.0.201</PkgFSharp_Core>
     <PkgFAkka_FsPickler Condition=" '$(PkgFAkka_FsPickler)' == '' ">C:\Users\Administrator\.nuget\packages\fakka.fspickler\9.0.100</PkgFAkka_FsPickler>
     <PkgFAkka_FsPickler_Json Condition=" '$(PkgFAkka_FsPickler_Json)' == '' ">C:\Users\Administrator\.nuget\packages\fakka.fspickler.json\9.0.100</PkgFAkka_FsPickler_Json>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' AND '$(ExcludeRestorePackageImports)' != 'true' ">
+    <PkgNETStandard_Library Condition=" '$(PkgNETStandard_Library)' == '' ">C:\Users\Administrator\.nuget\packages\netstandard.library\2.0.3</PkgNETStandard_Library>
+    <PkgFSharp_Core Condition=" '$(PkgFSharp_Core)' == '' ">C:\Users\Administrator\.nuget\packages\fsharp.core\9.0.201</PkgFSharp_Core>
+    <PkgFsPickler_nstd20 Condition=" '$(PkgFsPickler_nstd20)' == '' ">C:\Users\Administrator\.nuget\packages\fspickler.nstd20\2.0.9.2</PkgFsPickler_nstd20>
+    <PkgFsPickler_Json_nstd20 Condition=" '$(PkgFsPickler_Json_nstd20)' == '' ">C:\Users\Administrator\.nuget\packages\fspickler.json.nstd20\2.0.9.2</PkgFsPickler_Json_nstd20>
   </PropertyGroup>
 </Project>

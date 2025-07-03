@@ -1,20 +1,29 @@
 {
   "version": 2,
-  "dgSpecHash": "zLetT3IjeqQ=",
+  "dgSpecHash": "VpdyRnGNjXo=",
   "success": true,
   "projectFilePath": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\PersistedConcurrentSortedList.fsproj",
   "expectedPackageFiles": [
     "C:\\Users\\Administrator\\.nuget\\packages\\fakka.fspickler\\9.0.100\\fakka.fspickler.9.0.100.nupkg.sha512",
     "C:\\Users\\Administrator\\.nuget\\packages\\fakka.fspickler.json\\9.0.100\\fakka.fspickler.json.9.0.100.nupkg.sha512",
     "C:\\Users\\Administrator\\.nuget\\packages\\fsharp.core\\9.0.201\\fsharp.core.9.0.201.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\fspickler.json.nstd20\\2.0.9.2\\fspickler.json.nstd20.2.0.9.2.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\fspickler.nstd20\\2.0.9.2\\fspickler.nstd20.2.0.9.2.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512",
     "C:\\Users\\Administrator\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512",
     "C:\\Users\\Administrator\\.nuget\\packages\\protobuf-net\\3.2.45\\protobuf-net.3.2.45.nupkg.sha512",
     "C:\\Users\\Administrator\\.nuget\\packages\\protobuf-net.core\\3.2.45\\protobuf-net.core.3.2.45.nupkg.sha512",
     "C:\\Users\\Administrator\\.nuget\\packages\\system.buffers\\4.5.1\\system.buffers.4.5.1.nupkg.sha512",
     "C:\\Users\\Administrator\\.nuget\\packages\\system.collections.immutable\\7.0.0\\system.collections.immutable.7.0.0.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\system.memory\\4.5.5\\system.memory.4.5.5.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\system.numerics.vectors\\4.4.0\\system.numerics.vectors.4.4.0.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\system.reflection.emit\\4.7.0\\system.reflection.emit.4.7.0.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\system.reflection.emit.ilgeneration\\4.7.0\\system.reflection.emit.ilgeneration.4.7.0.nupkg.sha512",
     "C:\\Users\\Administrator\\.nuget\\packages\\system.reflection.emit.lightweight\\4.7.0\\system.reflection.emit.lightweight.4.7.0.nupkg.sha512",
-    "C:\\Users\\Administrator\\.nuget\\packages\\fakka.protobuf.fsharp\\9.0.11\\fakka.protobuf.fsharp.9.0.11.nupkg.sha512",
-    "C:\\Users\\Administrator\\.nuget\\packages\\fsharp.collections.parallelseq\\1.2.0\\fsharp.collections.parallelseq.1.2.0.nupkg.sha512"
+    "C:\\Users\\Administrator\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\fakka.fsharp.collections.parallelseq\\1.0.0\\fakka.fsharp.collections.parallelseq.1.0.0.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\fakka.protobuf.fsharp\\9.0.14\\fakka.protobuf.fsharp.9.0.14.nupkg.sha512"
   ],
   "logs": []
 }

@@ -32,8 +32,13 @@ open NTDLS.Katzebase.Parsers.Interfaces
 #endif
 //open Newtonsoft.Json
 
+#if NET9_0
 open MBrace.FsPickler.Json
 open MBrace.FsPickler.Combinators 
+#else
+open MBrace.FsPickler.nstd20.Json
+open MBrace.FsPickler.nstd20.Combinators 
+#endif
 open ProtoBuf
 open ProtoBuf.FSharp
 open FSharp.Reflection
@@ -50,7 +55,13 @@ module PCSL =
     open System.Threading.Tasks
 
     open FSharp.Collections.ParallelSeq
+#if NET9_0
     open MBrace.FsPickler.Json
+
+#else
+    open MBrace.FsPickler.nstd20.Json
+
+#endif
 
     
 

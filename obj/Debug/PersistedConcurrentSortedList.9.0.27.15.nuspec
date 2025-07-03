@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>PersistedConcurrentSortedList</id>
+    <version>9.0.27.15</version>
+    <authors>PersistedConcurrentSortedList</authors>
+    <projectUrl>https://github.com/ingted/PersistedConcurrentSortedList</projectUrl>
+    <description>SortedList with persistency and threadsafty.</description>
+    <repository type="git" commit="6b732ee00237b7574cb3079bdc543d8b27842a00" />
+    <dependencies>
+      <group targetFramework="net9.0">
+        <dependency id="FAkka.ProtoBuf.FSharp" version="9.0.14" exclude="Build,Analyzers" />
+        <dependency id="FAkka.FSharp.Collections.ParallelSeq" version="1.0.0" exclude="Build,Analyzers" />
+        <dependency id="FAkka.FsPickler" version="9.0.100" exclude="Build,Analyzers" />
+        <dependency id="FAkka.FsPickler.Json" version="9.0.100" exclude="Build,Analyzers" />
+        <dependency id="FSharp.Core" version="9.0.201" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="FAkka.ProtoBuf.FSharp" version="9.0.14" exclude="Build,Analyzers" />
+        <dependency id="FAkka.FSharp.Collections.ParallelSeq" version="1.0.0" exclude="Build,Analyzers" />
+        <dependency id="FSharp.Core" version="9.0.201" exclude="Build,Analyzers" />
+        <dependency id="FsPickler.Json.nstd20" version="2.0.9.2" exclude="Build,Analyzers" />
+        <dependency id="FsPickler.nstd20" version="2.0.9.2" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\net9.0\PersistedConcurrentSortedList.dll" target="lib\net9.0\PersistedConcurrentSortedList.dll" />
+    <file src="G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\net9.0\PersistedConcurrentSortedList.xml" target="lib\net9.0\PersistedConcurrentSortedList.xml" />
+    <file src="G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\netstandard2.0\PersistedConcurrentSortedList.dll" target="lib\netstandard2.0\PersistedConcurrentSortedList.dll" />
+    <file src="G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\netstandard2.0\PersistedConcurrentSortedList.xml" target="lib\netstandard2.0\PersistedConcurrentSortedList.xml" />
+  </files>
+</package>

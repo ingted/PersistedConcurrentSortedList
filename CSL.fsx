@@ -206,7 +206,21 @@ module CSL =
         //                return None
         //        }
         member this.WaitAsync(_toMilli:int) = 
+#if NET9_0
+               
+            // .NET 9 specific implementation
             this.WaitAsync(TimeSpan.FromMilliseconds _toMilli)
+#else
+            // .NET Standard 2.0 specific implementation
+               
+            Task.Run(fun () -> 
+                if this.Wait(_toMilli) then 
+                    this.Result
+                else
+                    raise (TimeoutException("Task timed out"))
+            )
+            
+#endif
         member this.Ignore () = ()
         member this.thisT = this :> Task
         member this.WaitIgnore = this.Result |> ignore
@@ -267,11 +281,18 @@ module CSL =
                         //            procCmd latestCmdToAppendOpt.Value
 
                         let rec getCmdAndProceed () =
+#if NET9_0
                             let ifD, m = messageQueue.TryDequeue () 
                             if ifD then
                                 procCmd m
+#else
+                            if messageQueue.Count > 0 then                                
+                                let m = messageQueue.Dequeue () 
+                                procCmd m
+#endif
 
                         and getCmdAndProceedBeforeLatestCmdProceed latestCmdToAppend =
+#if NET9_0
                             let ifD, m = messageQueue.TryDequeue () 
                             if ifD then
 #if DEBUG
@@ -282,6 +303,15 @@ module CSL =
                                 
                             else
                                 procCmd latestCmdToAppend
+#else
+                            if messageQueue.Count > 0 then
+                                let m = messageQueue.Dequeue ()
+                                printfn "Enqueue latestCmd first: %A" latestCmdToAppend
+                                messageQueue.Enqueue latestCmdToAppend
+                                procCmd m
+                            else
+                                procCmd latestCmdToAppend
+#endif
                         
                         and goAhead _status =
                             status <- _status
@@ -492,7 +522,17 @@ module CSL =
         member this.TryAddBase(key: 'Key, value: 'Value) =
             
             try
+#if NET9_0
                 let added = sortedList.TryAdd(key, value)
+#else
+                let added = 
+                    try
+                        sortedList.Add(key, value)
+                        true
+                    with
+                    | _ -> 
+                        false
+#endif
                 if this.autoCacheChange.IsSome && this.autoCacheChange.Value <> 0 then
                     SortedListCache<_, _>.CacheChange sortedList
 #if DEBUG1
@@ -525,12 +565,24 @@ module CSL =
                 sortedList.[key] <- newValue
                 2
             else
+#if NET9_0
                 if sortedList.TryAdd (key, newValue) then
                     if this.autoCacheChange.IsSome && this.autoCacheChange.Value <> 0 then
                         SortedListCache<_, _>.CacheChange sortedList
                     1
                 else
                     0
+#else
+                try
+                    sortedList.Add(key, newValue)
+                
+                    if this.autoCacheChange.IsSome && this.autoCacheChange.Value <> 0 then
+                        SortedListCache<_, _>.CacheChange sortedList
+                    1
+                with
+                | _ ->
+                    0
+#endif
                 
 
         member this.TryGetValueBase(key: 'Key) : bool * 'Value option =

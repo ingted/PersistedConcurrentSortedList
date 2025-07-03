@@ -30,10 +30,10 @@ open System.Collections.Generic
 #if KATZEBASE
 open NTDLS.Katzebase.Parsers.Interfaces
 #endif
-open Newtonsoft.Json
+//open Newtonsoft.Json
 
-open MBrace.FsPickler
-open MBrace.FsPickler.Combinators 
+//open MBrace.FsPickler
+//open MBrace.FsPickler.Combinators 
 open ProtoBuf
 open ProtoBuf.FSharp
 open FSharp.Reflection
@@ -392,7 +392,11 @@ module FS =
 
     let _ =
         mapper.Add(
+#if NET9_0
             typeof<string * fstring>, (fun (T (k, v)) -> box (KeyValuePair.Create(k, v)))
+#else
+            typeof<string * fstring>, (fun (T (k, v)) -> box (KeyValuePair(k, v)))
+#endif
         )
 
     [<Extension>]
@@ -465,6 +469,7 @@ module PB =
             )
             with get, set
 
+
         static member serializeFBase (m, (ms, o)) =
 #if DEBUG1
             printfn "[serializeF] type: %s, %A" (o.GetType().Name) o
@@ -476,6 +481,8 @@ module PB =
             printfn "[deserializeF] 'T: %s" typeof<'T>.Name
 #endif
             Serialiser.deserialiseConcreteType<'T> m ms
+
+
 
         static member serializeF (ms, o) = 
             ModelContainer<'T>.serializeFBase (ModelContainer<'T>.pbModel, (ms, o))
@@ -493,6 +500,7 @@ module PB =
         static member deserializeF ms = 
             ModelContainer<'T>.deserializeFBase (ModelContainer<'T>.pbModel, ms)
 
+
         static member write2File = fun filePath (o:'T) ->            
             File.WriteAllBytes(filePath, ModelContainer<'T>.serializeF2BArr o)
 
@@ -502,12 +510,14 @@ module PB =
             use input = new MemoryStream(serializedData)
             input.Position <- 0
             ModelContainer<'T>.deserializeF input
-        
+
         static member readFromFile = fun filePath ->
             if File.Exists(filePath) then
                 ModelContainer<'T>.readFromFileBase filePath |> Some
             else
                 None
+
+
 
     let registerType<'T> (rtmOpt:RuntimeTypeModel option) =
         if rtmOpt.IsNone then
@@ -519,3 +529,33 @@ module PB =
                 |> Serialiser.registerUnionIntoModel<'T>
             ModelContainer<'T>.pbModel <- updated
             ModelContainer<'T>.pbModel
+
+    module ModelContainer =
+        let inline configureSurrogateType<'T, 'surrogate when 'surrogate :  (static member op_Implicit : ^surrogate -> 'T )> () =
+            if not <| Serialiser.surrogateTypeMap.ContainsKey (typeof<'surrogate>, typeof<'T>) then
+                try
+                    ModelContainer<'T>.pbModel.Add(typeof<'T>, false).SetSurrogate(typeof<'surrogate>) |> ignore
+                with
+                | exn -> 
+                    printfn $"{exn.Message}"
+                Serialiser.surrogateTypeMap.TryAdd((typeof<'surrogate>, typeof<'T>), true) |> ignore
+
+        let inline deserializeFBase2<'T, 'surrogate when 'surrogate :  (static member op_Implicit : ^surrogate -> 'T )> (m, ms) =
+            configureSurrogateType<'T, 'surrogate>()
+            Serialiser.deserialiseConcreteType2<'T, 'surrogate> m ms
+        
+        let inline deserializeF2<'T, 'surrogate when 'surrogate :  (static member op_Implicit : ^surrogate -> 'T )>  ms = 
+            deserializeFBase2<'T, 'surrogate> (ModelContainer<'T>.pbModel, ms)
+
+        let inline readFromFileBase2<'T, 'surrogate when 'surrogate :  (static member op_Implicit : ^surrogate -> 'T )> filePath =
+            let serializedData = File.ReadAllBytes(filePath) |> Deflate.decompress
+            // 使用反序列化来读取值
+            use input = new MemoryStream(serializedData)
+            input.Position <- 0
+            deserializeF2<'T, 'surrogate> input
+        
+        let inline readFromFile2<'T, 'surrogate when 'surrogate :  (static member op_Implicit : ^surrogate -> 'T )> filePath =
+            if File.Exists(filePath) then
+                readFromFileBase2<'T, 'surrogate> filePath |> Some
+            else
+                None

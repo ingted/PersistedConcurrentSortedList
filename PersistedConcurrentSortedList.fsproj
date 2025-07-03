@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFrameworks>net9.0;netstandard2.0</TargetFrameworks>
+    <!--<TargetFrameworks>netstandard2.0</TargetFrameworks>-->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 	  <EnablePackageValidation>false</EnablePackageValidation>
 	  <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -24,6 +25,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+	  <None Include="test.fsx" />
 	  <None Include="CopyDll.ps1" />
 	  <None Include="README.md" />
 	  <None Include="PostBuildEvent.ps1" />
@@ -45,16 +47,26 @@
 
   <ItemGroup>
     <!--<PackageReference Include="FSharp.Collections.ParallelSeq" Version="1.2.0" />-->
-	<PackageReference Include="FAkka.ProtoBuf.FSharp" Version="9.0.11" Condition="'$(Configuration)'=='DebugWithNoDep'" />
+	<PackageReference Include="FAkka.ProtoBuf.FSharp" Version="9.0.14" Condition="'$(Configuration)'=='DebugWithNoDep'" />
+	<PackageReference Include="FAkka.ProtoBuf.FSharp" Version="9.0.14" Condition="'$(Configuration)'=='Release'" />
   </ItemGroup>
 
   <ItemGroup>
-	<ProjectReference Include="..\..\..\Libs\FSharp.Collections.ParallelSeq\src\FSharp.Collections.ParallelSeq\FSharp.Collections.ParallelSeq.fsproj" Condition="'$(Configuration)'=='Release'" />
+	<PackageReference Include="FAkka.FSharp.Collections.ParallelSeq" Version="1.0.0" Condition="'$(Configuration)'=='Release'" />
+	<!--<ProjectReference Include="..\..\..\Libs\FSharp.Collections.ParallelSeq\src\FSharp.Collections.ParallelSeq\FSharp.Collections.ParallelSeq.fsproj" Condition="'$(Configuration)'=='Release'" />-->
 	<ProjectReference Include="..\..\..\Libs\FSharp.Collections.ParallelSeq\src\FSharp.Collections.ParallelSeq\FSharp.Collections.ParallelSeq.fsproj" Condition="'$(Configuration)'=='Debug'" />
     <ProjectReference Include="..\NTDLS.Katzebase.Parsers.Generic\NTDLS.Katzebase.Parsers.Generic.csproj" Condition="$(DefineConstants.Contains('KATZEBASE'))" />
     <ProjectReference Include="..\protobuf-net-fsharp\src\ProtoBuf.FSharp\ProtoBuf.FSharp.fsproj" Condition="'$(Configuration)'=='Debug'" />
-    <ProjectReference Include="..\protobuf-net-fsharp\src\ProtoBuf.FSharp\ProtoBuf.FSharp.fsproj" />
+    <!--<ProjectReference Include="..\protobuf-net-fsharp\src\ProtoBuf.FSharp\ProtoBuf.FSharp.fsproj" />-->
+  </ItemGroup>
 	
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="FsPickler.nstd20">
+      <Version>2.0.9.2</Version>
+    </PackageReference>
+    <PackageReference Include="FsPickler.Json.nstd20">
+      <Version>2.0.9.2</Version>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
@@ -71,9 +83,13 @@
       <HintPath>..\..\..\Libs\FSharp.Collections.ParallelSeq\src\FSharp.Collections.ParallelSeq\bin\netstandard2.0\FSharp.Collections.ParallelSeq.dll</HintPath>
     </Reference>
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="9.0.201" />
+  </ItemGroup>
 	<PropertyGroup>
 		
-		<Version>9.0.27.11</Version>
+		<Version>9.0.27.15</Version>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 	  <Optimize>False</Optimize>

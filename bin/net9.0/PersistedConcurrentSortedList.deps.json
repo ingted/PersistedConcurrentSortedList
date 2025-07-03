@@ -6,14 +6,15 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v9.0": {
-      "PersistedConcurrentSortedList/9.0.27.11": {
+      "PersistedConcurrentSortedList/9.0.27.15": {
         "dependencies": {
+          "FAkka.FSharp.Collections.ParallelSeq": "1.0.0",
           "FAkka.FsPickler": "9.0.100",
           "FAkka.FsPickler.Json": "9.0.100",
-          "FAkka.ProtoBuf.FSharp": "9.0.11",
-          "FSharp.Collections.ParallelSeq": "1.2.0",
+          "FAkka.ProtoBuf.FSharp": "9.0.14",
           "FSharp.Core": "9.0.201",
-          "protobuf-net-fsharp": "9.0.11.0"
+          "FSharp.Collections.ParallelSeq": "1.0.0.0",
+          "protobuf-net-fsharp": "9.0.14.0"
         },
         "runtime": {
           "PersistedConcurrentSortedList.dll": {}
@@ -126,7 +127,18 @@
       "System.Buffers/4.5.1": {},
       "System.Collections.Immutable/7.0.0": {},
       "System.Reflection.Emit.Lightweight/4.7.0": {},
-      "FAkka.ProtoBuf.FSharp/9.0.11": {
+      "FAkka.FSharp.Collections.ParallelSeq/1.0.0": {
+        "dependencies": {
+          "FSharp.Core": "9.0.201"
+        },
+        "runtime": {
+          "FSharp.Collections.ParallelSeq.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "FAkka.ProtoBuf.FSharp/9.0.14": {
         "dependencies": {
           "FSharp.Core": "9.0.201",
           "System.Buffers": "4.5.1",
@@ -139,29 +151,26 @@
           }
         }
       },
-      "FSharp.Collections.ParallelSeq/1.2.0": {
-        "dependencies": {
-          "FSharp.Core": "9.0.201"
-        },
+      "FSharp.Collections.ParallelSeq/1.0.0.0": {
         "runtime": {
           "FSharp.Collections.ParallelSeq.dll": {
-            "assemblyVersion": "1.2.0.0",
-            "fileVersion": "1.2.0.0"
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
           }
         }
       },
-      "protobuf-net-fsharp/9.0.11.0": {
+      "protobuf-net-fsharp/9.0.14.0": {
         "runtime": {
           "protobuf-net-fsharp.dll": {
-            "assemblyVersion": "9.0.11.0",
-            "fileVersion": "9.0.11.0"
+            "assemblyVersion": "9.0.14.0",
+            "fileVersion": "9.0.14.0"
           }
         }
       }
     }
   },
   "libraries": {
-    "PersistedConcurrentSortedList/9.0.27.11": {
+    "PersistedConcurrentSortedList/9.0.27.15": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
@@ -229,17 +238,22 @@
       "path": "system.reflection.emit.lightweight/4.7.0",
       "hashPath": "system.reflection.emit.lightweight.4.7.0.nupkg.sha512"
     },
-    "FAkka.ProtoBuf.FSharp/9.0.11": {
+    "FAkka.FSharp.Collections.ParallelSeq/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "FSharp.Collections.ParallelSeq/1.2.0": {
+    "FAkka.ProtoBuf.FSharp/9.0.14": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "protobuf-net-fsharp/9.0.11.0": {
+    "FSharp.Collections.ParallelSeq/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "protobuf-net-fsharp/9.0.14.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""

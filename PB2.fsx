@@ -19,10 +19,15 @@
 open System
 open System.Collections
 open System.Collections.Generic
-open Newtonsoft.Json
+//open Newtonsoft.Json
 
-open MBrace.FsPickler
+#if NET9_0
+open MBrace.FsPickler.Json
 open MBrace.FsPickler.Combinators 
+#else
+open MBrace.FsPickler.nstd20.Json
+open MBrace.FsPickler.nstd20.Combinators 
+#endif
 open ProtoBuf
 open ProtoBuf.FSharp
 open FSharp.Reflection
@@ -207,7 +212,11 @@ module FS =
 
     let _ =
         mapper.Add(
+#if NET9_0
             typeof<string * fCell2<string>>, (fun (T (k, v)) -> box (KeyValuePair.Create(k, v)))
+#else
+            typeof<string * fCell2<string>>, (fun (T (k, v)) -> box (KeyValuePair(k, v)))
+#endif
         )
 
     [<Extension>]
