@@ -4,7 +4,7 @@
 #r @"nuget: Newtonsoft.Json, 13.0.3"
 #r @"nuget: FAkka.FsPickler, 9.0.4"
 #r @"nuget: FAkka.FsPickler.Json, 9.0.4"
-#r @"nuget: FAkka.ProtoBuf.FSharp, 1.0.0"
+#r @"nuget: FAkka.ProtoBuf.FSharp, 9.0.14.300"
 #r @"nuget: FSharp.Collections.ParallelSeq, 1.2.0"
 #r @"bin\net9.0\PersistedConcurrentSortedList.dll"
 #else

@@ -5,7 +5,7 @@
   },
   "projects": {
     "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\PersistedConcurrentSortedList.fsproj": {
-      "version": "9.0.27.16",
+      "version": "9.0.27.316",
       "restore": {
         "projectUniqueName": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\PersistedConcurrentSortedList.fsproj",
         "projectName": "PersistedConcurrentSortedList",
@@ -34,25 +34,11 @@
         "frameworks": {
           "net9.0": {
             "targetAlias": "net9.0",
-            "projectReferences": {
-              "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\protobuf-net-fsharp\\src\\ProtoBuf.FSharp\\ProtoBuf.FSharp.fsproj": {
-                "projectPath": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\protobuf-net-fsharp\\src\\ProtoBuf.FSharp\\ProtoBuf.FSharp.fsproj"
-              },
-              "G:\\coldfar_py\\sharftrade9\\Libs\\FSharp.Collections.ParallelSeq\\src\\FSharp.Collections.ParallelSeq\\FSharp.Collections.ParallelSeq.fsproj": {
-                "projectPath": "G:\\coldfar_py\\sharftrade9\\Libs\\FSharp.Collections.ParallelSeq\\src\\FSharp.Collections.ParallelSeq\\FSharp.Collections.ParallelSeq.fsproj"
-              }
-            }
+            "projectReferences": {}
           },
           "netstandard2.0": {
             "targetAlias": "netstandard2.0",
-            "projectReferences": {
-              "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\protobuf-net-fsharp\\src\\ProtoBuf.FSharp\\ProtoBuf.FSharp.fsproj": {
-                "projectPath": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\protobuf-net-fsharp\\src\\ProtoBuf.FSharp\\ProtoBuf.FSharp.fsproj"
-              },
-              "G:\\coldfar_py\\sharftrade9\\Libs\\FSharp.Collections.ParallelSeq\\src\\FSharp.Collections.ParallelSeq\\FSharp.Collections.ParallelSeq.fsproj": {
-                "projectPath": "G:\\coldfar_py\\sharftrade9\\Libs\\FSharp.Collections.ParallelSeq\\src\\FSharp.Collections.ParallelSeq\\FSharp.Collections.ParallelSeq.fsproj"
-              }
-            }
+            "projectReferences": {}
           }
         },
         "restoreAuditProperties": {
@@ -66,20 +52,45 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "dependencies": {
+            "FAkka.FSharp.Collections.ParallelSeq": {
+              "target": "Package",
+              "version": "[1.0.9.300, )",
+              "generatePathProperty": true
+            },
             "FAkka.FsPickler": {
               "target": "Package",
-              "version": "[9.0.100, )",
+              "version": "[9.0.300, )",
               "generatePathProperty": true
             },
             "FAkka.FsPickler.Json": {
               "target": "Package",
-              "version": "[9.0.100, )",
+              "version": "[9.0.300, )",
+              "generatePathProperty": true
+            },
+            "FAkka.ProtoBuf.FSharp": {
+              "target": "Package",
+              "version": "[9.0.14.300, )",
               "generatePathProperty": true
             },
             "FSharp.Core": {
               "include": "Runtime, Compile, Build, Native, Analyzers, BuildTransitive",
               "target": "Package",
-              "version": "[9.0.201, )",
+              "version": "[9.0.300, )",
+              "generatePathProperty": true
+            },
+            "System.Collections.Immutable": {
+              "target": "Package",
+              "version": "[9.0.0, )",
+              "generatePathProperty": true
+            },
+            "System.Runtime.CompilerServices.Unsafe": {
+              "target": "Package",
+              "version": "[6.1.2, )",
+              "generatePathProperty": true
+            },
+            "protobuf-net.Core": {
+              "target": "Package",
+              "version": "[3.2.45, )",
               "generatePathProperty": true
             }
           },
@@ -104,91 +115,30 @@
         "netstandard2.0": {
           "targetAlias": "netstandard2.0",
           "dependencies": {
+            "FAkka.FSharp.Collections.ParallelSeq": {
+              "target": "Package",
+              "version": "[1.0.9.300, )",
+              "generatePathProperty": true
+            },
+            "FAkka.ProtoBuf.FSharp": {
+              "target": "Package",
+              "version": "[9.0.14.300, )",
+              "generatePathProperty": true
+            },
             "FSharp.Core": {
               "include": "Runtime, Compile, Build, Native, Analyzers, BuildTransitive",
               "target": "Package",
-              "version": "[9.0.201, )",
+              "version": "[9.0.300, )",
               "generatePathProperty": true
             },
             "FsPickler.Json.nstd20": {
               "target": "Package",
-              "version": "[2.0.9.2, )",
+              "version": "[2.0.9.300, )",
               "generatePathProperty": true
             },
             "FsPickler.nstd20": {
               "target": "Package",
-              "version": "[2.0.9.2, )",
-              "generatePathProperty": true
-            },
-            "NETStandard.Library": {
-              "suppressParent": "All",
-              "target": "Package",
-              "version": "[2.0.3, )",
-              "autoReferenced": true,
-              "generatePathProperty": true
-            }
-          },
-          "imports": [
-            "net461",
-            "net462",
-            "net47",
-            "net471",
-            "net472",
-            "net48",
-            "net481"
-          ],
-          "assetTargetFallback": true,
-          "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.302\\RuntimeIdentifierGraph.json"
-        }
-      }
-    },
-    "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\protobuf-net-fsharp\\src\\ProtoBuf.FSharp\\ProtoBuf.FSharp.fsproj": {
-      "version": "9.0.14",
-      "restore": {
-        "projectUniqueName": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\protobuf-net-fsharp\\src\\ProtoBuf.FSharp\\ProtoBuf.FSharp.fsproj",
-        "projectName": "FAkka.ProtoBuf.FSharp",
-        "projectPath": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\protobuf-net-fsharp\\src\\ProtoBuf.FSharp\\ProtoBuf.FSharp.fsproj",
-        "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
-        "outputPath": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\protobuf-net-fsharp\\src\\ProtoBuf.FSharp\\obj\\",
-        "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
-        "configFilePaths": [
-          "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
-        ],
-        "originalTargetFrameworks": [
-          "netstandard2.0"
-        ],
-        "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\sdk\\9.0.302\\FSharp\\library-packs": {},
-          "https://api.nuget.org/v3/index.json": {}
-        },
-        "frameworks": {
-          "netstandard2.0": {
-            "targetAlias": "netstandard2.0",
-            "projectReferences": {}
-          }
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
-        },
-        "SdkAnalysisLevel": "9.0.300"
-      },
-      "frameworks": {
-        "netstandard2.0": {
-          "targetAlias": "netstandard2.0",
-          "dependencies": {
-            "FSharp.Core": {
-              "include": "Runtime, Compile, Build, Native, Analyzers, BuildTransitive",
-              "target": "Package",
-              "version": "[9.0.201, )",
+              "version": "[2.0.9.300, )",
               "generatePathProperty": true
             },
             "NETStandard.Library": {
@@ -198,90 +148,19 @@
               "autoReferenced": true,
               "generatePathProperty": true
             },
-            "System.Buffers": {
+            "System.Collections.Immutable": {
               "target": "Package",
-              "version": "[4.5.1, )",
+              "version": "[9.0.0, )",
               "generatePathProperty": true
             },
-            "protobuf-net": {
+            "System.Runtime.CompilerServices.Unsafe": {
               "target": "Package",
-              "version": "[3.2.45, )",
+              "version": "[6.1.2, )",
               "generatePathProperty": true
             },
             "protobuf-net.Core": {
               "target": "Package",
               "version": "[3.2.45, )",
-              "generatePathProperty": true
-            }
-          },
-          "imports": [
-            "net461",
-            "net462",
-            "net47",
-            "net471",
-            "net472",
-            "net48",
-            "net481"
-          ],
-          "assetTargetFallback": true,
-          "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.302\\RuntimeIdentifierGraph.json"
-        }
-      }
-    },
-    "G:\\coldfar_py\\sharftrade9\\Libs\\FSharp.Collections.ParallelSeq\\src\\FSharp.Collections.ParallelSeq\\FSharp.Collections.ParallelSeq.fsproj": {
-      "version": "1.0.0",
-      "restore": {
-        "projectUniqueName": "G:\\coldfar_py\\sharftrade9\\Libs\\FSharp.Collections.ParallelSeq\\src\\FSharp.Collections.ParallelSeq\\FSharp.Collections.ParallelSeq.fsproj",
-        "projectName": "FAkka.FSharp.Collections.ParallelSeq",
-        "projectPath": "G:\\coldfar_py\\sharftrade9\\Libs\\FSharp.Collections.ParallelSeq\\src\\FSharp.Collections.ParallelSeq\\FSharp.Collections.ParallelSeq.fsproj",
-        "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
-        "outputPath": "G:\\coldfar_py\\sharftrade9\\Libs\\FSharp.Collections.ParallelSeq\\src\\FSharp.Collections.ParallelSeq\\obj\\",
-        "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
-        "configFilePaths": [
-          "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
-        ],
-        "originalTargetFrameworks": [
-          "netstandard2.0"
-        ],
-        "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\sdk\\9.0.302\\FSharp\\library-packs": {},
-          "https://api.nuget.org/v3/index.json": {}
-        },
-        "frameworks": {
-          "netstandard2.0": {
-            "targetAlias": "netstandard2.0",
-            "projectReferences": {}
-          }
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
-        },
-        "SdkAnalysisLevel": "9.0.300"
-      },
-      "frameworks": {
-        "netstandard2.0": {
-          "targetAlias": "netstandard2.0",
-          "dependencies": {
-            "FSharp.Core": {
-              "include": "Runtime, Compile, Build, Native, Analyzers, BuildTransitive",
-              "target": "Package",
-              "version": "[9.0.201, )",
-              "generatePathProperty": true
-            },
-            "NETStandard.Library": {
-              "suppressParent": "All",
-              "target": "Package",
-              "version": "[2.0.3, )",
-              "autoReferenced": true,
               "generatePathProperty": true
             }
           },

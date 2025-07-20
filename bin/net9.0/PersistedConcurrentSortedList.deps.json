@@ -6,73 +6,78 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v9.0": {
-      "PersistedConcurrentSortedList/9.0.27.16": {
+      "PersistedConcurrentSortedList/9.0.27.316": {
         "dependencies": {
-          "FAkka.FSharp.Collections.ParallelSeq": "1.0.0",
-          "FAkka.FsPickler": "9.0.100",
-          "FAkka.FsPickler.Json": "9.0.100",
-          "FAkka.ProtoBuf.FSharp": "9.0.14",
-          "FSharp.Core": "9.0.201"
+          "FAkka.FSharp.Collections.ParallelSeq": "1.0.9.300",
+          "FAkka.FsPickler": "9.0.300",
+          "FAkka.FsPickler.Json": "9.0.300",
+          "FAkka.ProtoBuf.FSharp": "9.0.14.300",
+          "FSharp.Core": "9.0.300",
+          "System.Collections.Immutable": "9.0.0",
+          "System.Runtime.CompilerServices.Unsafe": "6.1.2",
+          "protobuf-net.Core": "3.2.45"
         },
         "runtime": {
           "PersistedConcurrentSortedList.dll": {}
         }
       },
-      "FAkka.FSharp.Collections.ParallelSeq/1.0.0": {
+      "FAkka.FSharp.Collections.ParallelSeq/1.0.9.300": {
         "dependencies": {
-          "FSharp.Core": "9.0.201"
+          "FSharp.Core": "9.0.300"
         },
         "runtime": {
           "lib/netstandard2.0/FSharp.Collections.ParallelSeq.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
+            "assemblyVersion": "1.0.9.300",
+            "fileVersion": "1.0.9.300"
           }
         }
       },
-      "FAkka.FsPickler/9.0.100": {
+      "FAkka.FsPickler/9.0.300": {
         "dependencies": {
-          "FSharp.Core": "9.0.201",
+          "FSharp.Core": "9.0.300",
           "System.Reflection.Emit.Lightweight": "4.7.0"
         },
         "runtime": {
           "lib/net9.0/FsPickler.dll": {
-            "assemblyVersion": "9.0.100.0",
-            "fileVersion": "9.0.100.0"
+            "assemblyVersion": "9.0.300.0",
+            "fileVersion": "9.0.300.0"
           }
         }
       },
-      "FAkka.FsPickler.Json/9.0.100": {
+      "FAkka.FsPickler.Json/9.0.300": {
         "dependencies": {
-          "FAkka.FsPickler": "9.0.100",
-          "FSharp.Core": "9.0.201",
+          "FAkka.FsPickler": "9.0.300",
+          "FSharp.Core": "9.0.300",
           "Newtonsoft.Json": "13.0.3"
         },
         "runtime": {
           "lib/net9.0/FsPickler.Json.dll": {
-            "assemblyVersion": "9.0.100.0",
-            "fileVersion": "9.0.100.0"
+            "assemblyVersion": "9.0.300.0",
+            "fileVersion": "9.0.300.0"
           }
         }
       },
-      "FAkka.ProtoBuf.FSharp/9.0.14": {
+      "FAkka.ProtoBuf.FSharp/9.0.14.300": {
         "dependencies": {
-          "FSharp.Core": "9.0.201",
+          "FSharp.Core": "9.0.300",
           "System.Buffers": "4.5.1",
+          "System.Collections.Immutable": "9.0.0",
+          "System.Runtime.CompilerServices.Unsafe": "6.1.2",
           "protobuf-net": "3.2.45",
           "protobuf-net.Core": "3.2.45"
         },
         "runtime": {
           "lib/netstandard2.0/protobuf-net-fsharp.dll": {
-            "assemblyVersion": "9.0.14.0",
-            "fileVersion": "9.0.14.0"
+            "assemblyVersion": "9.0.14.300",
+            "fileVersion": "9.0.14.300"
           }
         }
       },
-      "FSharp.Core/9.0.201": {
+      "FSharp.Core/9.0.300": {
         "runtime": {
           "lib/netstandard2.1/FSharp.Core.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.2.125.7003"
+            "fileVersion": "9.3.25.18101"
           }
         },
         "resources": {
@@ -138,7 +143,7 @@
       },
       "protobuf-net.Core/3.2.45": {
         "dependencies": {
-          "System.Collections.Immutable": "7.0.0"
+          "System.Collections.Immutable": "9.0.0"
         },
         "runtime": {
           "lib/net6.0/protobuf-net.Core.dll": {
@@ -148,50 +153,51 @@
         }
       },
       "System.Buffers/4.5.1": {},
-      "System.Collections.Immutable/7.0.0": {},
-      "System.Reflection.Emit.Lightweight/4.7.0": {}
+      "System.Collections.Immutable/9.0.0": {},
+      "System.Reflection.Emit.Lightweight/4.7.0": {},
+      "System.Runtime.CompilerServices.Unsafe/6.1.2": {}
     }
   },
   "libraries": {
-    "PersistedConcurrentSortedList/9.0.27.16": {
+    "PersistedConcurrentSortedList/9.0.27.316": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "FAkka.FSharp.Collections.ParallelSeq/1.0.0": {
+    "FAkka.FSharp.Collections.ParallelSeq/1.0.9.300": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-URHr3iCUJRNflo4QL495vb5xzLH2MRvey1Rcab/iOXq/Xfi5PPK1glsyJugJrUbLSjcNMzrqVgGXBNghG7t3DA==",
-      "path": "fakka.fsharp.collections.parallelseq/1.0.0",
-      "hashPath": "fakka.fsharp.collections.parallelseq.1.0.0.nupkg.sha512"
+      "sha512": "sha512-NAmqPZ3qbJOdzfVXJC5QGoZBhHdfUHdBHnyK1cghB+D4IWU+oyVDZSsAmFJkJI/6TrioNNSJvDk+Obuuuo1rAA==",
+      "path": "fakka.fsharp.collections.parallelseq/1.0.9.300",
+      "hashPath": "fakka.fsharp.collections.parallelseq.1.0.9.300.nupkg.sha512"
     },
-    "FAkka.FsPickler/9.0.100": {
+    "FAkka.FsPickler/9.0.300": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-yYNVeIHGDvpZ8/kWTxL+GkSLfXCaReqmyYmoK2X0AXCzlD6vJZTjl3lQJAFNpI2rCpK6tB+ZPZtYLgkcl4x4Ow==",
-      "path": "fakka.fspickler/9.0.100",
-      "hashPath": "fakka.fspickler.9.0.100.nupkg.sha512"
+      "sha512": "sha512-lfOoB0j7QTYxK2csCK7zxutRtRDrw86h5HTQgoLr73Mw2fzml1g+KlYND95Ns4ODm78h2tX+61eNYp5SX80BAA==",
+      "path": "fakka.fspickler/9.0.300",
+      "hashPath": "fakka.fspickler.9.0.300.nupkg.sha512"
     },
-    "FAkka.FsPickler.Json/9.0.100": {
+    "FAkka.FsPickler.Json/9.0.300": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-bb7h7tuW4+h80W55LUX2vBsVsBWt5dNDnWgHbWeAWMOC+90vxc+e57YsDaeYy1unVSbdBrPYDEzwPsgvtersWA==",
-      "path": "fakka.fspickler.json/9.0.100",
-      "hashPath": "fakka.fspickler.json.9.0.100.nupkg.sha512"
+      "sha512": "sha512-t2EVPmo3XuD/zQ7qrbf/Xta5IZ8rfD7mqgyrLtE1AilZfXQab1xRmliwaakzvb0aABFD+FvcdD3x36JeMUmSbA==",
+      "path": "fakka.fspickler.json/9.0.300",
+      "hashPath": "fakka.fspickler.json.9.0.300.nupkg.sha512"
     },
-    "FAkka.ProtoBuf.FSharp/9.0.14": {
+    "FAkka.ProtoBuf.FSharp/9.0.14.300": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-y41TpDOaYBPrcS/jj0r2kxMsSMA32cuFXN76E1TXK7NXuXg4BfJ+Jbl62+vCK1GcPnvM6kcKoKw1BGGRYDDEdQ==",
-      "path": "fakka.protobuf.fsharp/9.0.14",
-      "hashPath": "fakka.protobuf.fsharp.9.0.14.nupkg.sha512"
+      "sha512": "sha512-NBgNc4tv7GGFLPPhfroSbVK2IeCfGZctvdRW4DTuI9M48QQXhsxolR9sWht4GlqF3QTqPYX/Os8LrWXtbR3B4Q==",
+      "path": "fakka.protobuf.fsharp/9.0.14.300",
+      "hashPath": "fakka.protobuf.fsharp.9.0.14.300.nupkg.sha512"
     },
-    "FSharp.Core/9.0.201": {
+    "FSharp.Core/9.0.300": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-Ozq4T0ISTkqTYJ035XW/JkdDDaXofbykvfyVwkjLSqaDZ/4uNXfpf92cjcMI9lf9CxWqmlWHScViPh/4AvnWcw==",
-      "path": "fsharp.core/9.0.201",
-      "hashPath": "fsharp.core.9.0.201.nupkg.sha512"
+      "sha512": "sha512-TVt2J7RCE1KCS2IaONF+p8/KIZ1eHNbW+7qmKF6hGoD4tXl+o07ja1mPtFjMqRa5uHMFaTrGTPn/m945WnDLiQ==",
+      "path": "fsharp.core/9.0.300",
+      "hashPath": "fsharp.core.9.0.300.nupkg.sha512"
     },
     "Newtonsoft.Json/13.0.3": {
       "type": "package",
@@ -221,12 +227,12 @@
       "path": "system.buffers/4.5.1",
       "hashPath": "system.buffers.4.5.1.nupkg.sha512"
     },
-    "System.Collections.Immutable/7.0.0": {
+    "System.Collections.Immutable/9.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-dQPcs0U1IKnBdRDBkrCTi1FoajSTBzLcVTpjO4MBCMC7f4pDOIPzgBoX8JjG7X6uZRJ8EBxsi8+DR1JuwjnzOQ==",
-      "path": "system.collections.immutable/7.0.0",
-      "hashPath": "system.collections.immutable.7.0.0.nupkg.sha512"
+      "sha512": "sha512-QhkXUl2gNrQtvPmtBTQHb0YsUrDiDQ2QS09YbtTTiSjGcf7NBqtYbrG/BE06zcBPCKEwQGzIv13IVdXNOSub2w==",
+      "path": "system.collections.immutable/9.0.0",
+      "hashPath": "system.collections.immutable.9.0.0.nupkg.sha512"
     },
     "System.Reflection.Emit.Lightweight/4.7.0": {
       "type": "package",
@@ -234,6 +240,13 @@
       "sha512": "sha512-a4OLB4IITxAXJeV74MDx49Oq2+PsF6Sml54XAFv+2RyWwtDBcabzoxiiJRhdhx+gaohLh4hEGCLQyBozXoQPqA==",
       "path": "system.reflection.emit.lightweight/4.7.0",
       "hashPath": "system.reflection.emit.lightweight.4.7.0.nupkg.sha512"
+    },
+    "System.Runtime.CompilerServices.Unsafe/6.1.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-2hBr6zdbIBTDE3EhK7NSVNdX58uTK6iHW/P/Axmm9sl1xoGSLqDvMtpecn226TNwHByFokYwJmt/aQQNlO5CRw==",
+      "path": "system.runtime.compilerservices.unsafe/6.1.2",
+      "hashPath": "system.runtime.compilerservices.unsafe.6.1.2.nupkg.sha512"
     }
   }
 }
