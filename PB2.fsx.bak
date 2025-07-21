@@ -40,56 +40,27 @@ type fCell2<'CellTupleKey when 'CellTupleKey: comparison> =
 | D of decimal
 | A of fCell2<'CellTupleKey> []
 | T of 'CellTupleKey * fCell2<'CellTupleKey>
-| N of unit //代表 None/null
+| N //of unit //代表 None/null
     member this.toJsonString() =
-        //let rec toJson (f: fCell2<'CellTupleKey>) =
-        //    match f with
-        //    | S s -> sprintf "%A" s
-        //    | D d -> sprintf "%f" d
-        //    | A arr -> 
-        //        let elements = arr |> Array.map toJson |> String.concat ", "
-        //        sprintf "[%s]" elements
-        //    | T (key, value) ->
-        //        //let keyStr = sprintf "%A" key
-        //        let valueStr = toJson value
-        //        sprintf "{%A: %A}" key valueStr
-        //    | N _ -> null
-        //    | B true -> "true"
-        //    | B false -> "false"
-        //toJson this
-        
-        let escape (s:string) =
-            s.Replace("\\", "\\\\").Replace("\"", "\\\"")
         let rec toJson (f: fCell2<'CellTupleKey>) =
             match f with
-            | N _   -> "null"
-            | B true  -> "true"
-            | B false -> "false"
-            | D d   -> d.ToString(System.Globalization.CultureInfo.InvariantCulture)
-            | S s   -> "\"" + (escape s) + "\""
-            | A arr ->
-                let elems = arr |> Array.map toJson |> String.concat ","
-                "[" + elems + "]"
+            | S s -> sprintf "%s" s
+            | D d -> sprintf "%f" d
+            | A arr -> 
+                let elements = arr |> Array.map toJson |> String.concat ", "
+                sprintf "[%s]" elements
             | T (key, value) ->
-                // 如果 key 本身是 string，也要跳脫；否則就用 %A
-                let keyStr =
-                    match box key with
-                    | :? string as ks -> "\"" + (escape ks) + "\""
-                    | _                -> sprintf "%A" key
-                "{" + keyStr + ":" + toJson value + "}"
+                let keyStr = sprintf "%A" key
+                let valueStr = toJson value
+                sprintf "%A: %s" keyStr valueStr
         toJson this
 
     static member compareArrays (arr1: fCell2<'CellTupleKey> array) (arr2: fCell2<'CellTupleKey> array): int =
-        match arr1, arr2 with
-        | null, null -> 0
-        | _, null -> 1
-        | null, _ -> -1
-        | _ ->
-            Seq.zip arr1 arr2
-            |> Seq.tryPick (fun (x, y) ->
-                let res = compare x y
-                if res = 0 then None else Some res)
-            |> Option.defaultValue 0
+        Seq.zip arr1 arr2
+        |> Seq.tryPick (fun (x, y) ->
+            let res = compare x y
+            if res = 0 then None else Some res)
+        |> Option.defaultValue 0
 
     static member compareLength (arr1: fCell2<'CellTupleKey> array) (arr2: fCell2<'CellTupleKey> array): int =
         let a1l = if arr1 = null then 0 else arr1.Length
@@ -99,20 +70,14 @@ type fCell2<'CellTupleKey when 'CellTupleKey: comparison> =
     static member Compare (x: fCell2<'CellTupleKey>, y: fCell2<'CellTupleKey>): int =
         match box x, box y with
         | null, null -> 0
-        | _, null ->
-            if x = S null || x = A null || x = N () then 0 else 1
+        | _, null -> 
+            if x = S null then 0 else 1
         | null, _ ->
-            if y = S null || y = A null || y = N () then 0 else -1
+            if y = S null then 0 else -1
         | _ ->
             match (x, y) with
-            | (N _, N _) -> 0
-            | (N _, S s) when isNull s -> 0
-            | (S s, N _) when isNull s -> 0
             | (D d1, D d2) -> Decimal.Compare(d1, d2)
-            | (B b1, B b2) -> compare b1 b2
-            //20250721 不知為什麼要大小寫無區分，改掉
-            //| (S s1, S s2) -> String.Compare(s1, s2, StringComparison.OrdinalIgnoreCase)
-            | (S s1, S s2) -> String.Compare(s1, s2)
+            | (S s1, S s2) -> String.Compare(s1, s2, StringComparison.OrdinalIgnoreCase)
             | (A arr1, A arr2) ->
                 let lenComp = fCell2.compareLength arr1 arr2
                 if lenComp <> 0 then lenComp
@@ -121,13 +86,8 @@ type fCell2<'CellTupleKey when 'CellTupleKey: comparison> =
                 let tagComp = compare tag1 tag2
                 if tagComp <> 0 then tagComp
                 else fCell2.Compare(f1, f2)
-            // Cross-type comparisons (define ordering: N < D < B < S < A < T)
-            | (N _, _) -> -1
-            | (_, N _) -> 1
             | (D _, _) -> -1
             | (_, D _) -> 1
-            | (B _, (S _ | A _ | T _)) -> -1
-            | ((S _ | A _ | T _), B _) -> 1
             | (S _, (A _ | T _)) -> -1
             | ((A _ | T _), S _) -> 1
             | (A _, T _) -> -1
@@ -219,16 +179,15 @@ type fCell2<'CellTupleKey when 'CellTupleKey: comparison> =
     static member SIsNullOrEmpty (o:fCell2<'CellTupleKey>) = if box o = null || o = fCell2<'CellTupleKey>.SEmpty || o = fCell2<'CellTupleKey>.SNull then true else false
     static member AIsNullOrEmpty (o:fCell2<'CellTupleKey>) = if box o = null || o = fCell2<'CellTupleKey>.AEmpty || o = fCell2<'CellTupleKey>.ANull then true else false
     static member IsNull (o:fCell2<'CellTupleKey>) = 
-        if box o = null || o = fCell2.ANull || o = fCell2<'CellTupleKey>.SNull || o = N () then true else false
+        if box o = null || o = fCell2.ANull || o = fCell2<'CellTupleKey>.SNull then true else false
 
     member this.me =
         match this with
-        | B b -> b.ToString()
         | S s -> s
         | D d -> d.ToString()
         | A arr -> arr |> Array.map (fun f -> f.me) |> String.concat ", "
         | T (key, value) -> sprintf "%A: %s" key value.me
-        | N _ -> null
+        | N -> null
 
     member this.Value = this.me
 

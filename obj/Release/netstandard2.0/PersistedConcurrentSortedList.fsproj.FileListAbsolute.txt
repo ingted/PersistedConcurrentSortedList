@@ -3,11 +3,11 @@ G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\obj\Release\netstandard2.0\Persi
 G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\obj\Release\netstandard2.0\PersistedConcurrentSortedList.AssemblyInfo.fs
 G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\obj\Release\netstandard2.0\PersistedConcurrentSortedList.fsproj.CoreCompileInputs.cache
 G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\obj\Release\netstandard2.0\PersistedConcurrentSortedList.sourcelink.json
+G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\obj\Release\netstandard2.0\PersistedConcurrentSortedList.xml
+G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\netstandard2.0\PersistedConcurrentSortedList.dll.config
 G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\netstandard2.0\PersistedConcurrentSortedList.deps.json
 G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\netstandard2.0\PersistedConcurrentSortedList.dll
 G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\netstandard2.0\PersistedConcurrentSortedList.pdb
 G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\netstandard2.0\PersistedConcurrentSortedList.xml
 G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\obj\Release\netstandard2.0\PersistedConcurrentSortedList.dll
-G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\obj\Release\netstandard2.0\PersistedConcurrentSortedList.xml
 G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\obj\Release\netstandard2.0\PersistedConcurrentSortedList.pdb
-G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\netstandard2.0\PersistedConcurrentSortedList.dll.config

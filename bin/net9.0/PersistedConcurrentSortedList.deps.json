@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v9.0": {
-      "PersistedConcurrentSortedList/9.0.27.316": {
+      "PersistedConcurrentSortedList/9.0.27.317": {
         "dependencies": {
           "FAkka.FSharp.Collections.ParallelSeq": "1.0.9.300",
           "FAkka.FsPickler": "9.0.300",
@@ -159,7 +159,7 @@
     }
   },
   "libraries": {
-    "PersistedConcurrentSortedList/9.0.27.316": {
+    "PersistedConcurrentSortedList/9.0.27.317": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

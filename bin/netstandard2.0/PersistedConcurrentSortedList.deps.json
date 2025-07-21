@@ -7,7 +7,7 @@
   "targets": {
     ".NETStandard,Version=v2.0": {},
     ".NETStandard,Version=v2.0/": {
-      "PersistedConcurrentSortedList/9.0.27.316": {
+      "PersistedConcurrentSortedList/9.0.27.317": {
         "dependencies": {
           "FAkka.FSharp.Collections.ParallelSeq": "1.0.9.300",
           "FAkka.ProtoBuf.FSharp": "9.0.14.300",
@@ -245,7 +245,7 @@
     }
   },
   "libraries": {
-    "PersistedConcurrentSortedList/9.0.27.316": {
+    "PersistedConcurrentSortedList/9.0.27.317": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

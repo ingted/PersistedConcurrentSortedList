@@ -37,6 +37,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+	  <None Include="test2.fsx" />
 	  <None Include="test.fsx" />
 	  <None Include="CopyDll.ps1" />
 	  <None Include="README.md" />
@@ -104,7 +105,7 @@
   </ItemGroup>
 	<PropertyGroup>
 		
-		<Version>9.0.27.316</Version>
+		<Version>9.0.27.317</Version>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 	  <Optimize>False</Optimize>

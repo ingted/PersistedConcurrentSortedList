@@ -73,7 +73,7 @@ module PCSLTest =
 #if ProductionExample
 module TreeStructuralFileSystemDesign =
     
-#r @"nuget: PersistedConcurrentSortedList, 9.0.19"
+#r @"nuget: PersistedConcurrentSortedList, 9.0.27.317"
 //#r @"nuget: FSharp.Collections.ParallelSeq"
 open PersistedConcurrentSortedList
 open CSL
