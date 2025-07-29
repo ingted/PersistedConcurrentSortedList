@@ -39,7 +39,7 @@ type fCell2<'CellTupleKey when 'CellTupleKey: comparison> =
 | S of string
 | D of decimal
 | A of fCell2<'CellTupleKey> []
-| T of 'CellTupleKey * fCell2<'CellTupleKey>
+| T of Map<'CellTupleKey, fCell2<'CellTupleKey>>
 | N of unit //代表 None/null
     member this.toJsonString() =
         //let rec toJson (f: fCell2<'CellTupleKey>) =
@@ -70,13 +70,24 @@ type fCell2<'CellTupleKey when 'CellTupleKey: comparison> =
             | A arr ->
                 let elems = arr |> Array.map toJson |> String.concat ","
                 "[" + elems + "]"
-            | T (key, value) ->
-                // 如果 key 本身是 string，也要跳脫；否則就用 %A
-                let keyStr =
-                    match box key with
-                    | :? string as ks -> "\"" + (escape ks) + "\""
-                    | _                -> sprintf "%A" key
-                "{" + keyStr + ":" + toJson value + "}"
+            //| T (key, value) ->
+            //    // 如果 key 本身是 string，也要跳脫；否則就用 %A
+            //    let keyStr =
+            //        match box key with
+            //        | :? string as ks -> "\"" + (escape ks) + "\""
+            //        | _                -> "\"" + sprintf "%A" key + "\""
+            //    "{" + keyStr + ":" + toJson value + "}"
+            | T m ->
+                let elems =
+                    m
+                    |> Seq.map (fun (KeyValue(k,v)) ->
+                        let keyStr =
+                            match box k with
+                            | :? string as ks -> "\"" + escape ks + "\""
+                            | _ -> "\"" + sprintf "%A" k + "\""
+                        keyStr + ":" + toJson v)
+                    |> String.concat ","
+                "{" + elems + "}"
         toJson this
 
     static member compareArrays (arr1: fCell2<'CellTupleKey> array) (arr2: fCell2<'CellTupleKey> array): int =
@@ -117,10 +128,24 @@ type fCell2<'CellTupleKey when 'CellTupleKey: comparison> =
                 let lenComp = fCell2.compareLength arr1 arr2
                 if lenComp <> 0 then lenComp
                 else fCell2.compareArrays arr1 arr2
-            | (T (tag1, f1), T (tag2, f2)) ->
-                let tagComp = compare tag1 tag2
-                if tagComp <> 0 then tagComp
-                else fCell2.Compare(f1, f2)
+            //| (T (tag1, f1), T (tag2, f2)) ->
+            //    let tagComp = compare tag1 tag2
+            //    if tagComp <> 0 then tagComp
+            //    else fCell2.Compare(f1, f2)
+
+            | (T m1, T m2) ->
+                let seq1, seq2 = Seq.toArray m1, Seq.toArray m2
+                let lenComp = compare seq1.Length seq2.Length
+                if lenComp <> 0 then lenComp
+                else
+                    seq {
+                        for kvp1, kvp2 in Seq.zip seq1 seq2 ->
+                            let kc = compare kvp1.Key kvp2.Key
+                            if kc <> 0 then kc else fCell2.Compare(kvp1.Value, kvp2.Value)
+                    }
+                    |> Seq.tryFind ((<>) 0)
+                    |> Option.defaultValue 0
+
             // Cross-type comparisons (define ordering: N < D < B < S < A < T)
             | (N _, _) -> -1
             | (_, N _) -> 1
@@ -172,25 +197,68 @@ type fCell2<'CellTupleKey when 'CellTupleKey: comparison> =
         | A a -> a |> Array.map _.d
         | _ -> failwith "Not fCell.AD."
 
+    //member this.t =
+    //    match this with
+    //    | T (k, v) -> k, v
+    //    | _ -> failwith "Not fCell.T."
+
+    //member this.ta =
+    //    match this with
+    //    | T (k, A a) -> k, a
+    //    | _ -> failwith "Not fCell.TA."
+
+    //member this.ts =
+    //    match this with
+    //    | T (k, S s) -> k, s
+    //    | _ -> failwith "Not fCell.TS."
+
+    //member this.td =
+    //    match this with
+    //    | T (k, D d) -> k, d
+    //    | _ -> failwith "Not fCell.TD."
+
     member this.t =
         match this with
-        | T (k, v) -> k, v
+        | T m -> m
         | _ -> failwith "Not fCell.T."
 
     member this.ta =
         match this with
-        | T (k, A a) -> k, a
-        | _ -> failwith "Not fCell.TA."
+        | T m when m.Count > 0 ->
+            m |> Seq.map (fun kv ->
+                match kv.Value with
+                | A a -> kv.Key, a
+                | _ -> failwith "Not A in fCell.TA.") |> Seq.toArray
+        | _ -> failwith "Not fCell.T."
 
     member this.ts =
         match this with
-        | T (k, S s) -> k, s
-        | _ -> failwith "Not fCell.TS."
+        | T m ->
+            m
+            |> Seq.map (fun kv ->
+                match kv.Value with
+                | S s -> kv.Key, s
+                | _ -> failwith "Not S in fCell.TS.")
+            |> Seq.toArray
+        | _ -> failwith "Not fCell.T."
 
     member this.td =
         match this with
-        | T (k, D d) -> k, d
-        | _ -> failwith "Not fCell.TD."
+        | T m ->
+            m
+            |> Seq.map (fun kv ->
+                match kv.Value with
+                | D d -> kv.Key, d
+                | _ -> failwith "Not D in fCell.TD.")
+            |> Seq.toArray
+        | _ -> failwith "Not fCell.T."
+
+    member this.tHead =
+        match this with
+        | T m when m.Count > 0 ->
+            let kv = m |> Seq.head
+            kv.Key, kv.Value
+        | _ -> failwith "Not fCell.T or empty map."
 
     member this.ToLowerInvariant () =
         match this with
@@ -227,7 +295,11 @@ type fCell2<'CellTupleKey when 'CellTupleKey: comparison> =
         | S s -> s
         | D d -> d.ToString()
         | A arr -> arr |> Array.map (fun f -> f.me) |> String.concat ", "
-        | T (key, value) -> sprintf "%A: %s" key value.me
+        //| T (key, value) -> sprintf "%A: %s" key value.me
+        | T m ->
+            m
+            |> Seq.map (fun kv -> sprintf "%A: %s" kv.Key kv.Value.me)
+            |> String.concat "; "
         | N _ -> null
 
     member this.Value = this.me
@@ -256,9 +328,9 @@ module FS =
     let _ =
         mapper.Add(
 #if NET9_0
-            typeof<string * fCell2<string>>, (fun (T (k, v)) -> box (KeyValuePair.Create(k, v)))
+            typeof<string * fCell2<string>>, (fun (T m) -> box m)
 #else
-            typeof<string * fCell2<string>>, (fun (T (k, v)) -> box (KeyValuePair(k, v)))
+            typeof<string * fCell2<string>>, (fun (T m) -> box m)
 #endif
         )
 
