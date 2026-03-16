@@ -35,8 +35,13 @@ open NTDLS.Katzebase.Parsers.Interfaces
 open MBrace.FsPickler.Json
 open MBrace.FsPickler.Combinators 
 #else
+#if NET10_0
+open MBrace.FsPickler.Json
+open MBrace.FsPickler.Combinators 
+#else
 open MBrace.FsPickler.nstd20.Json
 open MBrace.FsPickler.nstd20.Combinators 
+#endif
 #endif
 open ProtoBuf
 open ProtoBuf.FSharp
@@ -149,11 +154,15 @@ module PCSL2 =
 #if ASYNC
                 |> PSeq.ordered
                 |> PSeq.withDegreeOfParallelism maxDoP
-                |> PSeq.filter (fun fi ->
-                    if fileNameFilter.IsNone then true
+                |> fun ps ->
+                    if fileNameFilter.IsNone then 
+                        ps
                     else
-                        fileNameFilter.Value fi.FullName 
-                )
+                        let ff = fileNameFilter.Value
+                        ps
+                        |> PSeq.filter (fun fi ->
+                            ff fi.FullName 
+                        )
                 |> PSeq.iter (
 #else
                 |> Seq.iter (

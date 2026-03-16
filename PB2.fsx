@@ -23,10 +23,15 @@ open System.Collections.Generic
 
 #if NET9_0
 open MBrace.FsPickler.Json
-open MBrace.FsPickler.Combinators 
+open MBrace.FsPickler.Combinators
+#else
+#if NET10_0
+open MBrace.FsPickler.Json
+open MBrace.FsPickler.Combinators
 #else
 open MBrace.FsPickler.nstd20.Json
-open MBrace.FsPickler.nstd20.Combinators 
+open MBrace.FsPickler.nstd20.Combinators
+#endif
 #endif
 open ProtoBuf
 open ProtoBuf.FSharp
@@ -35,18 +40,19 @@ open FSharp.Reflection
 
 [<ProtoBuf.ProtoContract>]
 type fCell2<'CellTupleKey when 'CellTupleKey: comparison> =
-| B of bool
-| S of string
-| D of decimal
-| A of fCell2<'CellTupleKey> []
-| T of Map<'CellTupleKey, fCell2<'CellTupleKey>>
-| N of unit //代表 None/null
+    | B of bool
+    | S of string
+    | D of decimal
+    | A of fCell2<'CellTupleKey>[]
+    | T of Map<'CellTupleKey, fCell2<'CellTupleKey>>
+    | N of unit //代表 None/null
+
     member this.toJsonString() =
         //let rec toJson (f: fCell2<'CellTupleKey>) =
         //    match f with
         //    | S s -> sprintf "%A" s
         //    | D d -> sprintf "%f" d
-        //    | A arr -> 
+        //    | A arr ->
         //        let elements = arr |> Array.map toJson |> String.concat ", "
         //        sprintf "[%s]" elements
         //    | T (key, value) ->
@@ -57,16 +63,17 @@ type fCell2<'CellTupleKey when 'CellTupleKey: comparison> =
         //    | B true -> "true"
         //    | B false -> "false"
         //toJson this
-        
-        let escape (s:string) =
+
+        let escape (s: string) =
             s.Replace("\\", "\\\\").Replace("\"", "\\\"")
+
         let rec toJson (f: fCell2<'CellTupleKey>) =
             match f with
-            | N _   -> "null"
-            | B true  -> "true"
+            | N _ -> "null"
+            | B true -> "true"
             | B false -> "false"
-            | D d   -> d.ToString(System.Globalization.CultureInfo.InvariantCulture)
-            | S s   -> "\"" + (escape s) + "\""
+            | D d -> d.ToString(System.Globalization.CultureInfo.InvariantCulture)
+            | S s -> "\"" + (escape s) + "\""
             | A arr ->
                 let elems = arr |> Array.map toJson |> String.concat ","
                 "[" + elems + "]"
@@ -80,17 +87,20 @@ type fCell2<'CellTupleKey when 'CellTupleKey: comparison> =
             | T m ->
                 let elems =
                     m
-                    |> Seq.map (fun (KeyValue(k,v)) ->
+                    |> Seq.map (fun (KeyValue(k, v)) ->
                         let keyStr =
                             match box k with
                             | :? string as ks -> "\"" + escape ks + "\""
                             | _ -> "\"" + sprintf "%A" k + "\""
+
                         keyStr + ":" + toJson v)
                     |> String.concat ","
+
                 "{" + elems + "}"
+
         toJson this
 
-    static member compareArrays (arr1: fCell2<'CellTupleKey> array) (arr2: fCell2<'CellTupleKey> array): int =
+    static member compareArrays (arr1: fCell2<'CellTupleKey> array) (arr2: fCell2<'CellTupleKey> array) : int =
         match arr1, arr2 with
         | null, null -> 0
         | _, null -> 1
@@ -102,18 +112,16 @@ type fCell2<'CellTupleKey when 'CellTupleKey: comparison> =
                 if res = 0 then None else Some res)
             |> Option.defaultValue 0
 
-    static member compareLength (arr1: fCell2<'CellTupleKey> array) (arr2: fCell2<'CellTupleKey> array): int =
+    static member compareLength (arr1: fCell2<'CellTupleKey> array) (arr2: fCell2<'CellTupleKey> array) : int =
         let a1l = if arr1 = null then 0 else arr1.Length
         let a2l = if arr2 = null then 0 else arr2.Length
         compare a1l a2l
 
-    static member Compare (x: fCell2<'CellTupleKey>, y: fCell2<'CellTupleKey>): int =
+    static member Compare(x: fCell2<'CellTupleKey>, y: fCell2<'CellTupleKey>) : int =
         match box x, box y with
         | null, null -> 0
-        | _, null ->
-            if x = S null || x = A null || x = N () then 0 else 1
-        | null, _ ->
-            if y = S null || y = A null || y = N () then 0 else -1
+        | _, null -> if x = S null || x = A null || x = N() then 0 else 1
+        | null, _ -> if y = S null || y = A null || y = N() then 0 else -1
         | _ ->
             match (x, y) with
             | (N _, N _) -> 0
@@ -126,8 +134,11 @@ type fCell2<'CellTupleKey when 'CellTupleKey: comparison> =
             | (S s1, S s2) -> String.Compare(s1, s2)
             | (A arr1, A arr2) ->
                 let lenComp = fCell2.compareLength arr1 arr2
-                if lenComp <> 0 then lenComp
-                else fCell2.compareArrays arr1 arr2
+
+                if lenComp <> 0 then
+                    lenComp
+                else
+                    fCell2.compareArrays arr1 arr2
             //| (T (tag1, f1), T (tag2, f2)) ->
             //    let tagComp = compare tag1 tag2
             //    if tagComp <> 0 then tagComp
@@ -136,12 +147,18 @@ type fCell2<'CellTupleKey when 'CellTupleKey: comparison> =
             | (T m1, T m2) ->
                 let seq1, seq2 = Seq.toArray m1, Seq.toArray m2
                 let lenComp = compare seq1.Length seq2.Length
-                if lenComp <> 0 then lenComp
+
+                if lenComp <> 0 then
+                    lenComp
                 else
                     seq {
                         for kvp1, kvp2 in Seq.zip seq1 seq2 ->
                             let kc = compare kvp1.Key kvp2.Key
-                            if kc <> 0 then kc else fCell2.Compare(kvp1.Value, kvp2.Value)
+
+                            if kc <> 0 then
+                                kc
+                            else
+                                fCell2.Compare(kvp1.Value, kvp2.Value)
                     }
                     |> Seq.tryFind ((<>) 0)
                     |> Option.defaultValue 0
@@ -159,8 +176,7 @@ type fCell2<'CellTupleKey when 'CellTupleKey: comparison> =
             | (T _, A _) -> 1
 
     interface IComparer<fCell2<'CellTupleKey>> with
-        override this.Compare(x: fCell2<'CellTupleKey>, y: fCell2<'CellTupleKey>): int =
-            fCell2.Compare(x, y)
+        override this.Compare(x: fCell2<'CellTupleKey>, y: fCell2<'CellTupleKey>) : int = fCell2.Compare(x, y)
 
     member this.s =
         match this with
@@ -222,13 +238,20 @@ type fCell2<'CellTupleKey when 'CellTupleKey: comparison> =
         | T m -> m
         | _ -> failwith "Not fCell.T."
 
+    member this.b =
+        match this with
+        | B b -> b
+        | _ -> failwith "Not fCell.B."
+
     member this.ta =
         match this with
         | T m when m.Count > 0 ->
-            m |> Seq.map (fun kv ->
+            m
+            |> Seq.map (fun kv ->
                 match kv.Value with
                 | A a -> kv.Key, a
-                | _ -> failwith "Not A in fCell.TA.") |> Seq.toArray
+                | _ -> failwith "Not A in fCell.TA.")
+            |> Seq.toArray
         | _ -> failwith "Not fCell.T."
 
     member this.ts =
@@ -260,34 +283,50 @@ type fCell2<'CellTupleKey when 'CellTupleKey: comparison> =
             kv.Key, kv.Value
         | _ -> failwith "Not fCell.T or empty map."
 
-    member this.ToLowerInvariant () =
+    member this.ToLowerInvariant() =
         match this with
         | S "" -> fCell2<'CellTupleKey>.SNull
         | S s -> s.ToLowerInvariant() |> S
         | _ -> failwith "Not fstring.S."
 
-    static member val CompareFunc : Func<fCell2<'CellTupleKey>, fCell2<'CellTupleKey>, bool> = 
+    static member val CompareFunc: Func<fCell2<'CellTupleKey>, fCell2<'CellTupleKey>, bool> =
         FuncConvert.FromFunc(fun (x: fCell2<'CellTupleKey>) (y: fCell2<'CellTupleKey>) -> fCell2.Compare(x, y) = 0)
 
-    static member aFromStringArr (sArr) =
-        sArr
-        |> Array.map S
-        |> A
+    static member aFromStringArr(sArr) = sArr |> Array.map S |> A
 
-    static member fromStringArr (sArr) =
-        sArr
-        |> Array.map S
+    static member fromStringArr(sArr) = sArr |> Array.map S
 
-    static member val SEmpty        = S ""                          with get
-    static member val AEmpty        = A [||]                        with get
-    static member val SNull         = S null                        with get
-    static member val ANull         = A null                        with get
-    static member val Unassigned    = Unchecked.defaultof<fCell2<'CellTupleKey>>  with get
+    static member val SEmpty = S "" with get
+    static member val AEmpty = A [||] with get
+    static member val SNull = S null with get
+    static member val ANull = A null with get
+    static member val Unassigned = Unchecked.defaultof<fCell2<'CellTupleKey>> with get
 
-    static member SIsNullOrEmpty (o:fCell2<'CellTupleKey>) = if box o = null || o = fCell2<'CellTupleKey>.SEmpty || o = fCell2<'CellTupleKey>.SNull then true else false
-    static member AIsNullOrEmpty (o:fCell2<'CellTupleKey>) = if box o = null || o = fCell2<'CellTupleKey>.AEmpty || o = fCell2<'CellTupleKey>.ANull then true else false
-    static member IsNull (o:fCell2<'CellTupleKey>) = 
-        if box o = null || o = fCell2.ANull || o = fCell2<'CellTupleKey>.SNull || o = N () then true else false
+    static member SIsNullOrEmpty(o: fCell2<'CellTupleKey>) =
+        if
+            box o = null
+            || o = fCell2<'CellTupleKey>.SEmpty
+            || o = fCell2<'CellTupleKey>.SNull
+        then
+            true
+        else
+            false
+
+    static member AIsNullOrEmpty(o: fCell2<'CellTupleKey>) =
+        if
+            box o = null
+            || o = fCell2<'CellTupleKey>.AEmpty
+            || o = fCell2<'CellTupleKey>.ANull
+        then
+            true
+        else
+            false
+
+    static member IsNull(o: fCell2<'CellTupleKey>) =
+        if box o = null || o = fCell2.ANull || o = fCell2<'CellTupleKey>.SNull || o = N() then
+            true
+        else
+            false
 
     member this.me =
         match this with
@@ -311,49 +350,43 @@ open System.Runtime.CompilerServices
 module FS =
     let mapper = new Dictionary<Type, fCell2<string> -> obj>()
 
-    let _ =
-        mapper.Add(
-            typeof<string>, (fun (S s) -> box s)
-        )
-    let _ =
-        mapper.Add(
-            typeof<double>, (fun (D d) -> box d)
-        )
+    let _ = mapper.Add(typeof<string>, (fun (S s) -> box s))
+    let _ = mapper.Add(typeof<double>, (fun (D d) -> box d))
 
-    let _ =
-        mapper.Add(
-            typeof<fCell2<string> []>, (fun (A a) -> box a)
-        )
+    let _ = mapper.Add(typeof<fCell2<string>[]>, (fun (A a) -> box a))
 
     let _ =
         mapper.Add(
 #if NET9_0
-            typeof<string * fCell2<string>>, (fun (T m) -> box m)
+            typeof<string * fCell2<string>>,
+            (fun (T m) -> box m)
 #else
-            typeof<string * fCell2<string>>, (fun (T m) -> box m)
+            typeof<string * fCell2<string>>,
+            (fun (T m) -> box m)
 #endif
         )
 
     [<Extension>]
-    let toType (this: fCell2<string>, t:Type) = mapper[t] this
+    let toType (this: fCell2<string>, t: Type) = mapper[t]this
 
 
 
 [<Extension>]
 module ExtensionsString =
     [<Extension>]
-    let toF(str : string) = S str
+    let toF (str: string) = S str
+
 [<Extension>]
 module ExtensionsDecimal =
     [<Extension>]
-    let toF(d : decimal) = D d
+    let toF (d: decimal) = D d
+
 [<Extension>]
 module ExtensionsDouble =
     [<Extension>]
-    let toF(d : double) = D (decimal d)
+    let toF (d: double) = D(decimal d)
 
 [<Extension>]
 module ExtensionsInt =
     [<Extension>]
-    let toF(d : int) = D (decimal d)
-
+    let toF (d: int) = D(decimal d)

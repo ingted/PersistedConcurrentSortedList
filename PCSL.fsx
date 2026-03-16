@@ -36,8 +36,13 @@ open NTDLS.Katzebase.Parsers.Interfaces
 open MBrace.FsPickler.Json
 open MBrace.FsPickler.Combinators 
 #else
+#if NET10_0
+open MBrace.FsPickler.Json
+open MBrace.FsPickler.Combinators 
+#else
 open MBrace.FsPickler.nstd20.Json
 open MBrace.FsPickler.nstd20.Combinators 
+#endif
 #endif
 open ProtoBuf
 open ProtoBuf.FSharp
@@ -59,8 +64,13 @@ module PCSL =
     open MBrace.FsPickler.Json
 
 #else
+#if NET10_0
+    open MBrace.FsPickler.Json
+
+#else
     open MBrace.FsPickler.nstd20.Json
 
+#endif
 #endif
 
     

@@ -10,9 +10,9 @@ open System.Reflection
 [<assembly: System.Reflection.AssemblyCompanyAttribute("PersistedConcurrentSortedList")>]
 [<assembly: System.Reflection.AssemblyConfigurationAttribute("Release")>]
 [<assembly: System.Reflection.AssemblyDescriptionAttribute("SortedList with persistency and threadsafty.")>]
-[<assembly: System.Reflection.AssemblyFileVersionAttribute("9.0.27.317")>]
-[<assembly: System.Reflection.AssemblyInformationalVersionAttribute("9.0.27.317+c383a639aa89ea7b90569e8fdac823e70f373bc7")>]
+[<assembly: System.Reflection.AssemblyFileVersionAttribute("10.0.103.2")>]
+[<assembly: System.Reflection.AssemblyInformationalVersionAttribute("10.0.103.2-dgx+91a259836e42da8c745098713b58dbd5661d8616")>]
 [<assembly: System.Reflection.AssemblyProductAttribute("PersistedConcurrentSortedList")>]
 [<assembly: System.Reflection.AssemblyTitleAttribute("PersistedConcurrentSortedList")>]
-[<assembly: System.Reflection.AssemblyVersionAttribute("9.0.27.317")>]
+[<assembly: System.Reflection.AssemblyVersionAttribute("10.0.103.2")>]
 do()

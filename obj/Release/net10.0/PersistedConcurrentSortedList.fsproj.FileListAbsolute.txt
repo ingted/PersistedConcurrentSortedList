@@ -1,0 +1,15 @@
+/workspace/home/work/sharftrade7/Libs5/KServer/fstring/bin/net10.0/PersistedConcurrentSortedList.dll.config
+/workspace/home/work/sharftrade7/Libs5/KServer/fstring/bin/net10.0/PersistedConcurrentSortedList.deps.json
+/workspace/home/work/sharftrade7/Libs5/KServer/fstring/bin/net10.0/PersistedConcurrentSortedList.dll
+/workspace/home/work/sharftrade7/Libs5/KServer/fstring/bin/net10.0/PersistedConcurrentSortedList.pdb
+/workspace/home/work/sharftrade7/Libs5/KServer/fstring/bin/net10.0/PersistedConcurrentSortedList.xml
+/workspace/home/work/sharftrade7/Libs5/KServer/fstring/obj/Release/net10.0/PersistedConcurrentSortedList.fsproj.AssemblyReference.cache
+/workspace/home/work/sharftrade7/Libs5/KServer/fstring/obj/Release/net10.0/PersistedConcurrentSortedList.AssemblyInfoInputs.cache
+/workspace/home/work/sharftrade7/Libs5/KServer/fstring/obj/Release/net10.0/PersistedConcurrentSortedList.AssemblyInfo.fs
+/workspace/home/work/sharftrade7/Libs5/KServer/fstring/obj/Release/net10.0/PersistedConcurrentSortedList.fsproj.CoreCompileInputs.cache
+/workspace/home/work/sharftrade7/Libs5/KServer/fstring/obj/Release/net10.0/PersistedConcurrentSortedList.sourcelink.json
+/workspace/home/work/sharftrade7/Libs5/KServer/fstring/obj/Release/net10.0/PersistedConcurrentSortedList.dll
+/workspace/home/work/sharftrade7/Libs5/KServer/fstring/obj/Release/net10.0/refint/PersistedConcurrentSortedList.dll
+/workspace/home/work/sharftrade7/Libs5/KServer/fstring/obj/Release/net10.0/PersistedConcurrentSortedList.xml
+/workspace/home/work/sharftrade7/Libs5/KServer/fstring/obj/Release/net10.0/PersistedConcurrentSortedList.pdb
+/workspace/home/work/sharftrade7/Libs5/KServer/fstring/obj/Release/net10.0/ref/PersistedConcurrentSortedList.dll

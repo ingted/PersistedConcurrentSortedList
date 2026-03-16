@@ -102,7 +102,7 @@ module Task =
             }
             *)
             try
-                Task.WaitAll(tasks |> Seq.toArray, TimeSpan.FromMilliseconds _toMilli) |> Choice1Of3
+                Task.WaitAll(tasks |> Seq.toArray, TimeSpan.FromMilliseconds (float _toMilli)) |> Choice1Of3
             with
             | :? TimeoutException as te ->
                 Choice2Of3 te

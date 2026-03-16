@@ -4,64 +4,33 @@
     <RestoreSuccess Condition=" '$(RestoreSuccess)' == '' ">True</RestoreSuccess>
     <RestoreTool Condition=" '$(RestoreTool)' == '' ">NuGet</RestoreTool>
     <ProjectAssetsFile Condition=" '$(ProjectAssetsFile)' == '' ">$(MSBuildThisFileDirectory)project.assets.json</ProjectAssetsFile>
-    <NuGetPackageRoot Condition=" '$(NuGetPackageRoot)' == '' ">$(UserProfile)\.nuget\packages\</NuGetPackageRoot>
-    <NuGetPackageFolders Condition=" '$(NuGetPackageFolders)' == '' ">C:\Users\Administrator\.nuget\packages\;C:\Program Files (x86)\Microsoft Visual Studio\Shared\NuGetPackages</NuGetPackageFolders>
+    <NuGetPackageRoot Condition=" '$(NuGetPackageRoot)' == '' ">/root/.nuget/packages/</NuGetPackageRoot>
+    <NuGetPackageFolders Condition=" '$(NuGetPackageFolders)' == '' ">/root/.nuget/packages/</NuGetPackageFolders>
     <NuGetProjectStyle Condition=" '$(NuGetProjectStyle)' == '' ">PackageReference</NuGetProjectStyle>
-    <NuGetToolVersion Condition=" '$(NuGetToolVersion)' == '' ">6.14.0</NuGetToolVersion>
+    <NuGetToolVersion Condition=" '$(NuGetToolVersion)' == '' ">7.0.0</NuGetToolVersion>
   </PropertyGroup>
   <ItemGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <SourceRoot Include="C:\Users\Administrator\.nuget\packages\" />
-    <SourceRoot Include="C:\Program Files (x86)\Microsoft Visual Studio\Shared\NuGetPackages\" />
+    <SourceRoot Include="/root/.nuget/packages/" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net9.0' AND '$(ExcludeRestorePackageImports)' != 'true' ">
-    <Content Include="$(NuGetPackageRoot)fakka.protobuf.fsharp\9.0.14.300\contentFiles\any\netstandard2.0\app.config" Condition="Exists('$(NuGetPackageRoot)fakka.protobuf.fsharp\9.0.14.300\contentFiles\any\netstandard2.0\app.config')">
+  <ItemGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
+    <Content Include="$(NuGetPackageRoot)fakka.protobuf.fsharp/10.0.103.2-dgx/contentFiles/any/net10.0/app.config" Condition="Exists('$(NuGetPackageRoot)fakka.protobuf.fsharp/10.0.103.2-dgx/contentFiles/any/net10.0/app.config')">
       <NuGetPackageId>FAkka.ProtoBuf.FSharp</NuGetPackageId>
-      <NuGetPackageVersion>9.0.14.300</NuGetPackageVersion>
+      <NuGetPackageVersion>10.0.103.2-dgx</NuGetPackageVersion>
       <NuGetItemType>Content</NuGetItemType>
       <Pack>false</Pack>
       <Private>False</Private>
       <Link>app.config</Link>
     </Content>
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' AND '$(ExcludeRestorePackageImports)' != 'true' ">
-    <Content Include="$(NuGetPackageRoot)fspickler.nstd20\2.0.9.300\contentFiles\any\netstandard2.0\global.json" Condition="Exists('$(NuGetPackageRoot)fspickler.nstd20\2.0.9.300\contentFiles\any\netstandard2.0\global.json')">
-      <NuGetPackageId>FsPickler.nstd20</NuGetPackageId>
-      <NuGetPackageVersion>2.0.9.300</NuGetPackageVersion>
-      <NuGetItemType>Content</NuGetItemType>
-      <Pack>false</Pack>
-      <Private>False</Private>
-      <Link>global.json</Link>
-    </Content>
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' AND '$(ExcludeRestorePackageImports)' != 'true' ">
-    <Content Include="$(NuGetPackageRoot)fakka.protobuf.fsharp\9.0.14.300\contentFiles\any\netstandard2.0\app.config" Condition="Exists('$(NuGetPackageRoot)fakka.protobuf.fsharp\9.0.14.300\contentFiles\any\netstandard2.0\app.config')">
-      <NuGetPackageId>FAkka.ProtoBuf.FSharp</NuGetPackageId>
-      <NuGetPackageVersion>9.0.14.300</NuGetPackageVersion>
-      <NuGetItemType>Content</NuGetItemType>
-      <Pack>false</Pack>
-      <Private>False</Private>
-      <Link>app.config</Link>
-    </Content>
-  </ItemGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net9.0' AND '$(ExcludeRestorePackageImports)' != 'true' ">
-    <PkgSystem_Runtime_CompilerServices_Unsafe Condition=" '$(PkgSystem_Runtime_CompilerServices_Unsafe)' == '' ">C:\Users\Administrator\.nuget\packages\system.runtime.compilerservices.unsafe\6.1.2</PkgSystem_Runtime_CompilerServices_Unsafe>
-    <PkgSystem_Collections_Immutable Condition=" '$(PkgSystem_Collections_Immutable)' == '' ">C:\Users\Administrator\.nuget\packages\system.collections.immutable\9.0.0</PkgSystem_Collections_Immutable>
-    <Pkgprotobuf-net_Core Condition=" '$(Pkgprotobuf-net_Core)' == '' ">C:\Users\Administrator\.nuget\packages\protobuf-net.core\3.2.45</Pkgprotobuf-net_Core>
-    <PkgFSharp_Core Condition=" '$(PkgFSharp_Core)' == '' ">C:\Users\Administrator\.nuget\packages\fsharp.core\9.0.300</PkgFSharp_Core>
-    <PkgFAkka_ProtoBuf_FSharp Condition=" '$(PkgFAkka_ProtoBuf_FSharp)' == '' ">C:\Users\Administrator\.nuget\packages\fakka.protobuf.fsharp\9.0.14.300</PkgFAkka_ProtoBuf_FSharp>
-    <PkgFAkka_FsPickler Condition=" '$(PkgFAkka_FsPickler)' == '' ">C:\Users\Administrator\.nuget\packages\fakka.fspickler\9.0.300</PkgFAkka_FsPickler>
-    <PkgFAkka_FsPickler_Json Condition=" '$(PkgFAkka_FsPickler_Json)' == '' ">C:\Users\Administrator\.nuget\packages\fakka.fspickler.json\9.0.300</PkgFAkka_FsPickler_Json>
-    <PkgFAkka_FSharp_Collections_ParallelSeq Condition=" '$(PkgFAkka_FSharp_Collections_ParallelSeq)' == '' ">C:\Users\Administrator\.nuget\packages\fakka.fsharp.collections.parallelseq\1.0.9.300</PkgFAkka_FSharp_Collections_ParallelSeq>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' AND '$(ExcludeRestorePackageImports)' != 'true' ">
-    <PkgSystem_Runtime_CompilerServices_Unsafe Condition=" '$(PkgSystem_Runtime_CompilerServices_Unsafe)' == '' ">C:\Users\Administrator\.nuget\packages\system.runtime.compilerservices.unsafe\6.1.2</PkgSystem_Runtime_CompilerServices_Unsafe>
-    <PkgSystem_Collections_Immutable Condition=" '$(PkgSystem_Collections_Immutable)' == '' ">C:\Users\Administrator\.nuget\packages\system.collections.immutable\9.0.0</PkgSystem_Collections_Immutable>
-    <Pkgprotobuf-net_Core Condition=" '$(Pkgprotobuf-net_Core)' == '' ">C:\Users\Administrator\.nuget\packages\protobuf-net.core\3.2.45</Pkgprotobuf-net_Core>
-    <PkgNETStandard_Library Condition=" '$(PkgNETStandard_Library)' == '' ">C:\Users\Administrator\.nuget\packages\netstandard.library\2.0.3</PkgNETStandard_Library>
-    <PkgFSharp_Core Condition=" '$(PkgFSharp_Core)' == '' ">C:\Users\Administrator\.nuget\packages\fsharp.core\9.0.300</PkgFSharp_Core>
-    <PkgFsPickler_nstd20 Condition=" '$(PkgFsPickler_nstd20)' == '' ">C:\Users\Administrator\.nuget\packages\fspickler.nstd20\2.0.9.300</PkgFsPickler_nstd20>
-    <PkgFsPickler_Json_nstd20 Condition=" '$(PkgFsPickler_Json_nstd20)' == '' ">C:\Users\Administrator\.nuget\packages\fspickler.json.nstd20\2.0.9.300</PkgFsPickler_Json_nstd20>
-    <PkgFAkka_ProtoBuf_FSharp Condition=" '$(PkgFAkka_ProtoBuf_FSharp)' == '' ">C:\Users\Administrator\.nuget\packages\fakka.protobuf.fsharp\9.0.14.300</PkgFAkka_ProtoBuf_FSharp>
-    <PkgFAkka_FSharp_Collections_ParallelSeq Condition=" '$(PkgFAkka_FSharp_Collections_ParallelSeq)' == '' ">C:\Users\Administrator\.nuget\packages\fakka.fsharp.collections.parallelseq\1.0.9.300</PkgFAkka_FSharp_Collections_ParallelSeq>
+  <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
+    <PkgSystem_Runtime_CompilerServices_Unsafe Condition=" '$(PkgSystem_Runtime_CompilerServices_Unsafe)' == '' ">/root/.nuget/packages/system.runtime.compilerservices.unsafe/6.1.2</PkgSystem_Runtime_CompilerServices_Unsafe>
+    <PkgSystem_Collections_Immutable Condition=" '$(PkgSystem_Collections_Immutable)' == '' ">/root/.nuget/packages/system.collections.immutable/10.0.5</PkgSystem_Collections_Immutable>
+    <Pkgprotobuf-net_Core Condition=" '$(Pkgprotobuf-net_Core)' == '' ">/root/.nuget/packages/protobuf-net.core/3.2.56</Pkgprotobuf-net_Core>
+    <PkgFSharp_Core Condition=" '$(PkgFSharp_Core)' == '' ">/root/.nuget/packages/fsharp.core/10.0.105</PkgFSharp_Core>
+    <PkgFAkka_ProtoBuf_FSharp Condition=" '$(PkgFAkka_ProtoBuf_FSharp)' == '' ">/root/.nuget/packages/fakka.protobuf.fsharp/10.0.103.2-dgx</PkgFAkka_ProtoBuf_FSharp>
+    <PkgAkka_Analyzers Condition=" '$(PkgAkka_Analyzers)' == '' ">/root/.nuget/packages/akka.analyzers/0.3.3</PkgAkka_Analyzers>
+    <PkgFAkka_FsPickler Condition=" '$(PkgFAkka_FsPickler)' == '' ">/root/.nuget/packages/fakka.fspickler/10.0.103.2-dgx</PkgFAkka_FsPickler>
+    <PkgFAkka_FsPickler_Json Condition=" '$(PkgFAkka_FsPickler_Json)' == '' ">/root/.nuget/packages/fakka.fspickler.json/10.0.103.2-dgx</PkgFAkka_FsPickler_Json>
+    <PkgFAkka_FSharp_Collections_ParallelSeq Condition=" '$(PkgFAkka_FSharp_Collections_ParallelSeq)' == '' ">/root/.nuget/packages/fakka.fsharp.collections.parallelseq/10.0.103.2-dgx</PkgFAkka_FSharp_Collections_ParallelSeq>
   </PropertyGroup>
 </Project>
