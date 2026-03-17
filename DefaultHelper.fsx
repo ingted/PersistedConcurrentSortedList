@@ -106,6 +106,14 @@ module DefaultHelper =
                 | TSL     -> KV   (CInt i)
                 | _ -> failwith "Unsupported type in CInt"
 
+            | CDecimal d ->
+                match id with
+                | TSLIdxR -> IdxR (CDecimal d)
+                | TSLIdx  -> Idx  (CDecimal d)
+                | TSLPSts -> PS   (CDecimal d)
+                | TSL     -> KV   (CDecimal d)
+                | _ -> failwith "Unsupported type in CDecimal"
+
             | CKeyList keys -> 
                 //match typeof<'Key>, typeof<'Value> with
                 //| tk, tv when tk = kvkt && tv = kvvt -> 
@@ -151,6 +159,22 @@ module DefaultHelper =
                     let vs = values |> Seq.map (fun (SLPS v) -> v)|> (fun s -> List<_>(s)) :> IList<SortedListPersistenceStatus>
                     PS (CValueList vs)
                 | _ -> failwith "Unsupported type in CValueList"
+
+            | CKVList kvArr ->
+                match id with
+                | TSL ->
+                    let kvs = kvArr |> Array.map (fun (SLK k, SLV v) -> k, v)
+                    KV (CKVList kvs)
+                | TSLIdx ->
+                    let kvs = kvArr |> Array.map (fun (SLK k, SLKH v) -> k, v)
+                    Idx (CKVList kvs)
+                | TSLIdxR ->
+                    let kvs = kvArr |> Array.map (fun (SLKH k, SLK v) -> k, v)
+                    IdxR (CKVList kvs)
+                | TSLPSts ->
+                    let kvs = kvArr |> Array.map (fun (SLK k, SLPS v) -> k, v)
+                    PS (CKVList kvs)
+                | _ -> failwith "Unsupported type in CKVList"
             | FoldResult rwArr ->
                 match id with
                 | TSL -> 
@@ -174,12 +198,18 @@ module DefaultHelper =
                     COptionValue (exists, vOpt)
                 | CInt i -> 
                     CInt i
+                | CDecimal d ->
+                    CDecimal d
                 | CKeyList keys -> 
                     let ks = keys |> Seq.map (fun (k:'Key) -> SLK k) |> fun l -> List<_> l :> IList<_>
                     CKeyList ks
                 | CValueList values -> 
                     let vs = values |> Seq.map (fun v -> SLV v) |> fun l -> List<_> l :> IList<_>
                     CValueList vs
+                | CKVList kvArr ->
+                    kvArr
+                    |> Array.map (fun (k, v) -> SLK k, SLV v)
+                    |> CKVList
                 
             | Idx (o:OpResult<'Key, KeyHash>) ->
                 match o with
@@ -192,12 +222,18 @@ module DefaultHelper =
                     COptionValue (exists, vOpt)
                 | CInt i -> 
                     CInt i
+                | CDecimal d ->
+                    CDecimal d
                 | CKeyList keys -> 
                     let ks = keys |> Seq.map (fun (k:'Key) -> SLK k) |> fun l -> List<_> l :> IList<_>
                     CKeyList ks
                 | CValueList values -> 
                     let vs = values |> Seq.map (fun v -> SLKH v) |> fun l -> List<_> l :> IList<_>
                     CValueList vs
+                | CKVList kvArr ->
+                    kvArr
+                    |> Array.map (fun (k, v) -> SLK k, SLKH v)
+                    |> CKVList
             | IdxR (o:OpResult<KeyHash, 'Key>) ->
                 match o with
                 | CUnit -> 
@@ -210,12 +246,18 @@ module DefaultHelper =
                     COptionValue (exists, vOpt)
                 | CInt i -> 
                     CInt i
+                | CDecimal d ->
+                    CDecimal d
                 | CKeyList keys -> 
                     let ks = keys |> Seq.map (fun (k:KeyHash) -> SLKH k) |> fun l -> List<_> l :> IList<_>
                     CKeyList ks
                 | CValueList values -> 
                     let vs = values |> Seq.map (fun v -> SLK v) |> fun l -> List<_> l :> IList<_>
                     CValueList vs
+                | CKVList kvArr ->
+                    kvArr
+                    |> Array.map (fun (k, v) -> SLKH k, SLK v)
+                    |> CKVList
             | PS (o:OpResult<'Key, SortedListPersistenceStatus>) ->
                 match o with
                 | CUnit -> 
@@ -227,12 +269,22 @@ module DefaultHelper =
                     COptionValue (exists, vOpt)
                 | CInt i -> 
                     CInt i
+                | CDecimal d ->
+                    CDecimal d
                 | CKeyList keys -> 
                     let ks = keys |> Seq.map (fun (k:'Key) -> SLK k) |> fun l -> List<_> l :> IList<_>
                     CKeyList ks
                 | CValueList values -> 
                     let vs = values |> Seq.map (fun v -> SLPS v) |> fun l -> List<_> l :> IList<_>
                     CValueList vs
+                | CKVList kvArr ->
+                    kvArr
+                    |> Array.map (fun (k, v) -> SLK k, SLPS v)
+                    |> CKVList
+            | FoldOpR o ->
+                o
+            | UtilOp ->
+                CUnit
 
         static member kvExtract (opr: OpResult<PCSLKVTyp<'Key, 'Value>, PCSLKVTyp<'Key, 'Value>>) =
             match opr with

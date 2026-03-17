@@ -25,6 +25,7 @@
 #endif
 
 open System
+open System.IO
 open System.Collections
 open System.Collections.Generic
 #if KATZEBASE
@@ -422,6 +423,126 @@ module ExtensionsInt =
     [<Extension>]
     let toF(d : int) = D (decimal d)
 
+[<Struct; CLIMutable; ProtoContract>]
+type UnitSurrogate =
+    { [<ProtoMember(1)>] Value: bool }
+
+    static member op_Implicit(_: unit) : UnitSurrogate =
+        { Value = true }
+
+    static member op_Implicit(_: UnitSurrogate) : unit =
+        ()
+
+[<CLIMutable; ProtoContract>]
+type FCell2MapEntryPb<'CellTupleKey when 'CellTupleKey: comparison> =
+    {
+        [<ProtoMember(1)>]
+        Key: 'CellTupleKey
+        [<ProtoMember(2)>]
+        Value: FCell2Pb<'CellTupleKey>
+    }
+
+and [<CLIMutable; ProtoContract>]
+FCell2Pb<'CellTupleKey when 'CellTupleKey: comparison> =
+    {
+        [<ProtoMember(1)>]
+        Tag: int
+        [<ProtoMember(2)>]
+        BoolValue: bool
+        [<ProtoMember(3)>]
+        StringValue: string
+        [<ProtoMember(4)>]
+        DecimalValue: decimal
+        [<ProtoMember(5)>]
+        ArrayValue: FCell2Pb<'CellTupleKey> array
+        [<ProtoMember(6)>]
+        MapValue: FCell2MapEntryPb<'CellTupleKey> array
+    }
+
+type private FCell2Proto =
+    static member private ToPb<'CellTupleKey when 'CellTupleKey: comparison>
+        (value: PersistedConcurrentSortedList.Type.fCell2<'CellTupleKey>)
+        : FCell2Pb<'CellTupleKey> =
+        match value with
+        | PersistedConcurrentSortedList.Type.fCell2.B b ->
+            { Tag = 1; BoolValue = b; StringValue = null; DecimalValue = 0m; ArrayValue = null; MapValue = null }
+        | PersistedConcurrentSortedList.Type.fCell2.S s ->
+            { Tag = 2; BoolValue = false; StringValue = s; DecimalValue = 0m; ArrayValue = null; MapValue = null }
+        | PersistedConcurrentSortedList.Type.fCell2.D d ->
+            { Tag = 3; BoolValue = false; StringValue = null; DecimalValue = d; ArrayValue = null; MapValue = null }
+        | PersistedConcurrentSortedList.Type.fCell2.A arr ->
+            { Tag = 4
+              BoolValue = false
+              StringValue = null
+              DecimalValue = 0m
+              ArrayValue = arr |> Array.map FCell2Proto.ToPb
+              MapValue = null }
+        | PersistedConcurrentSortedList.Type.fCell2.T m ->
+            { Tag = 5
+              BoolValue = false
+              StringValue = null
+              DecimalValue = 0m
+              ArrayValue = null
+              MapValue =
+                m
+                |> Seq.map (fun kv -> { Key = kv.Key; Value = FCell2Proto.ToPb kv.Value })
+                |> Seq.toArray }
+        | PersistedConcurrentSortedList.Type.fCell2.N _ ->
+            { Tag = 6; BoolValue = false; StringValue = null; DecimalValue = 0m; ArrayValue = null; MapValue = null }
+
+    static member private OfPb<'CellTupleKey when 'CellTupleKey: comparison>
+        (value: FCell2Pb<'CellTupleKey>)
+        : PersistedConcurrentSortedList.Type.fCell2<'CellTupleKey> =
+        match value.Tag with
+        | 1 -> PersistedConcurrentSortedList.Type.fCell2.B value.BoolValue
+        | 2 -> PersistedConcurrentSortedList.Type.fCell2.S value.StringValue
+        | 3 -> PersistedConcurrentSortedList.Type.fCell2.D value.DecimalValue
+        | 4 ->
+            let arr =
+                match value.ArrayValue with
+                | null -> null
+                | a -> a |> Array.map FCell2Proto.OfPb
+
+            PersistedConcurrentSortedList.Type.fCell2.A arr
+        | 5 ->
+            let map =
+                match value.MapValue with
+                | null -> Map.empty
+                | entries ->
+                    entries
+                    |> Seq.map (fun entry -> entry.Key, FCell2Proto.OfPb entry.Value)
+                    |> Map.ofSeq
+
+            PersistedConcurrentSortedList.Type.fCell2.T map
+        | 6 -> PersistedConcurrentSortedList.Type.fCell2.N()
+        | tag -> failwithf "Unsupported fCell2 protobuf tag: %d" tag
+
+    static member IsSupportedType(t: Type) =
+        t.IsGenericType
+        && t.GetGenericTypeDefinition()
+           = typedefof<PersistedConcurrentSortedList.Type.fCell2<_>>
+
+    static member Serialize(t: Type, ms: Stream, value: obj) =
+        let keyType = t.GetGenericArguments()[0]
+        let methodInfo =
+            typeof<FCell2Proto>.GetMethod(
+                "ToPb",
+                System.Reflection.BindingFlags.NonPublic ||| System.Reflection.BindingFlags.Static)
+
+        let pbValue = methodInfo.MakeGenericMethod([| keyType |]).Invoke(null, [| value |])
+        Serializer.NonGeneric.Serialize(ms, pbValue)
+
+    static member Deserialize(t: Type, ms: Stream) =
+        let keyType = t.GetGenericArguments()[0]
+        let pbType = typedefof<FCell2Pb<_>>.MakeGenericType([| keyType |])
+        let pbValue = Serializer.NonGeneric.Deserialize(pbType, ms)
+        let methodInfo =
+            typeof<FCell2Proto>.GetMethod(
+                "OfPb",
+                System.Reflection.BindingFlags.NonPublic ||| System.Reflection.BindingFlags.Static)
+
+        methodInfo.MakeGenericMethod([| keyType |]).Invoke(null, [| pbValue |])
+
 module PB =
     open System.IO
     open ProtoBuf.Meta
@@ -452,6 +573,15 @@ module PB =
         // 返回 Windows 安全的文件名
         safeHash
 
+    let ensureUnitSurrogate (model: RuntimeTypeModel) =
+        try
+            model.Add(typeof<unit>, false).SetSurrogate(typeof<UnitSurrogate>) |> ignore
+        with
+        | _ ->
+            ()
+
+        model
+
     type ModelContainer<'T> () =
         static let lockObj = obj()
 
@@ -459,6 +589,7 @@ module PB =
             lock lockObj (fun () ->
                 printfn $"?????????????????????????? {typeof<'T>.Name} ??????????????????????????"
                 RuntimeTypeModel.Create(typeof<'T>.Name)
+                |> ensureUnitSurrogate
                 |> fun m ->
                     if FSharpType.IsUnion typeof<'T> then
                         Serialiser.registerUnionIntoModel<'T> m
@@ -474,13 +605,19 @@ module PB =
 #if DEBUG1
             printfn "[serializeF] type: %s, %A" (o.GetType().Name) o
 #endif
-            Serialiser.serialise m ms o
+            if FCell2Proto.IsSupportedType typeof<'T> then
+                FCell2Proto.Serialize(typeof<'T>, ms, box o)
+            else
+                Serialiser.serialise m ms o
 
         static member deserializeFBase (m, ms) =
 #if DEBUG1
             printfn "[deserializeF] 'T: %s" typeof<'T>.Name
 #endif
-            Serialiser.deserialiseConcreteType<'T> m ms
+            if FCell2Proto.IsSupportedType typeof<'T> then
+                FCell2Proto.Deserialize(typeof<'T>, ms) |> unbox<'T>
+            else
+                Serialiser.deserialiseConcreteType<'T> m ms
 
 
 

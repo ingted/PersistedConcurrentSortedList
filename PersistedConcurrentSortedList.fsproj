@@ -13,30 +13,6 @@
 	  <Configurations>Debug;Release;DbgWithNoDep</Configurations>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0|AnyCPU'">
-    <DefineConstants>$(DefineConstants);ASYNC</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='DbgWithNoDep|net9.0|AnyCPU'">
-    <DefineConstants>$(DefineConstants);ASYNC</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0|AnyCPU'">
-    <DefineConstants>$(DefineConstants);ASYNC</DefineConstants>
-  </PropertyGroup>
-  
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
-  	<DefineConstants>$(DefineConstants);ASYNC</DefineConstants>
-  </PropertyGroup>
-  
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='DbgWithNoDep|netstandard2.0|AnyCPU'">
-  	<DefineConstants>$(DefineConstants);ASYNC</DefineConstants>
-  </PropertyGroup>
-  
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
-  	<DefineConstants>$(DefineConstants);ASYNC</DefineConstants>
-  </PropertyGroup>
-
   <ItemGroup>
 	  <None Include="test3.fsx" />
 	  <None Include="test2.fsx" />
@@ -46,8 +22,8 @@
 	  <None Include="PostBuildEvent.ps1" />
 	  <Compile Include="Compression.fsx" />
 	  <Compile Include="Memory.fsx" />
-	  <Compile Include="PB.fsx" />
 	  <Compile Include="PB2.fsx" />
+	  <Compile Include="PB.fsx" />
 	  <Compile Include="CSL.fsx" />
 	  <Compile Include="CSL2.fsx" />
 	  <Compile Include="Task.fsx" />

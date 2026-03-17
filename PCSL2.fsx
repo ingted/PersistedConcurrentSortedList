@@ -151,7 +151,7 @@ module PCSL2 =
                 let di = DirectoryInfo keysPath
                 di.GetFiles()
             
-#if ASYNC
+#if NET9_0_OR_GREATER
                 |> PSeq.ordered
                 |> PSeq.withDegreeOfParallelism maxDoP
                 |> fun ps ->
@@ -411,15 +411,47 @@ module PCSL2 =
             else
                 defaultValue
 
+        let snapshotState () =
+            rwLock.EnterReadLock()
+            try
+                let keys = sortedListIndex.KeysSafe |> Seq.toArray
+                let values = sortedList.ValuesSafe |> Seq.toArray
+                keys, values
+            finally
+                rwLock.ExitReadLock()
+
+        let compareSnapshot (keys1, values1) (keys2, values2) =
+            let keyCompare = compare keys1 keys2
+            if keyCompare = 0 then
+                compare values1 values2
+            else
+                keyCompare
+
+        let hashSnapshot (keys: 'Key[], values: 'Value[]) =
+            let hc = HashCode()
+            for key in keys do
+                hc.Add key
+            for value in values do
+                hc.Add value
+            hc.ToHashCode()
+
+        override this.Equals(otherObj) =
+            match otherObj with
+            | :? PersistedConcurrentSortedList<'Key, 'Value> as other ->
+                compareSnapshot (snapshotState ()) (other.SnapshotState()) = 0
+            | _ -> false
+
+        override this.GetHashCode() =
+            snapshotState () |> hashSnapshot
+
+        member private this.SnapshotState() =
+            snapshotState ()
+
         interface System.IComparable with
             member this.CompareTo(otherObj) =
                 match otherObj with
                 | :? PersistedConcurrentSortedList<'Key, 'Value> as other ->
-                    let keyCompare = compare (this._idx.KeysSafe |> Seq.toArray) (other._idx.KeysSafe |> Seq.toArray)
-                    if keyCompare = 0 then
-                        compare (this._base.ValuesSafe |> Seq.toArray) (other._base.ValuesSafe |> Seq.toArray)
-                    else
-                        keyCompare
+                    compareSnapshot (snapshotState ()) (other.SnapshotState())
                 | _ -> invalidArg "otherObj" $"Not a PersistedConcurrentSortedList<{typeof<'Key>}, {typeof<'Value>}>"
 
         member this.TryGetKeyHash = tryGetKeyHash

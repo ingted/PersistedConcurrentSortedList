@@ -329,7 +329,7 @@ module PCSL =
             let di = DirectoryInfo keysPath
             di.GetFiles()
             
-#if ASYNC
+#if NET9_0_OR_GREATER
             |> PSeq.ordered
             |> PSeq.withDegreeOfParallelism maxDoP
             |> PSeq.filter (fun fi ->
@@ -815,7 +815,7 @@ module PCSL =
             with get(key: 'Key) =
                 (this.TryGetValue(key) |> snd).Value
             and set(k: 'Key) (v: 'Value) =
-                failwith "upsert not yet implemented"
+                this.Upsert(k, v, defaultTimeout, false) |> ignore
 
         member this.TryGetValueAsync(key: 'Key) : Task<bool * 'Value option> =
             task {
@@ -854,4 +854,3 @@ module PCSL =
             PersistedConcurrentSortedList<'Key, 'Value>(
                 maxDoP, basePath, schemaName
                 , 30000, oFun = oFun, eFun = eFun, autoCache = autoCache)
-
