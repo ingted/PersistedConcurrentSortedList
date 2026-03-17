@@ -10,16 +10,14 @@
 	  <OutputPath>./bin</OutputPath>
 	  <Description>SortedList with persistency and threadsafty.</Description>
 	  <PackageProjectUrl>https://github.com/ingted/PersistedConcurrentSortedList</PackageProjectUrl>
+	  <RepositoryUrl>https://github.com/ingted/PersistedConcurrentSortedList</RepositoryUrl>
+	  <PackageReadmeFile>README.md</PackageReadmeFile>
+	  <PackageTags>fsharp;sortedlist;storage;persistence;protobuf;fspickler</PackageTags>
 	  <Configurations>Debug;Release;DbgWithNoDep</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
-	  <None Include="test3.fsx" />
-	  <None Include="test2.fsx" />
-	  <None Include="test.fsx" />
-	  <None Include="CopyDll.ps1" />
-	  <None Include="README.md" />
-	  <None Include="PostBuildEvent.ps1" />
+	  <None Include="README.md" Pack="true" PackagePath="\" />
 	  <Compile Include="Compression.fsx" />
 	  <Compile Include="Memory.fsx" />
 	  <Compile Include="PB2.fsx" />

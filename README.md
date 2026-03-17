@@ -1,78 +1,74 @@
-More example here
-https://github.com/ingted/PersistedConcurrentSortedList.Test
+# PersistedConcurrentSortedList
 
+`PersistedConcurrentSortedList` is an F# library for ordered key/value storage with on-disk persistence.
 
-# 2024-12-01: IgnoreQ mode supported, Ultra fast valueInitialize bug fixed!
-# 2024-12-06: No wrapper type required anymore, ULTRA FAST!
-# Supported Array/Struct similar with BigQuery in C# and F#
-# Usage: take a look at QuickStart.fsx (module PCSLTest)
-# ProtoBuf.FSharp mod: (if you don't want to use FAkka.ProtoBuf.FSharp) 
+It is designed for workloads where:
 
+- the dataset is loaded once or rebuilt at startup,
+- reads dominate after initialization,
+- only occasional small updates are expected,
+- ordered queries such as `FirstLastN*` still matter.
 
-Actually you could use the official ProtoBuf.FSharp, just replace deserialiseConcreteType in PB with (adding it yourself)
+## Features
 
-```
-let deserialiseConcreteType<'t> (model: RuntimeTypeModel) (stream: Stream) = 
-    // 判斷 't 是否為泛型類別
-    let tType = typeof<'t>
-    let actualType =
-        if tType.IsGenericType then
-            // 如果是泛型類別，則根據定義創建具體的類型
-            let genericTypeDefinition = tType.GetGenericTypeDefinition()
-            let genericArguments = tType.GetGenericArguments()
-            genericTypeDefinition.MakeGenericType(genericArguments)
-        else
-            // 如果不是泛型類別，直接返回 typeof<'t>
-            tType
+- ordered in-memory index over persisted values
+- `Add`, `Update`, `Upsert`, and `Remove`
+- `TryGetValue`, key hashing helpers, and buffered/non-buffered value loading
+- protobuf and FsPickler serialization paths
+- support for F# records and discriminated unions in the value path
 
-    // 使用動態生成的類型來反序列化
-    model.Deserialize(stream, null, actualType) :?> 't
+## Package
+
+NuGet package id:
+
+```text
+PersistedConcurrentSortedList
 ```
 
-Quick start: (dotnet fsi QuickStart.fsx)
+## Quick Start
 
+See [QuickStart.fsx](QuickStart.fsx) for a runnable sample.
+
+```fsharp
+let pcsl =
+    PersistedConcurrentSortedList<string, fstring>(
+        20,
+        @"c:\pcsl",
+        "test",
+        PCSLFunHelper<string, fstring>.oFun,
+        PCSLFunHelper<string, fstring>.eFun
+    )
+
+pcsl.Add("OGC", A [| S "GG" |], 3000) |> ignore
+pcsl.Upsert("123456", S "ORZ")
+
+let found, cell = pcsl.TryGetValue("OGC")
 ```
-let pcsl = PersistedConcurrentSortedList<string, fstring>(
-    20, @"c:\pcsl", "test"
-    , PCSLFunHelper<string, fstring>.oFun
-    , PCSLFunHelper<string, fstring>.eFun)
 
+## Serialization
 
-let s = [|1..200000|]|>Array.map (fun i -> S $"{i}")
+The library currently supports:
 
-let success = pcsl.Add ("OGC", (A [| S "GG"|]), 3000)
-let success2 = pcsl.Add ("ORZ2", (A s), 3000)
+- `FAkka.ProtoBuf.FSharp`
+- `FAkka.FsPickler`
+- `FAkka.FsPickler.Json`
 
-pcsl.Update ("ORZ", (S "ORZ"), 3000)
+The protobuf path includes the compatibility handling required by the current `fCell2<'T>` model used in this repository.
 
-pcsl.Update ("", (S "ORZ"), 3000)
+## Documentation
 
-pcsl.Upsert ("123456", (S "ORZ1"), 3000)
-pcsl.Upsert ("123456", (S "ORZ"))
+Additional design and test documents are under [doc/](doc/README.md).
 
-pcsl.Remove ("123456", 3000)
-pcsl.Remove ("123456")
+## Development
 
-pcsl.TryGetValue ("ORZ2")
-pcsl.TryGetValue ("ORZ") |> snd |> _.Value |> (fun (A o) -> o.Length)
-pcsl.TryGetValue ("OGC")
+Build:
 
-pcsl["ORZ2"]
+```bash
+dotnet build PersistedConcurrentSortedList.fsproj
+```
 
-pcsl.GenerateKeyHash "ORZ"
-pcsl.GetOrNewKeyHash "ORZ2"
+Pack:
 
-pcsl._base._base
-pcsl._idx._base.Keys |> Seq.toArray
-pcsl._idxR._base.Keys
-pcsl._pstatus._base.Keys |> Seq.toArray
-pcsl._pstatus._base.Values|> Seq.toArray
-
-
-pcsl._idx._base.Keys |> Seq.toArray |> Array.iter (fun (SLK k) ->
-    pcsl.RemoveAsync k |> ignore
-)
-
-pcsl.InfoPrint
-
+```bash
+dotnet pack PersistedConcurrentSortedList.fsproj -c Release
 ```
