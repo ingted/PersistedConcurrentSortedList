@@ -4,21 +4,25 @@
 #r @"nuget: Newtonsoft.Json, 13.0.3"
 #r @"nuget: FAkka.FsPickler, 9.0.4"
 #r @"nuget: FAkka.FsPickler.Json, 9.0.4"
+#r @"nuget: FAkka.FCell2, 10.1.300"
 #r @"nuget: FAkka.ProtoBuf.FSharp, 9.0.14.300"
 #r @"nuget: FSharp.Collections.ParallelSeq, 1.2.0"
-#r @"bin\net9.0\PersistedConcurrentSortedList.dll"
+#r @"bin\net10.0\PersistedConcurrentSortedList.dll"
 #else
 namespace PersistedConcurrentSortedList
 #endif
 
 open PersistedConcurrentSortedList
+open PersistedConcurrentSortedList.Type
 open System.Collections.Generic
 
 module CSLTest =
     open DefaultHelper
     open CSL
     open PCSL
-    let csl () = PCSL<string, fstring, SLTyp>(TSL, PCSLFunHelper<string, fstring>.oFun, PCSLFunHelper<string, fstring>.eFun, autoCache = 1)
+    type Cell = fCell2<string>
+
+    let csl () = PCSL<string, Cell, SLTyp>(TSL, PCSLFunHelper<string, Cell>.oFun, PCSLFunHelper<string, Cell>.eFun, autoCache = 1)
 
     //let (Some lock) = csl.RequireLock(None, None) |> Async.RunSynchronously
 
@@ -31,6 +35,11 @@ module PCSLTest =
     open DefaultHelper
     open PCSL
 
+    type Cell = fCell2<string>
+
+    let private sCell (value: string) : Cell = fCell2.S value
+    let private aCell (values: Cell array) : Cell = fCell2.A values
+
 
     let testFun () = 
         let pcsl = testPCSL ()
@@ -39,23 +48,29 @@ module PCSLTest =
             pcsl.RemoveAsync (k, false) |> ignore
         )
 
-        let s = [|1..200000|]|>Array.map (fun i -> S $"{i}")
+        let s = [|1..200000|] |> Array.map (fun i -> sCell $"{i}")
 
-        printfn "%A" <| pcsl.Add ("OGC", (A [| S "GG"|]), 3000)
-        printfn "%A" <| pcsl.Add ("ORZ2", (A s), 3000, false)
+        printfn "%A" <| pcsl.Add ("OGC", (aCell [| sCell "GG"|]), 3000)
+        printfn "%A" <| pcsl.Add ("ORZ2", (aCell s), 3000, false)
 
-        printfn "%A" <| pcsl.Update ("ORZ", (S "ORZ"), 3000)
+        printfn "%A" <| pcsl.Update ("ORZ", (sCell "ORZ"), 3000)
 
-        printfn "%A" <| pcsl.Update ("", (S "ORZ"), 3000)
+        printfn "%A" <| pcsl.Update ("", (sCell "ORZ"), 3000)
 
-        printfn "%A" <| pcsl.Upsert ("123456", (S "ORZ1"), 3000)
-        printfn "%A" <| pcsl.Upsert ("123456", (S "ORZ"))
+        printfn "%A" <| pcsl.Upsert ("123456", (sCell "ORZ1"), 3000)
+        printfn "%A" <| pcsl.Upsert ("123456", (sCell "ORZ"))
 
         printfn "%A" <| pcsl.Remove ("123456", 3000)
         printfn "%A" <| pcsl.Remove ("123456")
 
         printfn "%A" <| pcsl.TryGetValue ("ORZ2")
-        printfn "%A" <| (pcsl.TryGetValue ("ORZ2") |> snd |> _.Value |> (fun (A o) -> o.Length))
+        printfn "%A" <|
+            (pcsl.TryGetValue ("ORZ2")
+             |> snd
+             |> _.Value
+             |> function
+                | fCell2.A o -> o.Length
+                | value -> failwithf "Expected fCell2 array value, got %A" value)
         printfn "%A" <| pcsl.TryGetValue ("OGC")
 
         printfn "%A" <| pcsl["ORZ2"]
@@ -118,7 +133,7 @@ type System.Decimal with
 
 type AccountingDate = int64
 type MinKey = int64
-type CFPCSL = PersistedConcurrentSortedList<Set<MyCandleMetadata> * AccountingDate, fCell<MinKey>>
+type CFPCSL = PersistedConcurrentSortedList<Set<MyCandleMetadata> * AccountingDate, fCell2<MinKey>>
 
 let cfTA root ta taParam (usingOpt:int option) (k:int) = 
     let r, u = 
@@ -129,8 +144,8 @@ let cfTA root ta taParam (usingOpt:int option) (k:int) =
 
     let pcsl = CFPCSL(
         40, r, u, 3600000
-        , PCSLFunHelper<_, fCell<int64>>.oFun
-        , PCSLFunHelper<_, fCell<int64>>.eFun, 0, 0)
+        , PCSLFunHelper<_, fCell2<int64>>.oFun
+        , PCSLFunHelper<_, fCell2<int64>>.eFun, 0, 0)
     pcsl.GenerateKeyHash <-
         fun o ->
             sprintf "%A" o

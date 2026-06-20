@@ -38,6 +38,46 @@ open ProtoBuf.FSharp
 open FSharp.Reflection
 
 
+
+
+
+
+
+type fCell3<'K, 'K2, 'V when 'K : comparison and 'K2 : comparison and 'V : comparison> =
+
+    /// Boolean cell.
+    | B of bool
+
+    /// String cell.
+    | S of string
+
+    /// Numeric cell.
+    | D of decimal
+
+    /// Caller-defined leaf value.
+    | V of fCell3<'K2, 'K2, 'V>
+
+    /// Array cell.
+    | A of fCell3<'K, 'K2, 'V> array
+
+    /// Map cell.
+    | T of Map<'K, fCell3<'K2, 'K2, 'V>>
+
+    /// Explicit none/null marker.
+    | N of unit
+
+
+
+
+
+
+
+
+
+
+
+
+
 [<ProtoBuf.ProtoContract>]
 type fCell2<'CellTupleKey when 'CellTupleKey: comparison> =
     | B of bool

@@ -15,10 +15,11 @@
 #r "nuget: FAkka.FsPickler, 9.0.300"
 #r "nuget: FAkka.FsPickler.Json, 9.0.300"
 #r @"nuget: protobuf-net"
+#r @"nuget: FAkka.FCell2, 10.1.300"
 #r @"G:\coldfar_py\sharftrade9\Libs5\KServer\protobuf-net-fsharp\src\ProtoBuf.FSharp\bin\netstandard2.0\protobuf-net-fsharp.dll"
 //#load @"Compression.fsx"
 #r "nuget: FSharp.Collections.ParallelSeq, 1.2.0"
-#r @"bin\net9.0\PersistedConcurrentSortedList.dll"
+#r @"bin\net10.0\PersistedConcurrentSortedList.dll"
 open PersistedConcurrentSortedList
 #else
 namespace PersistedConcurrentSortedList
@@ -33,6 +34,7 @@ module DefaultHelper =
     open PB
     open CSL
     open PCSL
+    open PersistedConcurrentSortedList.Type
     open System.Collections.Generic
 
     type DefKVOpFun<'Key, 'Value when 'Key : comparison and 'Value: comparison> = KVOpFun<PCSLKVTyp<'Key, 'Value>, PCSLKVTyp<'Key, 'Value>>
@@ -296,10 +298,10 @@ module DefaultHelper =
                 kl |> Seq.map (fun (SLV k) -> k) |> Seq.toArray :> IList<_> |> CValueList
 
     let testPCSL () = 
-        let pcsl = PersistedConcurrentSortedList<string, fstring>(
+        let pcsl = PersistedConcurrentSortedList<string, fCell2<string>>(
             20, @"c:\pcsl", "test"
-            , PCSLFunHelper<string, fstring>.oFun
-            , PCSLFunHelper<string, fstring>.eFun)
+            , PCSLFunHelper<string, fCell2<string>>.oFun
+            , PCSLFunHelper<string, fCell2<string>>.eFun)
         
         printfn "InfoPrint: %A" pcsl.InfoPrint
 
