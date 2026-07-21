@@ -1,5 +1,5 @@
 param(
-    $assembly = "FAkka.Shared"
+    $assembly
 )
 function Get-VersionFromFileName {
     param ([string]$fileName)
@@ -37,7 +37,7 @@ $binPath = Join-Path (Get-Location).Path "bin/Release"
 if (-not (Test-Path $binPath)) { $binPath = Join-Path (Get-Location).Path "bin" }
 if (Test-Path $binPath) {
     Set-Location $binPath
-    $packages = Get-ChildItem "$($assembly)*.nupkg" | Sort-Object -Property { Get-VersionFromFileName $_.Name } -Descending
+    $packages = Get-ChildItem "$($assembly)*.nupkg" | Sort-Object -Property { Get-VersionFromFileName $_.Name.SubString($assembly.Length) } -Descending
     if ($packages.Count -eq 0) {
         Write-Host "No .nupkg found for $assembly" -ForegroundColor Yellow
         return
