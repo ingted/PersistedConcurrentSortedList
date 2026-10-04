@@ -1,0 +1,111 @@
+# PTC HOST native tail 修正
+起點：2026-10-04T20:13:50.5898496+08:00；Host aggregate 起點仍為 2026-10-04T16:36:36.920+08:00。
+Canonical：G:/coldfar_py/sharftrade9/Libs5/KServer/fstring；branch=chore/fstring-repo-cleanup-and-packaging；HEAD=1f4fc51cc472f6c772894fdf7c45d9da5f858342。
+目標：修正 PCSL UpsertAsync 的 ifIgnoreQ 未傳入內部 persistence-status 路徑，保留完整 native write completion、failure 與 cold recovery，不調全域 ThreadPool、不提前 ACK。
+既有 WIP：PersistedConcurrentSortedList.fsproj 的版本／依賴 10.1.400 更新由原工作保留，不 revert，不建立 branch/worktree。跨 repo runtime caller 位於 G:/PulseTrade2.fs；IFileSystem adapter 位於 G:/PulseTrade.fs。
+計畫：bounded review → baseline Release build（Pack 發布停用、TEMP isolated outputs）→ 可控制 native queue 阻塞的 RED → 最小 flag propagation → unit/native persistence failure/restart → local immutable candidate 與真 Host 同負載。設計／hypothesis／追溯在 Main 本次 Host 文件；不寫 MDC 凍結文件。
+範圍：CSL2.fsx／PCSL2.fsx 與必要測試／pack gate；優先只修已證實 native status queue，其他 general queue redesign 不展開。
+風險：套件同名版本禁止覆寫；canonical fsproj Pack target 會 push，所有 baseline/test 關閉自動 pack/publish；正式 release 另有來源、dependency closure、consumer gate。
+驗收：控制 queue blocked 時 ifIgnoreQ=true 仍完成實際持久化；false 保持排隊；buffer/nonbuffer、失敗拒絕、duplicate/cold reopen 原 contract 保留；實際測試 totals、source hashes、Host before/after。prod/MDC/ProcSupervisor 不操作。
+## Operations
+- 2026-10-04T20:13:50.5898496+08:00 Pre-work created before review/build/source edit. SourcePath provided by user; pinned source matches HEAD; fsproj existing dirty retained.
+- 2026-10-04T20:15:18.8188152+08:00 Review insight:24files268kB, no bulk source/doc loading; inspect onlyPCSL2.persistKeyValueBase/UpsertAsync, CSL2.Remove/OpQueue public seam, Main adapterPut default queue unchanged. NativeKM empty; activeNET10/sdk10.0.401. Baseline Release build directcanonical with all output/intermediate under ownedTEMP, GeneratePackageOnBuild=false; no Pack invoked.
+
+- 2026-10-04T20:15:46.5797694+08:00 Baseline first attempt MSB1008 beforecompile duePowerShell array '+' precedence: OutputPath argument split. Rawbaseline*.txt retained; fix each dynamic argument parenthesized. No source change/Pack/service effect.
+
+- 2026-10-04T20:15:56.5008259+08:00 Baseline r2 exit=0 elapsed=9.875 raw=C:\Users\Administrator\AppData\Local\Temp\aster-host-h3-02349fa677e543a5907b42e7ed0b884a\native-pcsl\baseline-r2.out.txt.
+
+- 2026-10-04T20:19:24.8730464+08:00 Native baseline Release PASS9.875s; 99warnings baseline retained(raw), noPack. Added10 actual Expecto cases using public OpQueue.RequireLock barrier (notThreadPool timing/mocks) plus cold/rewrite/failed index/value/defaultqueue; beforeproductionpatch. Scope correction: same dropped IgnoreQ in bufferRemove/RemoveAsync, addCSL.Remove(k,flag) overload keepingexistingdefault. Estimate8–14non-type; publicDefault semantics unchanged. Existing6private declarations incompileclosure mustremove perancestor/current F#policy; no separateAPI redesign. Beforeedit source hash/rawcapture next. Native tests are genuine fixture filesystem; noMDC/prod.
+
+- 2026-10-04T20:20:43.8401096+08:00 Native red/test-build begin; outputs=C:\Users\Administrator\AppData\Local\Temp\aster-host-h3-02349fa677e543a5907b42e7ed0b884a\native-pcsl\red noPack,noMDC/noProd.
+
+- 2026-10-04T20:20:49.7172488+08:00 Native red/test-build exit=0 elapsed=5.86 raw=C:\Users\Administrator\AppData\Local\Temp\aster-host-h3-02349fa677e543a5907b42e7ed0b884a\native-pcsl\red\test-build.out.txt.
+
+- 2026-10-04T20:20:49.7489807+08:00 Native red/tests begin; outputs=C:\Users\Administrator\AppData\Local\Temp\aster-host-h3-02349fa677e543a5907b42e7ed0b884a\native-pcsl\red noPack,noMDC/noProd.
+
+- 2026-10-04T20:20:53.4807118+08:00 Native red/tests exit=3 elapsed=3.732 raw=C:\Users\Administrator\AppData\Local\Temp\aster-host-h3-02349fa677e543a5907b42e7ed0b884a\native-pcsl\red\tests.out.txt.
+
+- 2026-10-04T20:21:39.2456027+08:00 NativeRED10=3P4F3E; 4controlledqueuefailures asplanned, 3cold errors duefixture constructor default autoInitialize=None (doesnotloadindex). Explicit publicIndexInitialize onreopen fixesoracle; production source noteditedyet. Originalraw retained(red). Testsnotpassing bychangedexpected. LatestHost mobile/desktop screenshots manuallyviewed, nooverlap/overflow incatalog; topnavigationmobile hasexistinghorizontal tabs scroll; no productUI patch.
+
+- 2026-10-04T20:21:39.2991483+08:00 Native red/test-build begin; outputs=C:\Users\Administrator\AppData\Local\Temp\aster-host-h3-02349fa677e543a5907b42e7ed0b884a\native-pcsl\red-r2 noPack,noMDC/noProd.
+
+- 2026-10-04T20:21:45.1363250+08:00 Native red/test-build exit=0 elapsed=5.828 raw=C:\Users\Administrator\AppData\Local\Temp\aster-host-h3-02349fa677e543a5907b42e7ed0b884a\native-pcsl\red-r2\test-build.out.txt.
+
+- 2026-10-04T20:21:45.1532792+08:00 Native red/tests begin; outputs=C:\Users\Administrator\AppData\Local\Temp\aster-host-h3-02349fa677e543a5907b42e7ed0b884a\native-pcsl\red-r2 noPack,noMDC/noProd.
+
+- 2026-10-04T20:21:48.8827718+08:00 Native red/tests exit=1 elapsed=3.729 raw=C:\Users\Administrator\AppData\Local\Temp\aster-host-h3-02349fa677e543a5907b42e7ed0b884a\native-pcsl\red-r2\tests.out.txt.
+
+- 2026-10-04T20:23:41.9570268+08:00 Native correctedRED10=6P4F0E. Exactfragment helper failedsingle-row arrayflatten afterappliedownPCSL/PB files; rawbaseline/hashes preserved,noforeignoverwrite. Corrected tuplearray andtwo-phase prevalidateall, resumeonlyownedexactfragments. No production/sourceacceptance beforeallgreen.
+
+- 2026-10-04T20:23:42.0736220+08:00 Native green/native-build begin; outputs=C:\Users\Administrator\AppData\Local\Temp\aster-host-h3-02349fa677e543a5907b42e7ed0b884a\native-pcsl\green noPack,noMDC/noProd.
+
+- 2026-10-04T20:23:50.6170160+08:00 Native green/native-build exit=0 elapsed=8.536 raw=C:\Users\Administrator\AppData\Local\Temp\aster-host-h3-02349fa677e543a5907b42e7ed0b884a\native-pcsl\green\native-build.out.txt.
+
+- 2026-10-04T20:23:50.6322667+08:00 Native green/test-build begin; outputs=C:\Users\Administrator\AppData\Local\Temp\aster-host-h3-02349fa677e543a5907b42e7ed0b884a\native-pcsl\green noPack,noMDC/noProd.
+
+- 2026-10-04T20:23:56.5575570+08:00 Native green/test-build exit=0 elapsed=5.925 raw=C:\Users\Administrator\AppData\Local\Temp\aster-host-h3-02349fa677e543a5907b42e7ed0b884a\native-pcsl\green\test-build.out.txt.
+
+- 2026-10-04T20:23:56.5604571+08:00 Native green/tests begin; outputs=C:\Users\Administrator\AppData\Local\Temp\aster-host-h3-02349fa677e543a5907b42e7ed0b884a\native-pcsl\green noPack,noMDC/noProd.
+
+- 2026-10-04T20:23:57.9461350+08:00 Native green/tests exit=2 elapsed=1.385 raw=C:\Users\Administrator\AppData\Local\Temp\aster-host-h3-02349fa677e543a5907b42e7ed0b884a\native-pcsl\green\tests.out.txt.
+
+- 2026-10-04T20:25:13.1278957+08:00 Native firstgreen buildPASS buttests1P9E: requiredprivate-removal exposespublicToPb/OfPb whileexistingSerialize/Deserialize reflection stillusesBindingFlags.NonPublic (NullReference). This isownpolicy migration regression, notqueuebug; fix2exactreflectionqueries toPublic, same serializedformat, testsunchanged. Minimalqueuepatch still<28non-type. NativeNuGet officialgallery latest10.1.400 verified:https://www.nuget.org/packages/PersistedConcurrentSortedList/ . No publication.
+
+- 2026-10-04T20:25:13.2128113+08:00 Native green/native-build begin; outputs=C:\Users\Administrator\AppData\Local\Temp\aster-host-h3-02349fa677e543a5907b42e7ed0b884a\native-pcsl\green-r2 noPack,noMDC/noProd.
+
+- 2026-10-04T20:25:21.7893525+08:00 Native green/native-build exit=0 elapsed=8.568 raw=C:\Users\Administrator\AppData\Local\Temp\aster-host-h3-02349fa677e543a5907b42e7ed0b884a\native-pcsl\green-r2\native-build.out.txt.
+
+- 2026-10-04T20:25:21.8045637+08:00 Native green/test-build begin; outputs=C:\Users\Administrator\AppData\Local\Temp\aster-host-h3-02349fa677e543a5907b42e7ed0b884a\native-pcsl\green-r2 noPack,noMDC/noProd.
+
+- 2026-10-04T20:25:27.8027595+08:00 Native green/test-build exit=0 elapsed=5.998 raw=C:\Users\Administrator\AppData\Local\Temp\aster-host-h3-02349fa677e543a5907b42e7ed0b884a\native-pcsl\green-r2\test-build.out.txt.
+
+- 2026-10-04T20:25:27.8058998+08:00 Native green/tests begin; outputs=C:\Users\Administrator\AppData\Local\Temp\aster-host-h3-02349fa677e543a5907b42e7ed0b884a\native-pcsl\green-r2 noPack,noMDC/noProd.
+
+- 2026-10-04T20:25:29.0544176+08:00 Native green/tests exit=0 elapsed=1.248 raw=C:\Users\Administrator\AppData\Local\Temp\aster-host-h3-02349fa677e543a5907b42e7ed0b884a\native-pcsl\green-r2\tests.out.txt.
+
+- 2026-10-04T20:29:47.3899923+08:00 Nativegreen corrected10/10PASS0skip1.248s, native4273002F... baselinewarnings unchangedFS0025/FS0064. Frozen realruntime source experiment in C:\Users\Administrator\AppData\Local\Temp\aster-host-h3-02349fa677e543a5907b42e7ed0b884a\performance-native (samepublishedassemblyidentity400 onlysourcecandidate, NOT package/public); ingressrequiresactualnativepath/hash. SamefullWSCore0AE.../sameHub2007/MCP2x27/browser7/cache11, noTrace/no competingbuild. Existingpackagenotmodified/overwritten. RELlaternewimmutableversion/exact activeCore/IFileSystem/FSISupervisor closure.
+
+- 2026-10-04T20:36:08.3089047+08:00 Full native consumer=core start; preserved original binary closure; ownfreshcopy nativeSHA=4273002F6A6FF3A2B71C91405EF344315602F80862D78F8697B562932C9EC816, baseline identity400source-only; actual originalrunner/discovery+sequencedsummary. noPack/live/MDC/prod.
+
+- 2026-10-04T20:36:09.3042960+08:00 core/discovery exit=0 elapsed=0.872 raw=C:\Users\Administrator\AppData\Local\Temp\aster-host-h3-02349fa677e543a5907b42e7ed0b884a\native-pcsl\full-consumers\core\discovery.stdout.raw.
+
+- 2026-10-04T20:37:12.4825279+08:00 Firstfull-consumer discovery only0.872s exit0; own parsercount1312 included2Expecto banners, expectedactual1310. No fullsuite executed; keepraw. Reuseoriginalrunner canonicaltest-nameprefix/^PulseTrade.Comm./ andsummary4labelparser, new-r2fixture. Source/native notchanged. SameHub runtime run-7ab59c...PASSMCP2x27/browser7/cache11/native427..., loadP99=98.252/UI377.266ms, all6PIDs/3portsabsent/gracefulhosts0. No prof/production.
+
+- 2026-10-04T20:37:13.2448246+08:00 Full native consumer=core start; preserved original binary closure; ownfreshcopy nativeSHA=4273002F6A6FF3A2B71C91405EF344315602F80862D78F8697B562932C9EC816, baseline identity400source-only; actual originalrunner/discovery+sequencedsummary. noPack/live/MDC/prod.
+
+- 2026-10-04T20:37:16.0453185+08:00 core/discovery exit=0 elapsed=2.673 raw=C:\Users\Administrator\AppData\Local\Temp\aster-host-h3-02349fa677e543a5907b42e7ed0b884a\native-pcsl\full-consumers-r2\core\discovery.stdout.raw.
+
+- 2026-10-04T20:40:05.6332734+08:00 core/full exit=0 elapsed=169.541 raw=C:\Users\Administrator\AppData\Local\Temp\aster-host-h3-02349fa677e543a5907b42e7ed0b884a\native-pcsl\full-consumers-r2\core\full.stdout.raw.
+
+- 2026-10-04T20:40:07.6432276+08:00 Full native consumer=gw start; preserved original binary closure; ownfreshcopy nativeSHA=4273002F6A6FF3A2B71C91405EF344315602F80862D78F8697B562932C9EC816, baseline identity400source-only; actual originalrunner/discovery+sequencedsummary. noPack/live/MDC/prod.
+
+- 2026-10-04T20:40:08.2211599+08:00 gw/discovery exit=0 elapsed=0.561 raw=C:\Users\Administrator\AppData\Local\Temp\aster-host-h3-02349fa677e543a5907b42e7ed0b884a\native-pcsl\full-consumers-r2\gw\discovery.stdout.raw.
+
+- 2026-10-04T20:42:46.6594163+08:00 gw/full exit=3 elapsed=158.429 raw=C:\Users\Administrator\AppData\Local\Temp\aster-host-h3-02349fa677e543a5907b42e7ed0b884a\native-pcsl\full-consumers-r2\gw\full.stdout.raw.
+
+- 2026-10-04T20:43:06.5550311+08:00 Registered PCSL-VFY-NATIVE-QUEUE-r1 beforecanonicalwrapperexecute. Canonicalmisc typeddefaultPLAN/explicitExecute, newownedTEMPsource hashes/exactcandidate/rawBaseStream/10actualtotals/watchdog. ProgramsetsUTF8 Console toavoidoldExpecto emittedseparator decoding; originalred/greenraw retained. SameSource1310/646 originalrunners inprogress, no repeatedprofile.
+
+- 2026-10-04T20:46:29.5370541+08:00 NativeCore full1310/1310PASS169.541s. GWfull627P8F11E: all19 classified missing harnessinputs—11 dependencyaudit missing Mainrelativepaths/one emptyJSON frommissingplan script; 8externalHost missingfixtureexe. OwnfullcopywrapperlostoriginalRun's WorkingDirectory=Main and non-secret PTC_GW_TEST_HOST_DIR. Correct wrapperonly, same tests/assertions/native427DLL, ownfreshfullhostclosure(nativeDLLalso427) thenGWonly-r3. No productregressionpatched/expectedchanged, originalfailure kept, Coregreen notrepeated. PriorSource646PASS remainsseparate. Canonicalunitwrapper sourceConsoleUTF8 edit pendingrun; no productioneffects.
+
+- 2026-10-04T20:46:31.2243921+08:00 Full native consumer=gw start; preserved original binary closure; ownfreshcopy nativeSHA=4273002F6A6FF3A2B71C91405EF344315602F80862D78F8697B562932C9EC816, baseline identity400source-only; actual originalrunner/discovery+sequencedsummary. noPack/live/MDC/prod.
+
+- 2026-10-04T20:46:32.3308029+08:00 gw/discovery exit=0 elapsed=1.013 raw=C:\Users\Administrator\AppData\Local\Temp\aster-host-h3-02349fa677e543a5907b42e7ed0b884a\native-pcsl\full-consumers-r3\gw\discovery.stdout.raw.
+
+- 2026-10-04T20:48:01.3245439+08:00 Execute registerednativequeue-r1 currentcanonical source withpre-worklog exists; ownfreshGUID Temp/typeddefaults/rawfile/sourcehash/actual10cases. No performancecapture running; GWcorrectedfullsuite independentownedfixture running. No Pack/push or canonical bin/obj.
+
+- 2026-10-04T20:51:45.3024853+08:00 gw/full exit=0 elapsed=312.924 raw=C:\Users\Administrator\AppData\Local\Temp\aster-host-h3-02349fa677e543a5907b42e7ed0b884a\native-pcsl\full-consumers-r3\gw\full.stdout.raw.
+
+- 2026-10-04T20:54:14.1392436+08:00 NativeGW correctedoriginalrunner full646/646PASS312.924s0skip/fail/error (Maincwd＋exactfreshNativeHost fixture/native427). NativeCore1310PASS preserved. Newcanonicalunitwrapper firstbuildFS0039: Console.ErrorEncoding isnot .NETAPI; removeunsupportedtest-only line (OutputEncoding UTF8 remains), rawresult retained170ec5... No productsourcechange or testoraclechange; rerunrequiredonce. Main/Core originalbaseline/full and nativefull distinguished.
+
+- 2026-10-04T20:59:47.7828343+08:00 Canonicalnativewrapper secondactualtests10P exit0 butitsparserfailed becauseExpecto ANSIcolor betweencount/label. Rawbyte/codepointsdeterministicinspect confirmscontrolCSI, nofault/totalschanges. ApplyexistingCore canonicalCSIstripbeforecountregex; preserving raw43421... andsource-stabilityrequirement. Freshwrappervalidation only, Core1310/GW646notrepeated. Native ownexternalGW childrenCount0.
+
+- 2026-10-04T21:04:52.8347684+08:00 Native canonicalwrapper PASS10/10 noignored/fail/error, sourceStabletrue, raw70bf147...; outputSHA4EA differs fromearlier427fixture duefreshbuild output/intermediate; no nativeproductsource editafter427. SnapshotupdatedNative docsfull1310/646PASS/ownednativechildren0. Preparedowned12 (+README=>13) sensitive/check beforeclassifiedsourcecommit. ParentfrozenMDC doc untouched; Main canonicalHostRFC/SA/SD remainsauthority. Existingfsproj302→400 alignsverifiedpublic400nuspec; classifiedsourcebaseline plusownpatch, no NuGet publication.
+
+- 2026-10-04T21:08:45.7568118+08:00 Correction：native-r1 scanner H0M0、check PASS30/WARN3/FAIL0、sourceStabletrue。Own latest_log WARN缺字段：原prework已記canonical/head/WIP/rootcause候選，現在補explicit欄位，非倒填建立時間。
+  - 背景/上下文：Main HostH3-03 native status queue漏傳flag，真fixedload仍約1.5s尾端等待；user指定此canonical fstring source及Main IFileSystem；Host aggregate起點16:36:36未重置。
+  - 假設：已受root serialization的explicitIgnoreQ仍阻status/Remove queue；publicqueuelease可控RED→GREEN並真Host量測作因果證據。Default queued semantics／allwrites／coldrecovery保留；未公開新package。
+  - 判讀：gitdirty為本次exact13paths；legacybranch名是既有、沒有授權改名、不是新collision。兩fsproj以raw copies均進scanner，freshnative-r2重驗；無High/Medium才sourcecommit/push。CurrentNative full/Core/GW已過、所有ownednative child退出；prod/MDC untouched。
+## Plan Correction
+背景/上下文：Host H3-03 fixed shared-load尚有1.5s tail；user指定native canonical root，原pre-work已有path／HEAD／WIP，未標明此欄位，現在明示補充，不重置起點。
+假設：persistKeyValueBase／RemoveAsync的ifIgnoreQ未傳status或Remove；public queue lease可控反證與實際持久化證明。已實作並通過unit／Core／GW／sameHub，package/deployed仍未開始。
+- 2026-10-04T21:14:14.0758653+08:00 native-r2 FAIL preserved(version_bump_devlog_missing): preexistingproducerfsprojPackageId literalAssemblyName＋fullnew400 missingexactDevLogliteral; actualpublicbaseline documentedwithfull302→400/packagealias/push/downstreamstatus, no verifierweakening. PlanCorrection marker isrequiredbychecker torecognizeappendedpre-workfields; correctedmarker, noteditoldprework. RemainingWARNunchangedstock snapshots reflectpriorcheck/no newcode, existinglegacybranch, expectedowneddirty. Freshnative-r3 requiredbeforecommit.

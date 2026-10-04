@@ -1225,8 +1225,14 @@ module CSL2 =
         member this.Upsert(k, v) =
             this.Upsert(k, v, false)
         /// Remove 方法：将移除操作封装为任务并执行
+        member this.Remove(k, ifIgnoreQ) =
+            if ifIgnoreQ then
+                this.LockableOp(IgnoreQ (CRemove(k)))
+            else
+                this.LockableOp(CRemove(k))
+
         member this.Remove(k) =
-            this.LockableOp(CRemove(k))
+            this.Remove(k, false)
 
         /// TryUpdate 方法：将更新操作封装为任务并执行
         member this.Update(k, v, ifIgnoreQ) =

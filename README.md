@@ -72,3 +72,7 @@ Pack:
 ```bash
 dotnet pack PersistedConcurrentSortedList.fsproj -c Release
 ```
+
+## Native queue regression
+
+Explicit IgnoreQ now propagates through persistence status, buffer removal and RemoveAsync. Default overloads keep queued completion. See [verification](Verification.md) and [Host change](HOST.NativeQueue.md). Run misc/verify.nativeQueue.ps1 with no arguments for PLAN, or with -Execute for synthetic native filesystem tests. This source milestone has not replaced the public 10.1.400 package.

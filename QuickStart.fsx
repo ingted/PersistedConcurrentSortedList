@@ -37,8 +37,8 @@ module PCSLTest =
 
     type Cell = fCell2<string>
 
-    let private sCell (value: string) : Cell = fCell2.S value
-    let private aCell (values: Cell array) : Cell = fCell2.A values
+    let sCell (value: string) : Cell = fCell2.S value
+    let aCell (values: Cell array) : Cell = fCell2.A values
 
 
     let testFun () = 

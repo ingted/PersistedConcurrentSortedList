@@ -459,8 +459,8 @@ FCell2Pb<'CellTupleKey when 'CellTupleKey: comparison> =
         MapValue: FCell2MapEntryPb<'CellTupleKey> array
     }
 
-type private FCell2Proto =
-    static member private ToPb<'CellTupleKey when 'CellTupleKey: comparison>
+type FCell2Proto =
+    static member ToPb<'CellTupleKey when 'CellTupleKey: comparison>
         (value: PersistedConcurrentSortedList.Type.fCell2<'CellTupleKey>)
         : FCell2Pb<'CellTupleKey> =
         match value with
@@ -490,7 +490,7 @@ type private FCell2Proto =
         | PersistedConcurrentSortedList.Type.fCell2.N _ ->
             { Tag = 6; BoolValue = false; StringValue = null; DecimalValue = 0m; ArrayValue = null; MapValue = null }
 
-    static member private OfPb<'CellTupleKey when 'CellTupleKey: comparison>
+    static member OfPb<'CellTupleKey when 'CellTupleKey: comparison>
         (value: FCell2Pb<'CellTupleKey>)
         : PersistedConcurrentSortedList.Type.fCell2<'CellTupleKey> =
         match value.Tag with
@@ -527,7 +527,7 @@ type private FCell2Proto =
         let methodInfo =
             typeof<FCell2Proto>.GetMethod(
                 "ToPb",
-                System.Reflection.BindingFlags.NonPublic ||| System.Reflection.BindingFlags.Static)
+                System.Reflection.BindingFlags.Public ||| System.Reflection.BindingFlags.Static)
 
         let pbValue = methodInfo.MakeGenericMethod([| keyType |]).Invoke(null, [| value |])
         Serializer.NonGeneric.Serialize(ms, pbValue)
@@ -539,7 +539,7 @@ type private FCell2Proto =
         let methodInfo =
             typeof<FCell2Proto>.GetMethod(
                 "OfPb",
-                System.Reflection.BindingFlags.NonPublic ||| System.Reflection.BindingFlags.Static)
+                System.Reflection.BindingFlags.Public ||| System.Reflection.BindingFlags.Static)
 
         methodInfo.MakeGenericMethod([| keyType |]).Invoke(null, [| pbValue |])
 

@@ -322,11 +322,11 @@ module PCSL2 =
             write >>
             if ifRemoveFromBuffer then
                 fun key ->
-                    (sortedList.Remove (key)).WaitIgnore
-                    sortedListPersistenceStatus.Upsert (key, NonBuffered)
+                    (sortedList.Remove (key, ifIgnoreQ)).WaitIgnore
+                    sortedListPersistenceStatus.Upsert (key, NonBuffered, ifIgnoreQ)
             else
                 fun key ->
-                    sortedListPersistenceStatus.Upsert (key, Buffered)
+                    sortedListPersistenceStatus.Upsert (key, Buffered, ifIgnoreQ)
 
         let removePersistedKeyValue (key: 'Key, ifIgnoreQ) =
             let hashKey = 
@@ -337,10 +337,10 @@ module PCSL2 =
                     generateKeyHash key
 
             [|
-                sortedList.Remove(key).thisT
-                sortedListPersistenceStatus.Remove(key).thisT
-                sortedListIndex.Remove(key).thisT
-                sortedListIndexReversed.Remove(hashKey).thisT
+                sortedList.Remove(key, ifIgnoreQ).thisT
+                sortedListPersistenceStatus.Remove(key, ifIgnoreQ).thisT
+                sortedListIndex.Remove(key, ifIgnoreQ).thisT
+                sortedListIndexReversed.Remove(hashKey, ifIgnoreQ).thisT
                 task {
                     let filePath = Path.Combine(schemaPath, hashKey + ".val")
                     File.Delete filePath
@@ -444,7 +444,7 @@ module PCSL2 =
         override this.GetHashCode() =
             snapshotState () |> hashSnapshot
 
-        member private this.SnapshotState() =
+        member this.SnapshotState() =
             snapshotState ()
 
         interface System.IComparable with

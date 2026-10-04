@@ -1,0 +1,2 @@
+# Native ancestor log rule correction
+- 2026-10-04T20:43:06.5550311+08:00 Applicable MDC ancestor asks log+op_log, while Main asksoneaggregate.log. Native pre-work .log existedbeforeall operations, but native op_log wasomitted; no operation/dataevidence lost, alltimes/results in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\log\20261004\20261004201350.aster_pcsl_host_tail.log. Native adds thispointer now; Main keepssingle.log. Not pretendingthisfilepreexisted. No scopeexpansion or source rollback required.
