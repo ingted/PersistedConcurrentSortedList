@@ -1,0 +1,14 @@
+# REL-01 operations correction
+Created 2026-10-05T05:45:36.7308335+08:00. 原prework plan已於修改前寫入既有active aggregate log。以下為被checker攔下之historical op_log本輪append-only tail原bytes，移存current-day；未回填creationtime。只反向本人append，oldHEADprefix核對逐byte相同。Native currentRELstart0512/Mainaggregate20261004163636不重置。
+
+### 2026-10-05T05:19:50.3633589+08:00 REL-01 Native pre-work
+Native baseline2a138b4367d940b99e73cd67396fd4a473c2e295 source/realqueue10PASS unchanged，newmetadataidentity10.1.400-win1 (public/cachefree0518) willnotoverwrite400. ConsumerSpa53exact [10.1.400-win1]. Capture/rebuildtestownTEMP beforeeditversion，noPackonBuild/GenerateNuspecNoBuild skipsNativeAfterPack externalpublishhook; noformalKey/env/service. Native ownSA/SD/Test/Verification/DevLog updated and ownlog+oplog carryoperations. MDCImpl/doc untouched. Source/taskaggregateMain20261004163636／RELactual0512 preserved.
+
+## REL-01 new immutable identity 202610050535
+Canonicalpackage Version10.1.400→10.1.401。Source2a138b4 queue/index/valueopt-in fixesunchanged；defaultfalse排隊保證/IFileSystem預設不變。Main Host releaseclosure/currentSA-SD見G:/PulseTrade.fs/doc/PTC HOST 優化/Release.Closure.md。實際NuGet.Versioning minimum400拒400-win1、接受401，故newstablemetadataonly；原public400不覆寫。Baselinecopied14inputsbuild9.084s stablePASS；新version復用verify.nativeQueue.ps1 actual10cases驗證、禁止PackonBuild，fullpackage/Host/prod separate。GenerateNuspec NoBuild跳過本project AfterPack發布hook；不在log記secret，不使用formalenv。新401只reserved，未pack/published，SourceCommit與package payload後續逐一驗。
+
+### 2026-10-05T05:40:31.1582036+08:00 REL Native401 source gate
+Version401 actualverify.nativeQueue10 executed=passed/0Ignored/Failed/Errored，SourceStable，producer9.633s/testbuild5.798s/tests0.989s；DLL C2B59E0A3EBDF26050AC4765E9B8DF8120C007ACF1C177F947C9CA7B26F1AA41，raw C:/Users/Administrator/AppData/Local/Temp/pcsl-native-queue-verification-60151372ab4c4cfd9b1b4c001d4419f1。Independent copied kernel source14 build9.068s stablePASS，Registry new6 source8 build7.676s stablePASS。現在Nativeowned6files metadata/docs/log/oplog strictdecode/scanner/check→commit/push；新package尚未pack/published，SourceCommit完成後新artifact SourceRevisionId/RepositoryCommit需綁實際commit。No public400 overwrite，prod/MDClogin無操作。
+
+### 2026-10-05T05:41:41.8843919+08:00 REL metadata encoding correction
+Native closeout r1 encodingFAIL caught project originalBOMtrue→false from ReadAllText strippingBOM/WriteAllText noBOM。恢復before-work rawprefix3bytes Native/Registry wherever baselineBOMtrue；保持Version401/6內容，未reset/restore其他WIP。r1原FAIL保留，freshr2strictencode/check; inputGate此前unit/freshbuild只為sameVersion textbody，BOM修復後下一packproducer新build綁sourcecommit，不誤稱旧artifacthash=currentbytes。之後metadata edit用rawBOM-aware helper，before/after3bytes判定先行。
