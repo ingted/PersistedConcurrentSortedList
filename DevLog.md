@@ -1,3 +1,6 @@
 
 ### 2026-10-05T08:04:56.3958068+08:00 Native401 immutable local artifact
 Source736ecd6fixedDLL2C5AA47E20EA18DF371DD3C99624F741027474AC09136B934A5AFCF241D2F44A/package7F1EC3256221B94FCCA86F168865E2776D1EFD23DABD952490D3DF787342031B，本機SDKreadback及Core53full1374/realactor/browser/3Hostbaseline閉包已使用新identity。正式NuGet/production仍pending；defaultqueuedfalse/舊400immutable/MDCScope保持。Operations log/20261005/20261005054536.aster_pcsl_rel401.op_log，20261004舊oplog不改。
+
+### 2026-10-06 Native25MB RFC and executable RED contract
+Human requests automatic25,000,000-byte physical .val chunking for Git-managed PTC persistence. Aster adds doc/RFC/20261006.25MB.Chunk RFC/SA/SD/pseudocode/Expecto TEST plus compiled runner and WBS; implementation belongs to MdcQuoteAgent. Baseline native10.1.401 build99existingwarnings/0errors; TEST build0warnings/errors. Actual13tests in39.584s:7PASS/6FAIL/0ignored/0errored, all6failures are genuine oversized .val (max58,245,341bytes), payload cold roundtrips passed. No production source, version, package, service, SQL or login changes. Future crash/precise boundary/custom-hook/consumer gates explicitly NotStarted. Evidence log/20261006/20261006014200.chunk_rfc.op_log; fixture ignored temp/agent.aster/chunk25/4953456bfdc242c7933963ccd352573b.

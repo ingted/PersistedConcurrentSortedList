@@ -1,0 +1,19 @@
+# Native PCSL 25MB auto-chunk RFC / executable test contract
+Start 2026-10-06T01:41:37.5891353+08:00. Owner Aster; user explicitly names doc/RFC/20261006.25MB.Chunk and delegates future implementation to MdcQuoteAgent. Canonical independent repository, branch chore/fstring-repo-cleanup-and-packaging, initial clean. Scope: RFC/SA/SD/Expecto TEST, baseline build and truthful RED current-native evidence; no production implementation/version/publish, services, login or SQL changes. Build only repo bin/net10.0/agent.aster/chunk-rfc; temporary fixtures repo temp/agent.aster. Inspect PB serializer, PCSL/PCSL2 read/write/index/delete and IFileSystem consumer; preserve public hooks and queue semantics. Tests use real native data, large single value, cold reopen/update/delete/legacy/corruption. Future fault-injection cases explicitly pending until seam exists. Commit/push exact scoped files after sensitive/check. External relation G:/PulseTrade.fs/doc/20261006.REFACTOR/RFC.md.
+
+## Planned steps（原pre-work段落的欄位對照）
+- 背景/上下文：原首段已記PTC Git持久化與人類指定Native RFC路徑；不是事後新增開發授權。
+- 目標：交RFC/SA/SD/Expecto反例，實作交M哥。
+- 假設：現行write2File單檔可能超25MB，需真大值反例。
+- 步驟：code analysis→baseline build→RFC/SD→Expecto RED→sensitive/check/commit。
+- 驗收：可編譯的真native測試、精確reported counts、未開始gate明列。
+- 風險：Release Pack publish hook；只Build，no service/SQL/MDC changes。
+
+## Operations
+- 2026-10-06T02:17:10.9237726+08:00：checker初次FAIL latest_log_has_plan/latest_log_operations。語意pre-work原已存在，Native另op_log有完整operations；補明確欄位與同log操作回鏈以同時滿足共同checker，保留原FAIL。詳20261006014200.chunk_rfc.op_log，實跑13/7PASS/6expectedRED/0error/skip；sensitive11text high0medium0。KM watch改指本native既有README，排除不相關PulseTrade根KM。
+
+- 2026-10-06T02:18:19.6060047+08:00：check30PASS/3WARN/0FAIL；RFC檔改標準ID名稱，解本輪traceability WARN。remaining dirty會exactstage，branch命名屬原canonical，不改branch。C25-01完成的是RFC與已執行RED test契約，C25-02..05仍未開始。準備分類commit/push。
+
+- 2026-10-06T02:28:21.5144482+08:00: Shared checker current op_log append classification fixed with unchanged prefix/date/path guards, original real session/state retained. Full checker regression pending completion. Native code remains unchanged; only RFC/tests/logs staged for delivery. Commit after existing scoped check returns noFAIL.
+
+- 2026-10-06T02:30:07.6322590+08:00: Canonical verifier revision7 full124/124PASS; same native scoped check34PASS9WARN0FAIL. Traceability WARN explained: user explicitly requires SA/SD/WBS under doc/RFC event directory; checker stock excludes all /RFC/, so links exist but are not counted. No stock duplication or checker weakening. Existing branch naming and unchanged watch WARN accepted. Final exact13 files sensitive scan and commit/push next; native implementation and publication not started.

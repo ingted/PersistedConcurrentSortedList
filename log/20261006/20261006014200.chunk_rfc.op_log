@@ -1,0 +1,12 @@
+# Operations
+- 2026-10-06T01:41:37.6033810+08:00: source inspected. PB writes whole serialized byte array to .val; PCSL2 publishes .index before value and remove deletes index/value concurrently. Native source baseline build starts, no Pack target.
+
+- 2026-10-06T02:08:25.3180048+08:00: TEST baseline compile0warning/0error; first execution exited before discovery because PL quoted Windows defaults consumed backslashes. Fix defaultArgumentsText to forward slash, retain exact scope guard and assertions. No native behavior changed.
+
+- 2026-10-06T02:10:29.9084976+08:00: Native baseline Release build succeeded99warnings FS0025/FS0064,0error; TEST build0warnings0error. dotnet TEST.dll actually executed13 in39.584s:7passed,6failed,0ignored,0errored, exit1. EveryFAIL is required physical25MB assertion (largest58,245,341;28,118,569 and28,118,489). All cold payload checks preceding size assertions completed. Fixture temp/agent.aster/chunk25/4953456bfdc242c7933963ccd352573b retained. Product implementation unchanged; RED is TDD deliverable, not feature acceptance. README records compiled entry and FSI compatibility limits.
+
+- 2026-10-06T02:18:19.6110110+08:00：checker0FAIL後rename新RFC檔為RFC-PCSL-0025.25MBChunk.md以符合traceability，README link同步；舊canonical branch命名WARN接受，dirty將exactstage。C25文件/反例交付完成，native實作/發布維持未開始。
+
+- 2026-10-06T02:28:21.5144482+08:00: Shared checker current op_log append classification fixed with unchanged prefix/date/path guards, original real session/state retained. Full checker regression pending completion. Native code remains unchanged; only RFC/tests/logs staged for delivery. Commit after existing scoped check returns noFAIL.
+
+- 2026-10-06T02:30:07.6322590+08:00: Canonical verifier revision7 full124/124PASS; same native scoped check34PASS9WARN0FAIL. Traceability WARN explained: user explicitly requires SA/SD/WBS under doc/RFC event directory; checker stock excludes all /RFC/, so links exist but are not counted. No stock duplication or checker weakening. Existing branch naming and unchanged watch WARN accepted. Final exact13 files sensitive scan and commit/push next; native implementation and publication not started.

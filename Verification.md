@@ -15,3 +15,9 @@ Canonicalpackage Version10.1.400→10.1.401。Source2a138b4 queue/index/valueopt
 
 ### 2026-10-05T05:40:31.1582036+08:00 REL Native401 source gate
 Version401 actualverify.nativeQueue10 executed=passed/0Ignored/Failed/Errored，SourceStable，producer9.633s/testbuild5.798s/tests0.989s；DLL C2B59E0A3EBDF26050AC4765E9B8DF8120C007ACF1C177F947C9CA7B26F1AA41，raw C:/Users/Administrator/AppData/Local/Temp/pcsl-native-queue-verification-60151372ab4c4cfd9b1b4c001d4419f1。Independent copied kernel source14 build9.068s stablePASS，Registry new6 source8 build7.676s stablePASS。現在Nativeowned6files metadata/docs/log/oplog strictdecode/scanner/check→commit/push；新package尚未pack/published，SourceCommit完成後新artifact SourceRevisionId/RepositoryCommit需綁實際commit。No public400 overwrite，prod/MDClogin無操作。
+
+## PCSL-VFY-CHUNK25-r1 intent (20261006)
+Entry doc/RFC/20261006.25MB.Chunk/TEST.fsx plus TEST.fsproj. 13 real native disk cases, sequential isolated repo temp fixtures; no service/SQL/login/publish. Default decimal25MB. Baseline10.1.401 expected RED for unimplemented auto-chunk, counts must be reported honestly. Existing queue10 unchanged. Candidate from exact PcslAssemblyPath, output only each project bin/net10.0/agent.aster; no package fallback. Fault injection/crash/precise-threshold cases remain future MdcQuoteAgent TDD per SD, not covered by this initial executable suite.
+
+### C25 baseline actual 202610060209
+TEST13 executed,7PASS/6FAIL/0ignored/0errored,39.584s; six physical-limit failures expected against native10.1.401. Largest physical .val58,245,341bytes proves the requested size risk. Tests build0warnings/errors; native baseline99existingwarnings/0errors. No implementation/package/runtime change. See RFC folder WBS/README and log/20261006/20261006014200.chunk_rfc.op_log; fault/threshold/consumer gates not executed.
