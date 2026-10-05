@@ -1,0 +1,2 @@
+# Keep this nested repository's text normalization consistent in parent checkouts.
+* text=auto
