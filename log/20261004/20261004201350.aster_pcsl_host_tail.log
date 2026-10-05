@@ -124,3 +124,11 @@ Native closeout r1 encodingFAIL caught project originalBOMtrue→false from Read
 
 ### 2026-10-05T05:45:36.7597481+08:00 Historical op_log correction
 Native r2 rawFAIL log_readonly_modify historicaloplog：native thisREL ownappend tail 2709 bytes移存 log/20261005/20261005054536.aster_pcsl_rel401.op_log，oldHEADprefix逐byte匹配後只反向本人append，原oplogGitclean。原active.log prework時序保留，新filecreation現在，沒有backdate。fresh r3scope仍6，只換currentdayoplog；no checker weakening/exception，branch既有命名WARN記錄，原readonlyFAIL保留。
+
+### 2026-10-05T05:49:38.2645764+08:00 REL native401 fixed artifact pre-work
+Commit736ecd651df9eeb4ef422b1adc8d05375731ecc0/remote同，scope6，scan7H0M0/check50P2knownW0F；oldoplogGitclean/currentday2709rawtail保留。Source重新freeze14inputs，build明傳SourceRevisionId/RepositoryCommit=736ecd6/noPack/publish；之後GenerateNuspecNoBuild固定artifact，不呼叫AfterPack；验证packageidentity/nuspec exactdeps/repositorycommit/DLLsha/metadataSource，existingglobalSDK packagepath若存在只hashcompare不覆寫。
+
+### 2026-10-05T05:51:56.0172579+08:00 Native pack output gate
+Fixed source736ecd6 build14inputs8.926sPASS/hashstable。First GenerateNuspecNoBuild exit0 but packages directoryempty, therefore noartifactPASS; inspectactual SDK target/properties to distinguish generation-only vs packing/noop and required flag. No public/cache mutation yet, AfterPack hasnotrun, nosecretread. Assertions willrequireactualexactnupkg+zipcontent/nuspec/dll/commit proof beforelibrarypacks copy.
+
+2026-10-05T08:04:18.5820861+08:00 REL401fixedpayload/currentSDKhash verified; Core1374andrealbrowser/3testHostbaseline使用新DLL2C5AA4，正式/prod未驗。Current-dayoperations log/20261005/20261005054536.aster_pcsl_rel401.op_log；20261004歷史oplogbyteclean。Next sensitive/check/doclogcommit; queueddefaultsfalse/400immutable/MDCScope保持。

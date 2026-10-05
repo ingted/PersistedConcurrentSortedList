@@ -1,0 +1,3 @@
+
+### 2026-10-05T08:04:56.3958068+08:00 Native401 immutable local artifact
+Source736ecd6fixedDLL2C5AA47E20EA18DF371DD3C99624F741027474AC09136B934A5AFCF241D2F44A/package7F1EC3256221B94FCCA86F168865E2776D1EFD23DABD952490D3DF787342031B，本機SDKreadback及Core53full1374/realactor/browser/3Hostbaseline閉包已使用新identity。正式NuGet/production仍pending；defaultqueuedfalse/舊400immutable/MDCScope保持。Operations log/20261005/20261005054536.aster_pcsl_rel401.op_log，20261004舊oplog不改。

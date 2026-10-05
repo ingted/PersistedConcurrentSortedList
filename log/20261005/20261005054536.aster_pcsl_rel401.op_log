@@ -12,3 +12,11 @@ Version401 actualverify.nativeQueue10 executed=passed/0Ignored/Failed/Errored，
 
 ### 2026-10-05T05:41:41.8843919+08:00 REL metadata encoding correction
 Native closeout r1 encodingFAIL caught project originalBOMtrue→false from ReadAllText strippingBOM/WriteAllText noBOM。恢復before-work rawprefix3bytes Native/Registry wherever baselineBOMtrue；保持Version401/6內容，未reset/restore其他WIP。r1原FAIL保留，freshr2strictencode/check; inputGate此前unit/freshbuild只為sameVersion textbody，BOM修復後下一packproducer新build綁sourcecommit，不誤稱旧artifacthash=currentbytes。之後metadata edit用rawBOM-aware helper，before/after3bytes判定先行。
+
+### 2026-10-05T05:49:38.2645764+08:00 REL native401 fixed artifact pre-work
+Commit736ecd651df9eeb4ef422b1adc8d05375731ecc0/remote同，scope6，scan7H0M0/check50P2knownW0F；oldoplogGitclean/currentday2709rawtail保留。Source重新freeze14inputs，build明傳SourceRevisionId/RepositoryCommit=736ecd6/noPack/publish；之後GenerateNuspecNoBuild固定artifact，不呼叫AfterPack；验证packageidentity/nuspec exactdeps/repositorycommit/DLLsha/metadataSource，existingglobalSDK packagepath若存在只hashcompare不覆寫。
+
+### 2026-10-05T05:51:56.0172579+08:00 Native pack output gate
+Fixed source736ecd6 build14inputs8.926sPASS/hashstable。First GenerateNuspecNoBuild exit0 but packages directoryempty, therefore noartifactPASS; inspectactual SDK target/properties to distinguish generation-only vs packing/noop and required flag. No public/cache mutation yet, AfterPack hasnotrun, nosecretread. Assertions willrequireactualexactnupkg+zipcontent/nuspec/dll/commit proof beforelibrarypacks copy.
+
+2026-10-05T08:04:18.5816278+08:00 Native401fixedpackcurrentidentity/source736ecd6/localSDKreadback完成223955B/7F1EC3256221B94FCCA86F168865E2776D1EFD23DABD952490D3DF787342031B/DLL2C5AA47E20EA18DF371DD3C99624F741027474AC09136B934A5AFCF241D2F44A。KernelCore1374/newrealactor/browser/28HostDLLmatcher均使用此fixedDLL，20locpackages闭包SourceGate非NuGet/prodproof。Actualpublic400notchanged、queueddefaultsfalse不變、MDClogin/prod无操作。新061dayoplogonlyappend；原20261004oplog不改。
