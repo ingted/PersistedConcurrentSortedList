@@ -1,0 +1,43 @@
+{
+  "Passed": true,
+  "Counts": {
+    "Executed": 84,
+    "Passed": 84,
+    "Ignored": 0,
+    "Failed": 0,
+    "Errored": 0
+  },
+  "Inventory": {
+    "NativeQueue": 10,
+    "Recovery": 20,
+    "Rfc": 13,
+    "Safety": 19,
+    "Storage": 22
+  },
+  "SourceStable": true,
+  "NativeSHA256": "E98E4E05272AEC23EAB470CD0BD810FF925D41FEA3FA58547DD8B9A88F717C1E",
+  "SourceCandidate": true,
+  "Pack": false,
+  "Production": false,
+  "Phases": [
+    {
+      "Name": "test-build",
+      "Exit": 0,
+      "Seconds": 7.527,
+      "Raw": "C:\\Users\\Administrator\\AppData\\Local\\Temp\\pcsl-native-queue-verification-f3f33e08246544ca9045b58da7503720\\test-build.stdout.raw"
+    },
+    {
+      "Name": "inventory",
+      "Exit": 0,
+      "Seconds": 0.745,
+      "Raw": "C:\\Users\\Administrator\\AppData\\Local\\Temp\\pcsl-native-queue-verification-f3f33e08246544ca9045b58da7503720\\inventory.stdout.raw"
+    },
+    {
+      "Name": "tests",
+      "Exit": 0,
+      "Seconds": 98.825,
+      "Raw": "C:\\Users\\Administrator\\AppData\\Local\\Temp\\pcsl-native-queue-verification-f3f33e08246544ca9045b58da7503720\\tests.stdout.raw"
+    }
+  ],
+  "Evidence": "C:\\Users\\Administrator\\AppData\\Local\\Temp\\pcsl-native-queue-verification-f3f33e08246544ca9045b58da7503720"
+}

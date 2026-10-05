@@ -1,3 +1,5 @@
+module Chunk25ContractTests
+
 // Real native filesystem contract, synthetic isolated data only. Current 10.1.401
 // is expected RED on auto-chunk. No service, SQL, network login, or package push.
 // FSI: use the candidate directory below and edit defaultArgumentsText.
@@ -29,10 +31,11 @@ open PersistedConcurrentSortedList.PCSL2
 type Arguments =
     | Fixture_Root of string
     interface IArgParserTemplate with
-        member _.Usage = "Synthetic fixture parent under this native repo temp/. Each run creates a new GUID; failures retained."
+        member _.Usage = "Synthetic fixture parent under the native repo temp/ or dedicated system TEMP pcsl-chunk-contract/. Each run creates a new GUID; failures retained."
 
 let repoRoot = Path.GetFullPath(Path.Combine(__SOURCE_DIRECTORY__, "../../.."))
-let defaultArgumentsText = sprintf "--fixture-root \"%s\"" (Path.Combine(repoRoot, "temp/agent.aster/chunk25").Replace('\\','/'))
+let fixtureTempRoot = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "pcsl-chunk-contract"))
+let defaultArgumentsText = sprintf "--fixture-root \"%s\"" (fixtureTempRoot.Replace('\\','/'))
 let parser = ArgumentParser.Create<Arguments>(programName="TEST.fsx")
 let defaults = parser.ParseCommandLine(PL.parseLine [|' '|] (Some '"') None true defaultArgumentsText)
 let limit = 25_000_000L
@@ -152,8 +155,9 @@ let tests fixtureParent =
 let main argv =
     let overrides=parser.ParseCommandLine argv
     let parent=overrides.TryGetResult Fixture_Root |> Option.orElse (defaults.TryGetResult Fixture_Root) |> Option.get |> Path.GetFullPath
-    let allowed=Path.Combine(repoRoot,"temp")+string Path.DirectorySeparatorChar
-    if not(parent.StartsWith(allowed,StringComparison.OrdinalIgnoreCase)) then invalidArg "fixture-root" "Fixtures must remain below native repo temp/."
+    let allowed = [ Path.Combine(repoRoot,"temp"); fixtureTempRoot ]
+    if not(allowed |> List.exists (fun root -> parent = root || parent.StartsWith(root + string Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase))) then
+        invalidArg "fixture-root" "Fixtures must remain below the native repo temp/ or the dedicated synthetic TEMP root."
     let runRoot=Path.Combine(parent,Guid.NewGuid().ToString("N"))
     Directory.CreateDirectory runRoot |> ignore
     printfn "C25 native candidate=%s physicalLimit=%d fixture=%s expectedTests=13" typeof<PersistedConcurrentSortedList<string,fCell2<string>>>.Assembly.Location limit runRoot
@@ -162,6 +166,8 @@ let main argv =
 #if INTERACTIVE
 fsi.CommandLineArgs |> Array.skip 1 |> Array.filter ((<>) "--") |> main |> fun code -> Environment.ExitCode <- code
 #else
+#if !PCSL_MERGED
 [<EntryPoint>]
 let entry argv = main argv
+#endif
 #endif

@@ -1,0 +1,94 @@
+[37m[[37m06:01:17 [37mINF[37m] [37mEXPECTO? Running tests...[37m [37m<[37mExpecto[37m>[37m
+[0m[1000D[?25h?????????????????????????? String ??????????????????????????
+[0m[1000D[?25h?????????????????????????? fCell2`1 ??????????????????????????
+[0m[1000D[?25h[37m[[37m06:01:50 [31mERR[37m] [36mPCSL complete contract.PCSL decimal25MB physical contract.update large to different large is whole new value[37m errored in [32m00:00:04.4960000[37m [37m<[37mExpecto[37m>[37m
+System.IO.IOException: There is not enough space on the disk. : 'G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\temp\mdcquote\merged25\8a01d7e355ab4079adb4b79f3fb1dc0a\b664efd316ce4b63ae8736661660363a\store\__staging__\bdoBHsBAlobHCUqiKFkaadapFQJXG3lTiPNDsH33spQ\ba17ff027d0949669a066ff86948216e\000000.val'.
+[37m   at PersistedConcurrentSortedList.ChunkedValue.writeCommitted@331.Invoke(Unit unitVar0) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\ChunkedValue.fs:line 386[37m
+[37m   at PersistedConcurrentSortedList.ChunkedValue.withKeyLock[a](String root, String keyHash, FSharpFunc`2 action) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\ChunkedValue.fs:line 98[37m
+[37m   at PersistedConcurrentSortedList.ChunkedValue.writeCommitted(String root, String hash, String codec, FSharpFunc`2 writePayload, FSharpOption`1 publish) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\ChunkedValue.fs:line 331[37m
+[37m   at PersistedConcurrentSortedList.ChunkedValue.writeDefault(String root, String hash, FSharpFunc`2 serialize, FSharpOption`1 publish) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\ChunkedValue.fs:line 389[37m
+[37m   at PersistedConcurrentSortedList.PCSL2.PersistedConcurrentSortedList`2.writePhysical(String filePath, Value value, FSharpOption`1 publish) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\PCSL2.fsx:line 270[37m
+[37m   at PersistedConcurrentSortedList.PCSL2.PersistedConcurrentSortedList`2.writeKeyValue(Key key, Value value, Boolean ifIgnoreQ) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\PCSL2.fsx:line 338[37m
+[37m   at PersistedConcurrentSortedList.PCSL2.clo@356-9.Invoke(Unit unitVar0) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\PCSL2.fsx:line 357[37m
+[37m   at PersistedConcurrentSortedList.ChunkedValue.withKeyLock[a](String root, String keyHash, FSharpFunc`2 action) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\ChunkedValue.fs:line 98[37m
+[37m   at PersistedConcurrentSortedList.PCSL2.PersistedConcurrentSortedList`2.commitMutation(FSharpFunc`2 mutation, Key key, Value value, Boolean ifRemoveFromBuffer, Boolean ifIgnoreQ) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\PCSL2.fsx:line 356[37m
+[37m   at PersistedConcurrentSortedList.PCSL2.PersistedConcurrentSortedList`2.UpsertAsync(Key key, Value value, Boolean ifRemoveFromBuffer, Boolean ifIgnoreQ) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\PCSL2.fsx:line 613[37m
+[37m   at Chunk25ContractTests.tests@102-7.Invoke(Unit _arg8) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\doc\RFC\20261006.25MB.Chunk\TEST.fsx:line 105[37m
+[37m   at Expecto.Impl.execTestAsync@579-1.Invoke(Unit unitVar)[37m
+[37m   at Microsoft.FSharp.Control.AsyncPrimitives.CallThenInvoke[T,TResult](AsyncActivation`1 ctxt, TResult result1, FSharpFunc`2 part2) in D:\a\_work\1\s\src\fsharp\src\FSharp.Core\async.fs:line 509[37m
+[37m   at Microsoft.FSharp.Control.Trampoline.Execute(FSharpFunc`2 firstAction) in D:\a\_work\1\s\src\fsharp\src\FSharp.Core\async.fs:line 112[37m
+[0m[1000D[?25h[1000D[?25h[37m[[37m06:01:51 [31mERR[37m] [36mPCSL complete contract.PCSL decimal25MB physical contract.remove large deletes index and every owned value part[37m errored in [32m00:00:01.5210000[37m [37m<[37mExpecto[37m>[37m
+System.IO.IOException: There is not enough space on the disk. : 'G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\temp\mdcquote\merged25\8a01d7e355ab4079adb4b79f3fb1dc0a\d54ac6fac62a48899925d251e324c1de\store\__staging__\bdoBHsBAlobHCUqiKFkaadapFQJXG3lTiPNDsH33spQ\40530a29ee1d4142b2b5f6330f1619ac\000000.val'.
+[37m   at PersistedConcurrentSortedList.ChunkedValue.writeCommitted@331.Invoke(Unit unitVar0) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\ChunkedValue.fs:line 386[37m
+[37m   at PersistedConcurrentSortedList.ChunkedValue.withKeyLock[a](String root, String keyHash, FSharpFunc`2 action) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\ChunkedValue.fs:line 98[37m
+[37m   at PersistedConcurrentSortedList.ChunkedValue.writeCommitted(String root, String hash, String codec, FSharpFunc`2 writePayload, FSharpOption`1 publish) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\ChunkedValue.fs:line 331[37m
+[37m   at PersistedConcurrentSortedList.ChunkedValue.writeDefault(String root, String hash, FSharpFunc`2 serialize, FSharpOption`1 publish) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\ChunkedValue.fs:line 389[37m
+[37m   at PersistedConcurrentSortedList.PCSL2.PersistedConcurrentSortedList`2.writePhysical(String filePath, Value value, FSharpOption`1 publish) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\PCSL2.fsx:line 270[37m
+[37m   at PersistedConcurrentSortedList.PCSL2.PersistedConcurrentSortedList`2.writeKeyValue(Key key, Value value, Boolean ifIgnoreQ) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\PCSL2.fsx:line 338[37m
+[37m   at PersistedConcurrentSortedList.PCSL2.clo@356-9.Invoke(Unit unitVar0) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\PCSL2.fsx:line 357[37m
+[37m   at PersistedConcurrentSortedList.ChunkedValue.withKeyLock[a](String root, String keyHash, FSharpFunc`2 action) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\ChunkedValue.fs:line 98[37m
+[37m   at PersistedConcurrentSortedList.PCSL2.PersistedConcurrentSortedList`2.commitMutation(FSharpFunc`2 mutation, Key key, Value value, Boolean ifRemoveFromBuffer, Boolean ifIgnoreQ) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\PCSL2.fsx:line 356[37m
+[37m   at PersistedConcurrentSortedList.PCSL2.PersistedConcurrentSortedList`2.UpsertAsync(Key key, Value value, Boolean ifRemoveFromBuffer, Boolean ifIgnoreQ) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\PCSL2.fsx:line 613[37m
+[37m   at Chunk25ContractTests.tests@108-8.Invoke(Unit _arg9) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\doc\RFC\20261006.25MB.Chunk\TEST.fsx:line 110[37m
+[37m   at Expecto.Impl.execTestAsync@579-1.Invoke(Unit unitVar)[37m
+[37m   at Microsoft.FSharp.Control.AsyncPrimitives.CallThenInvoke[T,TResult](AsyncActivation`1 ctxt, TResult result1, FSharpFunc`2 part2) in D:\a\_work\1\s\src\fsharp\src\FSharp.Core\async.fs:line 509[37m
+[37m   at Microsoft.FSharp.Control.Trampoline.Execute(FSharpFunc`2 firstAction) in D:\a\_work\1\s\src\fsharp\src\FSharp.Core\async.fs:line 112[37m
+[0m[1000D[?25h[1000D[?25h[37m[[37m06:01:53 [31mERR[37m] [36mPCSL complete contract.PCSL decimal25MB physical contract.remove does not delete neighboring key[37m errored in [32m00:00:01.4690000[37m [37m<[37mExpecto[37m>[37m
+System.IO.IOException: There is not enough space on the disk. : 'G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\temp\mdcquote\merged25\8a01d7e355ab4079adb4b79f3fb1dc0a\07f3b1724d534d7d87b06b3356e9631a\store\__staging__\bdoBHsBAlobHCUqiKFkaadapFQJXG3lTiPNDsH33spQ\201f243a8dba4c30afd44c985233fb80\000000.val'.
+[37m   at PersistedConcurrentSortedList.ChunkedValue.writeCommitted@331.Invoke(Unit unitVar0) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\ChunkedValue.fs:line 386[37m
+[37m   at PersistedConcurrentSortedList.ChunkedValue.withKeyLock[a](String root, String keyHash, FSharpFunc`2 action) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\ChunkedValue.fs:line 98[37m
+[37m   at PersistedConcurrentSortedList.ChunkedValue.writeCommitted(String root, String hash, String codec, FSharpFunc`2 writePayload, FSharpOption`1 publish) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\ChunkedValue.fs:line 331[37m
+[37m   at PersistedConcurrentSortedList.ChunkedValue.writeDefault(String root, String hash, FSharpFunc`2 serialize, FSharpOption`1 publish) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\ChunkedValue.fs:line 389[37m
+[37m   at PersistedConcurrentSortedList.PCSL2.PersistedConcurrentSortedList`2.writePhysical(String filePath, Value value, FSharpOption`1 publish) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\PCSL2.fsx:line 270[37m
+[37m   at PersistedConcurrentSortedList.PCSL2.PersistedConcurrentSortedList`2.writeKeyValue(Key key, Value value, Boolean ifIgnoreQ) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\PCSL2.fsx:line 338[37m
+[37m   at PersistedConcurrentSortedList.PCSL2.clo@356-9.Invoke(Unit unitVar0) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\PCSL2.fsx:line 357[37m
+[37m   at PersistedConcurrentSortedList.ChunkedValue.withKeyLock[a](String root, String keyHash, FSharpFunc`2 action) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\ChunkedValue.fs:line 98[37m
+[37m   at PersistedConcurrentSortedList.PCSL2.PersistedConcurrentSortedList`2.commitMutation(FSharpFunc`2 mutation, Key key, Value value, Boolean ifRemoveFromBuffer, Boolean ifIgnoreQ) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\PCSL2.fsx:line 356[37m
+[37m   at PersistedConcurrentSortedList.PCSL2.PersistedConcurrentSortedList`2.UpsertAsync(Key key, Value value, Boolean ifRemoveFromBuffer, Boolean ifIgnoreQ) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\PCSL2.fsx:line 613[37m
+[37m   at Chunk25ContractTests.tests@114-9.Invoke(Unit _arg10) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\doc\RFC\20261006.25MB.Chunk\TEST.fsx:line 116[37m
+[37m   at Expecto.Impl.execTestAsync@579-1.Invoke(Unit unitVar)[37m
+[37m   at Microsoft.FSharp.Control.AsyncPrimitives.CallThenInvoke[T,TResult](AsyncActivation`1 ctxt, TResult result1, FSharpFunc`2 part2) in D:\a\_work\1\s\src\fsharp\src\FSharp.Core\async.fs:line 509[37m
+[37m   at Microsoft.FSharp.Control.Trampoline.Execute(FSharpFunc`2 firstAction) in D:\a\_work\1\s\src\fsharp\src\FSharp.Core\async.fs:line 112[37m
+[0m[1000D[?25h[1000D[?25h[37m[[37m06:01:54 [31mERR[37m] [36mPCSL complete contract.PCSL decimal25MB physical contract.legacy large blob reads without rewrite then migrates on upsert[37m errored in [32m00:00:01.3230000[37m [37m<[37mExpecto[37m>[37m
+System.IO.IOException: There is not enough space on the disk. : 'G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\temp\mdcquote\merged25\8a01d7e355ab4079adb4b79f3fb1dc0a\46ae61888f6c42d39303cc4507467af0\store\bdoBHsBAlobHCUqiKFkaadapFQJXG3lTiPNDsH33spQ.val'.
+[37m   at System.IO.RandomAccess.WriteAtOffset(SafeFileHandle handle, ReadOnlySpan`1 buffer, Int64 fileOffset)[37m
+[37m   at System.IO.File.WriteAllBytes(String path, ReadOnlySpan`1 bytes)[37m
+[37m   at System.IO.File.WriteAllBytes(String path, Byte[] bytes)[37m
+[37m   at Chunk25ContractTests.tests@121-10.Invoke(Unit _arg11) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\doc\RFC\20261006.25MB.Chunk\TEST.fsx:line 129[37m
+[37m   at Expecto.Impl.execTestAsync@579-1.Invoke(Unit unitVar)[37m
+[37m   at Microsoft.FSharp.Control.AsyncPrimitives.CallThenInvoke[T,TResult](AsyncActivation`1 ctxt, TResult result1, FSharpFunc`2 part2) in D:\a\_work\1\s\src\fsharp\src\FSharp.Core\async.fs:line 509[37m
+[37m   at Microsoft.FSharp.Control.Trampoline.Execute(FSharpFunc`2 firstAction) in D:\a\_work\1\s\src\fsharp\src\FSharp.Core\async.fs:line 112[37m
+[0m[1000D[?25h[1000D[?25h[37m[[37m06:01:55 [31mERR[37m] [36mPCSL complete contract.PCSL decimal25MB physical contract.missing committed value part fails closed[37m errored in [32m00:00:01.4410000[37m [37m<[37mExpecto[37m>[37m
+System.IO.IOException: There is not enough space on the disk. : 'G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\temp\mdcquote\merged25\8a01d7e355ab4079adb4b79f3fb1dc0a\e54d68db74df43c4a4e77abd1c5eedeb\store\__staging__\bdoBHsBAlobHCUqiKFkaadapFQJXG3lTiPNDsH33spQ\bb466c6009a74e7ba1948cc8b33467de\000000.val'.
+[37m   at PersistedConcurrentSortedList.ChunkedValue.writeCommitted@331.Invoke(Unit unitVar0) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\ChunkedValue.fs:line 386[37m
+[37m   at PersistedConcurrentSortedList.ChunkedValue.withKeyLock[a](String root, String keyHash, FSharpFunc`2 action) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\ChunkedValue.fs:line 98[37m
+[37m   at PersistedConcurrentSortedList.ChunkedValue.writeCommitted(String root, String hash, String codec, FSharpFunc`2 writePayload, FSharpOption`1 publish) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\ChunkedValue.fs:line 331[37m
+[37m   at PersistedConcurrentSortedList.ChunkedValue.writeDefault(String root, String hash, FSharpFunc`2 serialize, FSharpOption`1 publish) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\ChunkedValue.fs:line 389[37m
+[37m   at PersistedConcurrentSortedList.PCSL2.PersistedConcurrentSortedList`2.writePhysical(String filePath, Value value, FSharpOption`1 publish) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\PCSL2.fsx:line 270[37m
+[37m   at PersistedConcurrentSortedList.PCSL2.PersistedConcurrentSortedList`2.writeKeyValue(Key key, Value value, Boolean ifIgnoreQ) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\PCSL2.fsx:line 338[37m
+[37m   at PersistedConcurrentSortedList.PCSL2.clo@356-9.Invoke(Unit unitVar0) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\PCSL2.fsx:line 357[37m
+[37m   at PersistedConcurrentSortedList.ChunkedValue.withKeyLock[a](String root, String keyHash, FSharpFunc`2 action) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\ChunkedValue.fs:line 98[37m
+[37m   at PersistedConcurrentSortedList.PCSL2.PersistedConcurrentSortedList`2.commitMutation(FSharpFunc`2 mutation, Key key, Value value, Boolean ifRemoveFromBuffer, Boolean ifIgnoreQ) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\PCSL2.fsx:line 356[37m
+[37m   at PersistedConcurrentSortedList.PCSL2.PersistedConcurrentSortedList`2.UpsertAsync(Key key, Value value, Boolean ifRemoveFromBuffer, Boolean ifIgnoreQ) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\PCSL2.fsx:line 613[37m
+[37m   at Chunk25ContractTests.tests@138-11.Invoke(Unit _arg12) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\doc\RFC\20261006.25MB.Chunk\TEST.fsx:line 140[37m
+[37m   at Expecto.Impl.execTestAsync@579-1.Invoke(Unit unitVar)[37m
+[37m   at Microsoft.FSharp.Control.AsyncPrimitives.CallThenInvoke[T,TResult](AsyncActivation`1 ctxt, TResult result1, FSharpFunc`2 part2) in D:\a\_work\1\s\src\fsharp\src\FSharp.Core\async.fs:line 509[37m
+[37m   at Microsoft.FSharp.Control.Trampoline.Execute(FSharpFunc`2 firstAction) in D:\a\_work\1\s\src\fsharp\src\FSharp.Core\async.fs:line 112[37m
+[0m[1000D[?25h[1000D[?25h[37m[[37m06:01:57 [31mERR[37m] [36mPCSL complete contract.PCSL decimal25MB physical contract.truncated committed value part fails closed[37m errored in [32m00:00:01.5000000[37m [37m<[37mExpecto[37m>[37m
+System.IO.IOException: There is not enough space on the disk. : 'G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\temp\mdcquote\merged25\8a01d7e355ab4079adb4b79f3fb1dc0a\f18148729a3246dc9488f798d7babf1f\store\__staging__\bdoBHsBAlobHCUqiKFkaadapFQJXG3lTiPNDsH33spQ\be022422e48743f98a1397649a9f9ee4\000000.val'.
+[37m   at PersistedConcurrentSortedList.ChunkedValue.writeCommitted@331.Invoke(Unit unitVar0) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\ChunkedValue.fs:line 386[37m
+[37m   at PersistedConcurrentSortedList.ChunkedValue.withKeyLock[a](String root, String keyHash, FSharpFunc`2 action) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\ChunkedValue.fs:line 98[37m
+[37m   at PersistedConcurrentSortedList.ChunkedValue.writeCommitted(String root, String hash, String codec, FSharpFunc`2 writePayload, FSharpOption`1 publish) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\ChunkedValue.fs:line 331[37m
+[37m   at PersistedConcurrentSortedList.ChunkedValue.writeDefault(String root, String hash, FSharpFunc`2 serialize, FSharpOption`1 publish) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\ChunkedValue.fs:line 389[37m
+[37m   at PersistedConcurrentSortedList.PCSL2.PersistedConcurrentSortedList`2.writePhysical(String filePath, Value value, FSharpOption`1 publish) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\PCSL2.fsx:line 270[37m
+[37m   at PersistedConcurrentSortedList.PCSL2.PersistedConcurrentSortedList`2.writeKeyValue(Key key, Value value, Boolean ifIgnoreQ) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\PCSL2.fsx:line 338[37m
+[37m   at PersistedConcurrentSortedList.PCSL2.clo@356-9.Invoke(Unit unitVar0) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\PCSL2.fsx:line 357[37m
+[37m   at PersistedConcurrentSortedList.ChunkedValue.withKeyLock[a](String root, String keyHash, FSharpFunc`2 action) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\ChunkedValue.fs:line 98[37m
+[37m   at PersistedConcurrentSortedList.PCSL2.PersistedConcurrentSortedList`2.commitMutation(FSharpFunc`2 mutation, Key key, Value value, Boolean ifRemoveFromBuffer, Boolean ifIgnoreQ) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\PCSL2.fsx:line 356[37m
+[37m   at PersistedConcurrentSortedList.PCSL2.PersistedConcurrentSortedList`2.UpsertAsync(Key key, Value value, Boolean ifRemoveFromBuffer, Boolean ifIgnoreQ) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\PCSL2.fsx:line 613[37m
+[37m   at Chunk25ContractTests.tests@144-13.Invoke(Unit _arg13) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\doc\RFC\20261006.25MB.Chunk\TEST.fsx:line 146[37m
+[37m   at Expecto.Impl.execTestAsync@579-1.Invoke(Unit unitVar)[37m
+[37m   at Microsoft.FSharp.Control.AsyncPrimitives.CallThenInvoke[T,TResult](AsyncActivation`1 ctxt, TResult result1, FSharpFunc`2 part2) in D:\a\_work\1\s\src\fsharp\src\FSharp.Core\async.fs:line 509[37m
+[37m   at Microsoft.FSharp.Control.Trampoline.Execute(FSharpFunc`2 firstAction) in D:\a\_work\1\s\src\fsharp\src\FSharp.Core\async.fs:line 112[37m
+[0m[1000D[?25h[1000D[?25h[37m[[37m06:01:57 [37mINF[37m] [37mEXPECTO! [36m23[37m tests run in [32m00:00:39.9295354[37m for [36mPCSL complete contract[37m – [36m17[37m passed, [36m0[37m ignored, [36m0[37m failed, [36m6[37m errored. [36m[37m [37m<[37mExpecto[37m>[37m
+[0m

@@ -1,4 +1,4 @@
-﻿namespace PersistedConcurrentSortedList
+namespace PersistedConcurrentSortedList
 
 #if INTERACTIVE
 #r @"nuget: Newtonsoft.Json, 13.0.3"
@@ -142,6 +142,7 @@ module PCSL2 =
         //    sortedList.mreReadOpt <- Some mreReadLock
 
         let indexInitializeBase () =
+                ChunkedValue.recoverStore schemaPath
                 fullyBuffered <- false
                 [|
                     sortedListIndex.Clean().thisT
@@ -149,7 +150,7 @@ module PCSL2 =
                     sortedListPersistenceStatus.Clean().thisT
                 |] |> Task.WaitAll
                 let di = DirectoryInfo keysPath
-                di.GetFiles()
+                di.GetFiles("*.index")
             
 #if NET9_0_OR_GREATER
                 |> PSeq.ordered
@@ -256,6 +257,19 @@ module PCSL2 =
 
         let mutable write2File = ModelContainer<'Value>.write2File
         let mutable readFromFile = ModelContainer<'Value>.readFromFile
+        let mutable defaultWriter = true
+        let mutable defaultReader = true
+        let readPhysical filePath =
+            let root = Path.GetDirectoryName(Path.GetFullPath filePath)
+            let hash = Path.GetFileNameWithoutExtension filePath
+            ChunkedValue.readCommitted root hash defaultReader ModelContainer<'Value>.deserializeF readFromFile
+        let writePhysical filePath value publish =
+            let root = Path.GetDirectoryName(Path.GetFullPath filePath)
+            let hash = Path.GetFileNameWithoutExtension filePath
+            if defaultWriter then
+                ChunkedValue.writeDefault root hash (fun stream -> ModelContainer<'Value>.serializeF(stream, value)) publish |> ignore
+            else
+                ChunkedValue.writeCustom root hash (fun path -> write2File path value) publish |> ignore
         
         // 生成 SHA-256 哈希
         let mutable generateKeyHash : 'Key -> KeyHash = fun (key: 'Key) ->
@@ -264,6 +278,7 @@ module PCSL2 =
         do 
             createPath schemaPath
             createPath keysPath
+            ChunkedValue.recoverStore schemaPath
             if autoInitialize.IsSome && autoInitialize.Value <> 0 then
                 initTask <- task {
                     indexInitialize ()
@@ -312,21 +327,37 @@ module PCSL2 =
                 | _ ->
                     failwithf "[getOrNewAndPersistKeyHash] Failed! %A" w
             kh
-        // 存储 value 到文件
-        let persistKeyValueBase ifRemoveFromBuffer ifIgnoreQ =
-            let inline write (key: 'Key, value: 'Value) =
-                let hashKey = getOrNewAndPersistKeyHash (key, ifIgnoreQ)
-                let filePath = Path.Combine(schemaPath, hashKey + ".val")
-                write2File filePath value
-                key
-            write >>
+        let storageHash key =
+            match tryGetKeyHash(key, true) with
+            | true, Some hash -> hash
+            | _ -> generateKeyHash key
+
+        let writeKeyValue key value ifIgnoreQ =
+            let hash = storageHash key
+            let keyBytes = Encoding.UTF8.GetBytes(js.PickleToString key)
+            writePhysical (Path.Combine(schemaPath, hash + ".val")) value
+                (Some(fun () -> ChunkedValue.publishIndex schemaPath hash keyBytes))
+            [| sortedListIndex.Add(key, hash, ifIgnoreQ).thisT
+               sortedListIndexReversed.Add(hash, key, ifIgnoreQ).thisT |]
+            |> Task.WhenAll |> fun pending -> pending.GetAwaiter().GetResult()
+
+        let persistBufferStatus ifRemoveFromBuffer ifIgnoreQ key =
             if ifRemoveFromBuffer then
-                fun key ->
-                    (sortedList.Remove (key, ifIgnoreQ)).WaitIgnore
-                    sortedListPersistenceStatus.Upsert (key, NonBuffered, ifIgnoreQ)
-            else
-                fun key ->
-                    sortedListPersistenceStatus.Upsert (key, Buffered, ifIgnoreQ)
+                (sortedList.Remove(key, ifIgnoreQ)).WaitIgnore
+                sortedListPersistenceStatus.Upsert(key, NonBuffered, ifIgnoreQ)
+            else sortedListPersistenceStatus.Upsert(key, Buffered, ifIgnoreQ)
+
+        let persistKeyValueBase ifRemoveFromBuffer ifIgnoreQ (key, value) =
+            ChunkedValue.withKeyLock schemaPath (storageHash key) (fun () ->
+                writeKeyValue key value ifIgnoreQ
+                persistBufferStatus ifRemoveFromBuffer ifIgnoreQ key)
+
+        let commitMutation mutation key value ifRemoveFromBuffer ifIgnoreQ =
+            ChunkedValue.withKeyLock schemaPath (storageHash key) (fun () ->
+                writeKeyValue key value ifIgnoreQ
+                let result = mutation key value ifIgnoreQ
+                let status = persistBufferStatus ifRemoveFromBuffer ifIgnoreQ key
+                [| result; status.thisT |])
 
         let removePersistedKeyValue (key: 'Key, ifIgnoreQ) =
             let hashKey = 
@@ -336,20 +367,15 @@ module PCSL2 =
                     //假設初始化的時候有把全部 KEY 載入，所以後續不會再從 keyPath 讀 index，頂多新增寫入
                     generateKeyHash key
 
-            [|
+            let mutable completions: Task array = [||]
+            ChunkedValue.deleteCommitted schemaPath hashKey (fun () ->
+                completions <- [|
                 sortedList.Remove(key, ifIgnoreQ).thisT
                 sortedListPersistenceStatus.Remove(key, ifIgnoreQ).thisT
                 sortedListIndex.Remove(key, ifIgnoreQ).thisT
                 sortedListIndexReversed.Remove(hashKey, ifIgnoreQ).thisT
-                task {
-                    let filePath = Path.Combine(schemaPath, hashKey + ".val")
-                    File.Delete filePath
-                }
-                task {
-                    let indexPath = Path.Combine(keysPath, hashKey + ".index") //js.UnPickleOfString<A>
-                    File.Delete indexPath
-                }
-            |]
+                |])
+            completions
 
         let persistKeyValueNoRemove = persistKeyValueBase false
         let persistKeyValueRemove = persistKeyValueBase true
@@ -372,10 +398,12 @@ module PCSL2 =
             match tryGetKeyHash (key, ifIgnoreQ) with
             | true, (Some keyHash) ->
                 let filePath = Path.Combine(schemaPath, keyHash + ".val")
-                (Some keyHash), true, readFromFile filePath //None means file not existed
+                let stored = readPhysical filePath
+                if stored.IsNone then raise (InvalidDataException("Visible PCSL index has no readable value."))
+                (Some keyHash), true, stored
             | _ ->
                 let filePath = Path.Combine(schemaPath, generateKeyHash key + ".val")
-                if (FileInfo filePath).Exists then
+                if (FileInfo filePath).Exists && not (ChunkedValue.isUnpublishedNewAnchor schemaPath (generateKeyHash key)) then
                     failwith $"[WARNING] Index not consists with file {filePath}"
                 else
                     None, false, None //索引無該 key
@@ -464,16 +492,16 @@ module PCSL2 =
         member this.InitTask = initTask
         member this.PersistKeyValues = persistKeyValues
         member this.Write2File 
-            with get () = write2File
-            and set (v) = write2File <- v
+            with get () = fun path value -> writePhysical path value None
+            and set (v) = write2File <- v; defaultWriter <- false
 
         member this.GenerateKeyHash 
             with get () = generateKeyHash
             and set (v) = generateKeyHash <- v
 
         member this.ReadFromFile 
-            with get () = readFromFile
-            and set (v) = readFromFile <- v
+            with get () = readPhysical
+            and set (v) = readFromFile <- v; defaultReader <- false
             
         member this.IndexInitialized
             with get () = indexInitialized
@@ -484,6 +512,7 @@ module PCSL2 =
         member this.ValueInitializeSingleThread = valueInitializeSingleThread
         member this.SetReadFromFile f =
                     readFromFile <- f
+                    defaultReader <- false
                     this
         member this.SetGenerateKeyHash f =
                     generateKeyHash <- f
@@ -506,10 +535,7 @@ module PCSL2 =
 #endif
                         [||]
                     else
-                        let rst = [|                
-                                sortedList.Add(key, value).thisT
-                                ((persistKeyValueBase ifRemoveFromBuffer ifIgnoreQ) (key,  value)).thisT
-                            |]
+                        let rst = commitMutation (fun k v bypass -> sortedList.Add(k, v, bypass).thisT) key value ifRemoveFromBuffer ifIgnoreQ
 #if DEBUG1
 #else                    
 
@@ -552,10 +578,7 @@ module PCSL2 =
                         //rwLock.ExitWriteLock()
                         [||]
                     else
-                        let rst = [|
-                                sortedList.Update(key, value, ifIgnoreQ).thisT
-                                ((persistKeyValueBase ifRemoveFromBuffer ifIgnoreQ) (key,  value)).thisT
-                            |]
+                        let rst = commitMutation (fun k v bypass -> sortedList.Update(k, v, bypass).thisT) key value ifRemoveFromBuffer ifIgnoreQ
 #if DEBUG1
 #else                    
                         //rwLock.ExitWriteLock()
@@ -581,10 +604,7 @@ module PCSL2 =
 #endif
             try
                 let rst =
-                    [|
-                        sortedList.Upsert(key, value, ifIgnoreQ).thisT
-                        ((persistKeyValueBase ifRemoveFromBuffer ifIgnoreQ) (key,  value)).thisT
-                    |]
+                    commitMutation (fun k v bypass -> sortedList.Upsert(k, v, bypass).thisT) key value ifRemoveFromBuffer ifIgnoreQ
 #if DEBUG1
 #else                    
                 //rwLock.ExitWriteLock()
@@ -652,54 +672,15 @@ module PCSL2 =
 
 
         member this.TryGetValueNoThreadLock (key: 'Key, _toMilli:int, ifIgnoreQ) = //: bool * 'Value option =
-            
-#if DEBUG
-            let mutable trace = 0
-            try
-#endif
-                //mreReadLock.Reset ()
-                //mre.Wait ()
-                let gr = sortedList.GetValue(key, ifIgnoreQ)
-                //mreReadLock.Set ()
-#if DEBUG
-                trace <- 1            
-#endif
-                //printfn "[TryGetValueNoThreadLock.GetValue] value task: %A" gr
-                //let (Choice1Of3 _) =
-                //    [|
-                //        gr.thisT
-                //        //us.thisT
-                //    |]
-                //    |> Task.WaitAllWithTimeout _toMilli
-                let exists, value = gr.Result.OptionValue.Value
-                //printfn "[TryGetValueNoThreadLock.kvOptionValue] exists: %A, value: %A" exists value
-#if DEBUG
-                trace <- 2
-#endif
-            
+            ChunkedValue.withKeyLock schemaPath (storageHash key) (fun () ->
+                let exists, value = sortedList.GetValue(key, ifIgnoreQ).Result.OptionValue.Value
                 if exists then
-                    let us = sortedListPersistenceStatus.Upsert(key, Buffered, ifIgnoreQ).Result
-                    //printfn "[TryGetValueNoThreadLock.Upsert] value task: %A" us
-#if DEBUG
-                    trace <- 3
-#endif
-            
+                    sortedListPersistenceStatus.Upsert(key, Buffered, ifIgnoreQ).Result |> ignore
                     true, value
                 else
-#if DEBUG
-                    trace <- 4
-#endif
                     match readFromFileBaseAndBuffer (key, _toMilli, ifIgnoreQ, ifIgnoreQ, ifIgnoreQ) with
-                    | Some v ->
-                        true, Some v
-                    | None -> false, None
-#if DEBUG
-            with
-            | exn ->    
-                printfn "[TryGetValueNoThreadLock] %s" exn.Message
-                printfn "[TryGetValueNoThreadLock][%d] Query KV %A" trace key
-                false, None
-#endif            
+                    | Some value -> true, Some value
+                    | None -> false, None)
         
         ///需要全資料初始化，所以就不需要後續的 buffered 了，不選擇各自 readfromfile 原因是要利用 CSL 的 GetValues API
         member this.TryGetValuesNoThreadLock (keys: 'Key seq, _toMilli:int, ifIgnoreQ, ?maxDoP:int) = //: bool * 'Value option =

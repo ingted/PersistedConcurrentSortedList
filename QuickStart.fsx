@@ -1,4 +1,4 @@
-﻿#if INTERACTIVE
+#if INTERACTIVE
 #r @"nuget: Newtonsoft.Json, 13.0.3"
 #r @"nuget: protobuf-net"
 #r @"nuget: Newtonsoft.Json, 13.0.3"

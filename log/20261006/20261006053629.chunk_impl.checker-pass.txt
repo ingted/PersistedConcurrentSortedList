@@ -1,0 +1,48 @@
+SessionId   : 01a0fa50-20a2-7ad2-af1c-0c12167cc8e3
+State file  : /workspace/home/codex\scoped-1d7090c58b7088990d2e32b8695a81b22e798929019fd2c650b8377cbcb759cf.state.json
+Summary     : PASS=35 WARN=9 FAIL=0
+
+[PASS] log_dir_exists - log 目錄存在：G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\log\20261006
+[PASS] op_log_dir_default - .op_log 檢查目錄使用 --log-dir
+[PASS] latest_log_found - 最新 log：G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\log\20261006\20261006053629.chunk_impl.log @ 2026-10-05T22:38:09.086Z
+[PASS] latest_log_operations - 單一log含非空Operations；不要求另建op_log
+[PASS] latest_log_name - 最新 log 檔名符合規範
+[PASS] latest_op_log_name - 最新 op_log 檔名符合規範
+[PASS] latest_log_has_plan - 最新 log 內含 planned steps/計畫步驟
+[PASS] latest_log_required_fields - 最新 log 已覆蓋最低欄位
+[PASS] km_exists - km 存在：G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\README.md
+[WARN] km_unchanged - km 自上次檢查後未更新
+[PASS] km_text_encoding - km 文字 encoding 可 strict decode：utf8
+[PASS] devlog_exists - devlog 存在：G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\DevLog.md
+[PASS] devlog_changed - devlog 自上次檢查後已更新，mtime=2026-10-05T22:38:09.086Z
+[PASS] devlog_text_encoding - devlog 文字 encoding 可 strict decode：utf8
+[PASS] devlog_text_encoding_preserved - devlog 修改後維持 encoding/BOM：utf8
+[PASS] test_exists - test 存在：G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\doc\RFC\20261006.25MB.Chunk\TEST.fsx
+[WARN] test_unchanged - test 自上次檢查後未更新
+[PASS] test_text_encoding - test 文字 encoding 可 strict decode：utf8
+[PASS] wbs_exists - wbs 存在：G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\doc\RFC\20261006.25MB.Chunk\WBS.md
+[WARN] wbs_unchanged - wbs 自上次檢查後未更新
+[PASS] wbs_text_encoding - wbs 文字 encoding 可 strict decode：utf8
+[PASS] sd_exists - sd 存在：G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\doc\RFC\20261006.25MB.Chunk\SD.md
+[WARN] sd_unchanged - sd 自上次檢查後未更新
+[PASS] sd_text_encoding - sd 文字 encoding 可 strict decode：utf8
+[PASS] sa_exists - sa 存在：G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\doc\RFC\20261006.25MB.Chunk\SA.md
+[WARN] sa_unchanged - sa 自上次檢查後未更新
+[PASS] sa_text_encoding - sa 文字 encoding 可 strict decode：utf8
+[PASS] active_log_append_only - 本輪active log/op_log/hypothesis僅追加證據，原bytes prefix不變
+[PASS] active_log_append_only - 本輪active log/op_log/hypothesis僅追加證據，原bytes prefix不變
+[PASS] devlog_append_only - devlog 以 append-only 方式追加
+[PASS] latest_log_advanced - 與上次檢查相比，最新 log 已前進
+[WARN] git_dirty_no_commit - repo 仍有未提交變更
+[PASS] git_repo - Git repo：G:\coldfar_py\sharftrade9\Libs5\KServer\fstring
+[PASS] git_branch - 目前 branch：chore/fstring-repo-cleanup-and-packaging
+[PASS] git_head - 目前 HEAD：8fa82f6d0cf359eb632ba0b4c483edd768171f4f 2026-10-06T02:31:12+08:00 docs(pcsl): specify 25MB native value chunks with executable TDD baseline
+[WARN] git_dirty - repo 有未提交變更
+[WARN] git_branch_name - 目前 branch 命名不符合 YYYYMMDD_001.topic 規範
+[PASS] wbs_global_audit - 掃描 1 份 WBS.md，未完成 1 筆；最低：doc/RFC/20261006.25MB.Chunk/WBS.md:11 C25-05=0%
+[PASS] wbs_progress_status_consistent - 未發現 progress < 100 但狀態為 Done/結案 的 WBS row
+[PASS] doc_traceability_audit - 掃描 markdown=18 stock=8 RFC=6；RFC ids=1 thin=0 missing=1；WBS ids=0 missing=0；Test ids=0 missing=0
+[WARN] doc_traceability_coverage - 追溯仍有缺口：RFC thin=0 sample=[]; RFC missing=1 sample=[RFC-PCSL-0025]; WBS missing=0 sample=[]; Test missing=0 sample=[]
+[PASS] version_bump_detected - 偵測到 repo 自身版本上升：$(AssemblyName) 10.1.401 -> 10.1.402-dev.chunk25.1 (PersistedConcurrentSortedList.fsproj)
+[PASS] version_bump_devlog_recorded - DevLog 已記錄本輪 repo 自身 version bump 的 package id 與新版號
+[PASS] version_bump_package_references_synced - 引用 bumped repo package 的 PackageReference 已同步到新版

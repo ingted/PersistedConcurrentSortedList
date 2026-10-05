@@ -1,0 +1,9 @@
+  Determining projects to restore...
+  Restored G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\tests\PersistedConcurrentSortedList.Tests\PersistedConcurrentSortedList.Tests.fsproj (in 470 ms).
+  PersistedConcurrentSortedList.Tests -> C:\Users\Administrator\AppData\Local\Temp\pcsl-native-queue-verification-197ed13bb8d9466bab14fb82e2a019b1\tests\PersistedConcurrentSortedList.Tests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:06.78

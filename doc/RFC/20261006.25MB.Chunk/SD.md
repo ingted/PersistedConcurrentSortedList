@@ -1,6 +1,6 @@
 # SD：physical format、pseudocode與失敗路徑
 
-這是待實作設計，不是existing API。default25,000,000 bytes；小threshold僅internal test seam。型別名字可由M哥依現有style微調，磁碟與可觀察契約須保持。
+本契約已接入native development source；實際驗收與發布狀態見WBS。default25,000,000 bytes；小threshold僅scoped test seam，不作正式caller參數。
 
 ## Layout與型別
 
@@ -103,7 +103,13 @@ openStore () =
 
 `beforePartFlush`、`afterPartFlush`、`beforeAnchorPublish`、`afterAnchorPublishBeforeIndex`、`afterIndexPublish`、`afterIndexUnpublish`是test-only injectable callback或內部filesystem seam，production default no-op。M哥須在相同Expecto suite擴：每點child process abrupt exit、reopen、duplicate/retry、old/new完整值、new-key不存在、Delete不復活、無已ACK value丟失。並驗read/delete、read/update lease交错与cancel。
 
-目前[TEST.fsx](TEST.fsx)以現有public API可編譯並產生真RED，涵蓋完整roundtrip/大單值/更新/刪除/legacy/缺失/截斷；上述尚無seam的crash／precision-threshold cases是**未實作未執行**，不可用skip冒充完成。
+原始[TEST.fsx](TEST.fsx)對10.1.401產生真RED，涵蓋完整roundtrip/大單值/更新/刪除/legacy/缺失/截斷。當時尚未有seam的crash／precision-threshold cases已在本輪加入同一完整suite；保留歷史結果，不以原13項代替新增gates。
+
+### 2026-10-06 implementation
+
+`ChunkedValue.fs`共用於兩個class；default使用stream codec，custom使用一次hook spool。`withKeyLock`沿原queue ownership保護同key的verify/decode及buffer publish，不新增mailbox；六個commit stages透過scoped `withTestSettings`測試。`WriteReceipt.CleanupPending`區分已發布的cleanup問題與失敗寫入。新key已有legacy orphan時串流複製rollback backup，new index發布前失敗會復原；crash後reopen也恢復backup。rollback本身I/O失敗保留generation與原始/rollback兩個exception供reopen收斂。Tombstone先完成cleanup才允許同key新寫入。
+
+Manifest必需fields、未知/重複fields、size/count、ordinal/owner/codec/total/hash與reparse都fail closed。`inspectCommitted`回完整verified manifest；physical consumer不得用anchor file size代表logical length。原13反例未弱化，同project另有精確threshold、hooks、兩class、六點真子程序abrupt exit/fresh reopen/retry與read/update/delete/cancel案例；具體總數與最新run evidence以WBS為準。無已發布package／Host deployment或斷電驗收衍生。
 
 ## Package／consumer rollout
 

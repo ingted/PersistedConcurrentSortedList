@@ -1,0 +1,49 @@
+{
+  "Passed": true,
+  "Counts": {
+    "Executed": 84,
+    "Passed": 84,
+    "Ignored": 0,
+    "Failed": 0,
+    "Errored": 0
+  },
+  "Inventory": {
+    "NativeQueue": 10,
+    "Recovery": 20,
+    "Rfc": 13,
+    "Safety": 19,
+    "Storage": 22
+  },
+  "SourceStable": true,
+  "NativeSHA256": "9998568A0A372FD0A3984885D30E005BD87261E296DFC6E97D24635030F032B3",
+  "SourceCandidate": true,
+  "Pack": false,
+  "Production": false,
+  "Phases": [
+    {
+      "Name": "producer",
+      "Exit": 0,
+      "Seconds": 10.218,
+      "Raw": "C:\\Users\\Administrator\\AppData\\Local\\Temp\\pcsl-native-queue-verification-197ed13bb8d9466bab14fb82e2a019b1\\producer.stdout.raw"
+    },
+    {
+      "Name": "test-build",
+      "Exit": 0,
+      "Seconds": 7.351,
+      "Raw": "C:\\Users\\Administrator\\AppData\\Local\\Temp\\pcsl-native-queue-verification-197ed13bb8d9466bab14fb82e2a019b1\\test-build.stdout.raw"
+    },
+    {
+      "Name": "inventory",
+      "Exit": 0,
+      "Seconds": 0.675,
+      "Raw": "C:\\Users\\Administrator\\AppData\\Local\\Temp\\pcsl-native-queue-verification-197ed13bb8d9466bab14fb82e2a019b1\\inventory.stdout.raw"
+    },
+    {
+      "Name": "tests",
+      "Exit": 0,
+      "Seconds": 97.9,
+      "Raw": "C:\\Users\\Administrator\\AppData\\Local\\Temp\\pcsl-native-queue-verification-197ed13bb8d9466bab14fb82e2a019b1\\tests.stdout.raw"
+    }
+  ],
+  "Evidence": "C:\\Users\\Administrator\\AppData\\Local\\Temp\\pcsl-native-queue-verification-197ed13bb8d9466bab14fb82e2a019b1"
+}

@@ -1,4 +1,4 @@
-﻿namespace PersistedConcurrentSortedList
+namespace PersistedConcurrentSortedList
 
  
 module CSL2 =

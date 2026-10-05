@@ -1,4 +1,4 @@
-﻿namespace PersistedConcurrentSortedList
+namespace PersistedConcurrentSortedList
 
 #if INTERACTIVE
 #r @"nuget: Newtonsoft.Json, 13.0.3"

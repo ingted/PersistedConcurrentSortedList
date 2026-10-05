@@ -1,6 +1,6 @@
 # RFC-PCSL-0025：25MB physical value auto-chunk
 
-狀態：Proposed；需求已由人類指定，實作交M哥（MdcQuoteAgent）TDD。Aster負責本文件及可執行反例，不在此發布新package。
+狀態：Native development implemented／84tests ALL PASSED；正式package/consumer rollout未開始。需求由人類指定，MdcQuoteAgent獨立實作，Aster原始契約/反例保留；actual evidence見WBS。
 
 ## 背景／目標
 
@@ -28,4 +28,4 @@ PTC Host所有PCSL將置於`G:/PulseTrade.fs/pcsl/`並納Git。現行native 10.1
 
 [SA](SA.md) → [SD](SD.md) → [TEST.fsx](TEST.fsx)／[TEST.fsproj](TEST.fsproj) → M哥實作 → 原10個native queue tests＋physical disk/cold process/fault suites → immutable package與IFileSystem/PTCS exact consumers。
 
-TEST目前對未實作candidate預期部分RED；不能改assertion、降低payload熵或只挑既有PASS宣稱完成。執行與進度见[WBS](WBS.md)。
+原TEST對10.1.401部分RED作為historical baseline；目前same-source TEST13與原queue10及新增fault/boundary cases合併，原assertions/entropy不變。執行、84/84零skip/error及未發布邊界見[WBS](WBS.md)。

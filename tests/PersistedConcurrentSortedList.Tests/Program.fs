@@ -4,6 +4,7 @@ open System
 open System.IO
 open System.Threading.Tasks
 open Expecto
+open Argu
 open PersistedConcurrentSortedList.PCSL2
 open PersistedConcurrentSortedList.CSL2
 open PersistedConcurrentSortedList.Type
@@ -127,6 +128,18 @@ let tests =
     ]
 
 [<EntryPoint>]
-let main _ =
+let main arguments =
     Console.OutputEncoding <- Text.UTF8Encoding(false)
-    runTestsWithCLIArgs [Sequenced] [||] tests
+    let parsed = ChunkRecoveryTests.parser.ParseCommandLine arguments
+    if parsed.Contains ChunkRecoveryTests.Inventory then
+        let root = Path.Combine(Chunk25ContractTests.fixtureTempRoot, Guid.NewGuid().ToString("N"))
+        let count test = Test.toTestCodeList test |> List.length
+        let counts = {| NativeQueue = count tests; Rfc = count(Chunk25ContractTests.tests root); Storage = count(ChunkStorageTests.tests root); Recovery = count(ChunkRecoveryTests.tests root); Safety = count(ChunkSafetyTests.tests root) |}
+        Console.WriteLine(System.Text.Json.JsonSerializer.Serialize counts)
+        0
+    elif arguments.Length > 0 then ChunkRecoveryTests.child arguments
+    else
+        let fixtureParent = Path.Combine(Chunk25ContractTests.fixtureTempRoot, Guid.NewGuid().ToString("N"))
+        Directory.CreateDirectory fixtureParent |> ignore
+        runTestsWithCLIArgs [Sequenced] [||]
+            (testList "PCSL complete contract" [ tests; Chunk25ContractTests.tests fixtureParent; ChunkStorageTests.tests fixtureParent; ChunkRecoveryTests.tests fixtureParent; ChunkSafetyTests.tests fixtureParent ])

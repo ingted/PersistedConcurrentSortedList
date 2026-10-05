@@ -1,0 +1,82 @@
+[
+  {
+    "Path": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\ChunkedValue.fs",
+    "SHA256": "E2A6E34AEC490408A91644C97EE9DA5A14FEDC459AA5C44C4EDB4A97DF3321B0"
+  },
+  {
+    "Path": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\Compression.fsx",
+    "SHA256": "FA3F1A51A8D47A415823990EE482305334EBDE35F42FD95955B976193CDB8EB8"
+  },
+  {
+    "Path": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\CSL.fsx",
+    "SHA256": "9E2580524B99401CE3C7150B2D42F107C3A8CB43201DA55EA113949D632515EB"
+  },
+  {
+    "Path": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\CSL2.fsx",
+    "SHA256": "C0B206728B31F1A63980F2428D69243248D15D507FFAD98525C5D9EE262845A8"
+  },
+  {
+    "Path": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\DefaultHelper.fsx",
+    "SHA256": "2EBE89521F70B0B2619CC4059C403D784F89A78349C1BDA2630B698F929C747D"
+  },
+  {
+    "Path": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\doc\\RFC\\20261006.25MB.Chunk\\ParseLine.fsx",
+    "SHA256": "3EF2509DC3A02626D8AB1F7A900448C6A53CE8047CEFB1E095D1C837C231584C"
+  },
+  {
+    "Path": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\doc\\RFC\\20261006.25MB.Chunk\\TEST.fsx",
+    "SHA256": "073737513130DD1F3279AC62A6E9D446E9117753BE4C3AB881F6F4AECE3850B1"
+  },
+  {
+    "Path": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\Memory.fsx",
+    "SHA256": "D0B95C63A6090E4403493D0F4B304E6594C6BABA5F0DD0010C3630DCAEDA17BC"
+  },
+  {
+    "Path": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\misc\\verify.nativeQueue.ps1",
+    "SHA256": "DD3FB69F9D991CC88E3A47B702954E7D339D6368D672BFF854AD43943D5C3379"
+  },
+  {
+    "Path": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\PB.fsx",
+    "SHA256": "ED41EDDA9257F39B6A49D2A395E74D00D2EA8131987F74AB12AFFB483DE628DA"
+  },
+  {
+    "Path": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\PCSL.fsx",
+    "SHA256": "63C98DB82029C6B4A1AB33ACD24197E4991BFE79D8350A80C2F66941E8F28EFB"
+  },
+  {
+    "Path": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\PCSL2.fsx",
+    "SHA256": "E7D72D6403142355829DA10FC5E79ABAE81C2DB5FF1CCF2F2AA3B9E495D9244A"
+  },
+  {
+    "Path": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\PersistedConcurrentSortedList.fsproj",
+    "SHA256": "A9139D116B8BFB6D13B3704F878AD713C7826599B4D3BA35365214744EA6168F"
+  },
+  {
+    "Path": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\QuickStart.fsx",
+    "SHA256": "00F5780FAA9E7673D8A3A61BBFFA5A0A0ABA78DF5C3E4CFAAA5C31E86FDCB5F9"
+  },
+  {
+    "Path": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\Task.fsx",
+    "SHA256": "1BAC0295CA68BD26DB5AAE1DE97353F07FFA750F5D9B64ED461F8D2B4D609A27"
+  },
+  {
+    "Path": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\tests\\PersistedConcurrentSortedList.Tests\\ChunkRecoveryTests.fs",
+    "SHA256": "9D9C14BE7158A226A3FE0DCA605CAF0429868C7DD335385FA0BDDF100DB66D09"
+  },
+  {
+    "Path": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\tests\\PersistedConcurrentSortedList.Tests\\ChunkSafetyTests.fs",
+    "SHA256": "3032FCD15563869F76B8868B78B9889A49DB83A7CDDC48EB7296D14B7DE25DFF"
+  },
+  {
+    "Path": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\tests\\PersistedConcurrentSortedList.Tests\\ChunkStorageTests.fs",
+    "SHA256": "4214861F76B9D503E7F8F66332BA59C0D791BC02598301815D2111A4C10BB255"
+  },
+  {
+    "Path": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\tests\\PersistedConcurrentSortedList.Tests\\PersistedConcurrentSortedList.Tests.fsproj",
+    "SHA256": "A24D8658BC75733B2D44C060FE0506A5318EA25FD22B32C48621C4306A2F63B5"
+  },
+  {
+    "Path": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\tests\\PersistedConcurrentSortedList.Tests\\Program.fs",
+    "SHA256": "8B4AF786A1A4106676E55053A86D19EF6CC67A3A3D8FFFF2869445A7613549DD"
+  }
+]

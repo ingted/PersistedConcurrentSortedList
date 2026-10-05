@@ -13,6 +13,8 @@
 | `G:/PulseTrade.fs/Libs/PersistedConcurrentSortedList.IFileSystem/PcslStorage.fs` | Put/Delete/TryGet使用PCSL2<string,fCell2<string>>，Commit no-op；不直接拼`.val` | 預期不改API，只升exact package並驗大string、restart、delete。Commit no-op不是flush或Git checkpoint，文件不可宣稱提供持久化交易。 |
 | `G:/PulseTrade2.fs/Libs/PulseTrade.Comm.Spa/Stream.fs` | native hooks和直接`hash.val`位置用于read、size guard、purge；不是純opaque consumer | 必須盤點其physical enumeration/delete/size assumptions；anchor小不等於logical payload小。需native inspect/delete seam或讓consumer透過既有store API，禁止只刪anchor遺留chunks。 |
 
+上述impact表描述10.1.401 baseline；本輪已實作的source接線與failure分類見SD implementation，actual gates與C25-05 consumer rollout分列於WBS。Compression既有byte-array helpers不改；新Deflate stream由共用ChunkedValue邊界持有。
+
 ## 主要風險與gate
 
 1. atomic anchor與index是兩個檔案，不能宣稱跨檔transaction。new-key index最後發布；crash前孤兒無可見key。update index已存在，只換anchor，reader得到全舊或全新。Remove index先unpublish，再刪資料。

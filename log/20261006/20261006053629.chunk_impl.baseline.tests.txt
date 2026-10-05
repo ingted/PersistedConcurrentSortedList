@@ -1,0 +1,50 @@
+[37m[[37m05:55:12 [37mINF[37m] [37mEXPECTO? Running tests...[37m [37m<[37mExpecto[37m>[37m
+[0m[1000D[?25h?????????????????????????? String ??????????????????????????
+[0m[1000D[?25h?????????????????????????? fCell2`1 ??????????????????????????
+[0m[1000D[?25h[37m[[37m05:55:16 [31mERR[37m] [36mPCSL complete contract.PCSL decimal25MB physical contract.single compressed value above25MB auto chunks[37m failed in [32m00:00:03.0780000[37m. [36m
+Every committed physical .val, including the anchor, must respect decimal 25MB.. Expected a (28118569L) to be less than or equal to b (25000000L).
+   at Chunk25ContractTests.assertBounded(String root) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\doc\RFC\20261006.25MB.Chunk\TEST.fsx:line 61
+   at Chunk25ContractTests.checkLarge@78(String fixtureParent, String text, Boolean removeBuffer) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\doc\RFC\20261006.25MB.Chunk\TEST.fsx:line 82
+   at Chunk25ContractTests.tests@86-2.Invoke(Unit _arg3) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\doc\RFC\20261006.25MB.Chunk\TEST.fsx:line 86
+   at Expecto.Impl.execTestAsync@579-1.Invoke(Unit unitVar)
+   at Microsoft.FSharp.Control.AsyncPrimitives.CallThenInvoke[T,TResult](AsyncActivation`1 ctxt, TResult result1, FSharpFunc`2 part2) in D:\a\_work\1\s\src\fsharp\src\FSharp.Core\async.fs:line 509
+[37m [37m<[37mExpecto[37m>[37m
+[0m[1000D[?25h[1000D[?25h[37m[[37m05:55:22 [31mERR[37m] [36mPCSL complete contract.PCSL decimal25MB physical contract.single compressed value above50MB crosses multiple chunks[37m failed in [32m00:00:06.5370000[37m. [36m
+Every committed physical .val, including the anchor, must respect decimal 25MB.. Expected a (58245341L) to be less than or equal to b (25000000L).
+   at Chunk25ContractTests.assertBounded(String root) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\doc\RFC\20261006.25MB.Chunk\TEST.fsx:line 61
+   at Chunk25ContractTests.checkLarge@78(String fixtureParent, String text, Boolean removeBuffer) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\doc\RFC\20261006.25MB.Chunk\TEST.fsx:line 82
+   at Chunk25ContractTests.tests@87-3.Invoke(Unit _arg4) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\doc\RFC\20261006.25MB.Chunk\TEST.fsx:line 87
+   at Expecto.Impl.execTestAsync@579-1.Invoke(Unit unitVar)
+   at Microsoft.FSharp.Control.AsyncPrimitives.CallThenInvoke[T,TResult](AsyncActivation`1 ctxt, TResult result1, FSharpFunc`2 part2) in D:\a\_work\1\s\src\fsharp\src\FSharp.Core\async.fs:line 509
+[37m [37m<[37mExpecto[37m>[37m
+[0m[1000D[?25h[1000D[?25h[37m[[37m05:55:25 [31mERR[37m] [36mPCSL complete contract.PCSL decimal25MB physical contract.nonbuffered large value follows the same contract[37m failed in [32m00:00:02.7870000[37m. [36m
+Every committed physical .val, including the anchor, must respect decimal 25MB.. Expected a (28118569L) to be less than or equal to b (25000000L).
+   at Chunk25ContractTests.assertBounded(String root) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\doc\RFC\20261006.25MB.Chunk\TEST.fsx:line 61
+   at Chunk25ContractTests.checkLarge@78(String fixtureParent, String text, Boolean removeBuffer) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\doc\RFC\20261006.25MB.Chunk\TEST.fsx:line 82
+   at Chunk25ContractTests.tests@88-4.Invoke(Unit _arg5) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\doc\RFC\20261006.25MB.Chunk\TEST.fsx:line 88
+   at Expecto.Impl.execTestAsync@579-1.Invoke(Unit unitVar)
+   at Microsoft.FSharp.Control.AsyncPrimitives.CallThenInvoke[T,TResult](AsyncActivation`1 ctxt, TResult result1, FSharpFunc`2 part2) in D:\a\_work\1\s\src\fsharp\src\FSharp.Core\async.fs:line 509
+[37m [37m<[37mExpecto[37m>[37m
+[0m[1000D[?25h[1000D[?25h[37m[[37m05:55:28 [31mERR[37m] [36mPCSL complete contract.PCSL decimal25MB physical contract.update small to large survives reopen[37m failed in [32m00:00:02.6380000[37m. [36m
+Every committed physical .val, including the anchor, must respect decimal 25MB.. Expected a (28118569L) to be less than or equal to b (25000000L).
+   at Chunk25ContractTests.assertBounded(String root) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\doc\RFC\20261006.25MB.Chunk\TEST.fsx:line 61
+   at Chunk25ContractTests.tests@89-5.Invoke(Unit _arg6) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\doc\RFC\20261006.25MB.Chunk\TEST.fsx:line 94
+   at Expecto.Impl.execTestAsync@579-1.Invoke(Unit unitVar)
+   at Microsoft.FSharp.Control.AsyncPrimitives.CallThenInvoke[T,TResult](AsyncActivation`1 ctxt, TResult result1, FSharpFunc`2 part2) in D:\a\_work\1\s\src\fsharp\src\FSharp.Core\async.fs:line 509
+   at Microsoft.FSharp.Control.Trampoline.Execute(FSharpFunc`2 firstAction) in D:\a\_work\1\s\src\fsharp\src\FSharp.Core\async.fs:line 112[37m [37m<[37mExpecto[37m>[37m
+[0m[1000D[?25h[1000D[?25h[37m[[37m05:55:33 [31mERR[37m] [36mPCSL complete contract.PCSL decimal25MB physical contract.update large to different large is whole new value[37m failed in [32m00:00:04.0990000[37m. [36m
+Every committed physical .val, including the anchor, must respect decimal 25MB.. Expected a (28118489L) to be less than or equal to b (25000000L).
+   at Chunk25ContractTests.assertBounded(String root) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\doc\RFC\20261006.25MB.Chunk\TEST.fsx:line 61
+   at Chunk25ContractTests.tests@102-7.Invoke(Unit _arg8) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\doc\RFC\20261006.25MB.Chunk\TEST.fsx:line 107
+   at Expecto.Impl.execTestAsync@579-1.Invoke(Unit unitVar)
+   at Microsoft.FSharp.Control.AsyncPrimitives.CallThenInvoke[T,TResult](AsyncActivation`1 ctxt, TResult result1, FSharpFunc`2 part2) in D:\a\_work\1\s\src\fsharp\src\FSharp.Core\async.fs:line 509
+   at Microsoft.FSharp.Control.Trampoline.Execute(FSharpFunc`2 firstAction) in D:\a\_work\1\s\src\fsharp\src\FSharp.Core\async.fs:line 112[37m [37m<[37mExpecto[37m>[37m
+[0m[1000D[?25h[1000D[?25h[37m[[37m05:55:41 [31mERR[37m] [36mPCSL complete contract.PCSL decimal25MB physical contract.legacy large blob reads without rewrite then migrates on upsert[37m failed in [32m00:00:04.6760000[37m. [36m
+Every committed physical .val, including the anchor, must respect decimal 25MB.. Expected a (28118489L) to be less than or equal to b (25000000L).
+   at Chunk25ContractTests.assertBounded(String root) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\doc\RFC\20261006.25MB.Chunk\TEST.fsx:line 61
+   at Chunk25ContractTests.tests@121-10.Invoke(Unit _arg11) in G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\doc\RFC\20261006.25MB.Chunk\TEST.fsx:line 137
+   at Expecto.Impl.execTestAsync@579-1.Invoke(Unit unitVar)
+   at Microsoft.FSharp.Control.AsyncPrimitives.CallThenInvoke[T,TResult](AsyncActivation`1 ctxt, TResult result1, FSharpFunc`2 part2) in D:\a\_work\1\s\src\fsharp\src\FSharp.Core\async.fs:line 509
+   at Microsoft.FSharp.Control.Trampoline.Execute(FSharpFunc`2 firstAction) in D:\a\_work\1\s\src\fsharp\src\FSharp.Core\async.fs:line 112[37m [37m<[37mExpecto[37m>[37m
+[0m[1000D[?25h[1000D[?25h[37m[[37m05:55:45 [37mINF[37m] [37mEXPECTO! [36m23[37m tests run in [32m00:00:32.7161968[37m for [36mPCSL complete contract[37m – [36m17[37m passed, [36m0[37m ignored, [36m6[37m failed, [36m0[37m errored. [36m[37m [37m<[37mExpecto[37m>[37m
+[0m

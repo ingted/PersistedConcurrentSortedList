@@ -1,0 +1,9 @@
+  Determining projects to restore...
+  Restored G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\doc\RFC\20261006.25MB.Chunk\TEST.fsproj (in 488 ms).
+  TEST -> C:\coldfar-scratch\sharftrade9\PcslChunk25-20261006\standalone\TEST.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:05.93

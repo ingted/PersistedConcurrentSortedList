@@ -1,4 +1,4 @@
-﻿namespace PersistedConcurrentSortedList
+namespace PersistedConcurrentSortedList
 
 #if INTERACTIVE
 #r @"nuget: Newtonsoft.Json, 13.0.3"
@@ -321,13 +321,14 @@ module PCSL =
 
 
         let indexInitialize () =
+            ChunkedValue.recoverStore schemaPath
             [|
                 sortedListIndex.Clean().thisT
                 sortedListIndexReversed.Clean().thisT
                 sortedListPersistenceStatus.Clean().thisT
             |] |> Task.WaitAll
             let di = DirectoryInfo keysPath
-            di.GetFiles()
+            di.GetFiles("*.index")
             
 #if NET9_0_OR_GREATER
             |> PSeq.ordered
@@ -415,6 +416,18 @@ module PCSL =
 
         let mutable write2File = ModelContainer<'Value>.write2File
         let mutable readFromFile = ModelContainer<'Value>.readFromFile
+        let mutable defaultWriter = true
+        let mutable defaultReader = true
+        let readPhysical filePath =
+            let root = Path.GetDirectoryName(Path.GetFullPath filePath)
+            let hash = Path.GetFileNameWithoutExtension filePath
+            ChunkedValue.readCommitted root hash defaultReader ModelContainer<'Value>.deserializeF readFromFile
+        let writePhysical filePath value publish =
+            let root = Path.GetDirectoryName(Path.GetFullPath filePath)
+            let hash = Path.GetFileNameWithoutExtension filePath
+            if defaultWriter then
+                ChunkedValue.writeDefault root hash (fun stream -> ModelContainer<'Value>.serializeF(stream, value)) publish |> ignore
+            else ChunkedValue.writeCustom root hash (fun path -> write2File path value) publish |> ignore
         // 生成 SHA-256 哈希
         let mutable generateKeyHash : 'Key -> KeyHash = fun (key: 'Key) ->
             ModelContainer<'Key>.getHashStr key
@@ -422,6 +435,7 @@ module PCSL =
         do 
             createPath schemaPath
             createPath keysPath
+            ChunkedValue.recoverStore schemaPath
             if autoInitialize.IsSome && autoInitialize.Value <> 0 then
                 initTask <- task {
                     indexInitialize ()
@@ -466,21 +480,37 @@ module PCSL =
 #endif
             |> fun (Choice1Of3 success) -> ()
             kh.slkHash
-        // 存储 value 到文件
-        let persistKeyValueBase ifRemoveFromBuffer ifIgnoreQ =
-            let inline write (key: 'Key, value: 'Value) =
-                let hashKey = getOrNewAndPersistKeyHash (key, ifIgnoreQ)
-                let filePath = Path.Combine(schemaPath, hashKey + ".val")
-                write2File filePath value
-                key
-            write >>
+        let storageHash key =
+            match tryGetKeyHash(key, true) with
+            | true, Some hash -> hash.slkHash
+            | _ -> generateKeyHash key
+
+        let writeKeyValue key value ifIgnoreQ =
+            let hash = storageHash key
+            let keyBytes = Encoding.UTF8.GetBytes(js.PickleToString key)
+            writePhysical (Path.Combine(schemaPath, hash + ".val")) value
+                (Some(fun () -> ChunkedValue.publishIndex schemaPath hash keyBytes))
+            [| sortedListIndex.Add(SLK key, SLKH hash, ifIgnoreQ).thisT
+               sortedListIndexReversed.Add(SLKH hash, SLK key, ifIgnoreQ).thisT |]
+            |> Task.WhenAll |> fun pending -> pending.GetAwaiter().GetResult()
+
+        let persistBufferStatus ifRemoveFromBuffer ifIgnoreQ key =
             if ifRemoveFromBuffer then
-                fun key ->
-                    (sortedList.Remove (SLK key)).WaitIgnore
-                    sortedListPersistenceStatus.Upsert (SLK key, SLPS NonBuffered)
-            else
-                fun key ->
-                    sortedListPersistenceStatus.Upsert (SLK key, SLPS Buffered)
+                (sortedList.Remove(SLK key, ifIgnoreQ)).WaitIgnore
+                sortedListPersistenceStatus.Upsert(SLK key, SLPS NonBuffered, ifIgnoreQ)
+            else sortedListPersistenceStatus.Upsert(SLK key, SLPS Buffered, ifIgnoreQ)
+
+        let persistKeyValueBase ifRemoveFromBuffer ifIgnoreQ (key, value) =
+            ChunkedValue.withKeyLock schemaPath (storageHash key) (fun () ->
+                writeKeyValue key value ifIgnoreQ
+                persistBufferStatus ifRemoveFromBuffer ifIgnoreQ key)
+
+        let commitMutation mutation key value ifRemoveFromBuffer ifIgnoreQ =
+            ChunkedValue.withKeyLock schemaPath (storageHash key) (fun () ->
+                writeKeyValue key value ifIgnoreQ
+                let result = mutation key value ifIgnoreQ
+                let status = persistBufferStatus ifRemoveFromBuffer ifIgnoreQ key
+                [| result; status |])
 
         let removePersistedKeyValue (key: 'Key, ifIgnoreQ) =
             let hashKey = 
@@ -491,22 +521,13 @@ module PCSL =
                     generateKeyHash key
 
             let k = SLK key
-            [|
-                sortedList.Remove k
-                sortedListPersistenceStatus.Remove k
-                sortedListIndex.Remove k
-                sortedListIndexReversed.Remove (SLKH hashKey)
-                task {
-                    let filePath = Path.Combine(schemaPath, hashKey + ".val")
-                    File.Delete filePath
-                    return UtilOp
-                }
-                task {
-                    let indexPath = Path.Combine(keysPath, hashKey + ".index") //js.UnPickleOfString<A>
-                    File.Delete indexPath
-                    return UtilOp
-                }
-            |]
+            let mutable completions = [||]
+            ChunkedValue.deleteCommitted schemaPath hashKey (fun () ->
+                completions <- [| sortedList.Remove(k, ifIgnoreQ)
+                                  sortedListPersistenceStatus.Remove(k, ifIgnoreQ)
+                                  sortedListIndex.Remove(k, ifIgnoreQ)
+                                  sortedListIndexReversed.Remove(SLKH hashKey, ifIgnoreQ) |])
+            completions
 
         let persistKeyValueNoRemove = persistKeyValueBase false
         let persistKeyValueRemove = persistKeyValueBase true
@@ -530,10 +551,12 @@ module PCSL =
             | true, (Some keyHash) ->
                 let kh = keyHash.slkHash
                 let filePath = Path.Combine(schemaPath, kh + ".val")
-                (Some kh), true, readFromFile filePath //None means file not existed
+                let stored = readPhysical filePath
+                if stored.IsNone then raise (InvalidDataException("Visible PCSL index has no readable value."))
+                (Some kh), true, stored
             | _ ->
                 let filePath = Path.Combine(schemaPath, generateKeyHash key + ".val")
-                if (FileInfo filePath).Exists then
+                if (FileInfo filePath).Exists && not (ChunkedValue.isUnpublishedNewAnchor schemaPath (generateKeyHash key)) then
                     failwith $"[WARNING] Index not consists with file {filePath}"
                 else
                     None, false, None //索引無該 key
@@ -583,16 +606,16 @@ module PCSL =
         member this.InitTask = initTask
         member this.PersistKeyValues = persistKeyValues
         member this.Write2File 
-            with get () = write2File
-            and set (v) = write2File <- v
+            with get () = fun path value -> writePhysical path value None
+            and set (v) = write2File <- v; defaultWriter <- false
 
         member this.GenerateKeyHash 
             with get () = generateKeyHash
             and set (v) = generateKeyHash <- v
 
         member this.ReadFromFile 
-            with get () = readFromFile
-            and set (v) = readFromFile <- v
+            with get () = readPhysical
+            and set (v) = readFromFile <- v; defaultReader <- false
             
         member this.Initialized
             with get () = initialized
@@ -611,16 +634,7 @@ module PCSL =
                 if sortedListIndex.ContainsKeySafe (SLK key) then
                     [||]
                 else
-                    [|                
-                        sortedList.Add(SLK key, SLV value)
-                        //sortedList.LockableOps (SeqOp [                    
-                        //    CAdd (SLK key, SLV value)
-                        //]) |> Seq.last
-                        if ifRemoveFromBuffer then
-                            persistKeyValueRemove ifIgnoreQ (key,  value)
-                        else
-                            persistKeyValueNoRemove ifIgnoreQ (key,  value)
-                    |]
+                    commitMutation (fun k v bypass -> sortedList.Add(SLK k, SLV v, bypass)) key value ifRemoveFromBuffer ifIgnoreQ
 #if DEBUG1
 #else                
             )
@@ -659,13 +673,7 @@ module PCSL =
                 if not <| sortedListIndex.ContainsKeySafe (SLK key) then
                     [||]
                 else
-                    [|
-                        sortedList.Update(SLK key, SLV value, ifIgnoreQ)
-                        if ifRemoveFromBuffer then
-                            persistKeyValueRemove ifIgnoreQ (key,  value)
-                        else
-                            persistKeyValueNoRemove ifIgnoreQ (key,  value)
-                    |]
+                    commitMutation (fun k v bypass -> sortedList.Update(SLK k, SLV v, bypass)) key value ifRemoveFromBuffer ifIgnoreQ
 #if DEBUG1
 #else                
             )
@@ -693,13 +701,7 @@ module PCSL =
 #else
             lock sortedList.LockObj (fun () ->
 #endif
-            [|
-                sortedList.Upsert(SLK key, SLV value, ifIgnoreQ)
-                if ifRemoveFromBuffer then
-                    persistKeyValueRemove ifIgnoreQ  (key,  value)
-                else
-                    persistKeyValueNoRemove ifIgnoreQ (key,  value)
-            |]
+            commitMutation (fun k v bypass -> sortedList.Upsert(SLK k, SLV v, bypass)) key value ifRemoveFromBuffer ifIgnoreQ
 #if DEBUG1
 #else                
             )
@@ -758,51 +760,15 @@ module PCSL =
 
         // 获取 value，如果 ConcurrentSortedList 中不存在则从文件系统中读取
         member this.TryGetValueNoThreadLock (key: 'Key, _toMilli:int, ifIgnoreQ) = //: bool * 'Value option =
-            
-#if DEBUG
-            let mutable trace = 0
-            try
-#endif
-                let gr = sortedList.GetValue(SLK key, ifIgnoreQ)
-#if DEBUG
-                trace <- 1            
-#endif
-                //printfn "[TryGetValueNoThreadLock.GetValue] value task: %A" gr
-                //let (Choice1Of3 _) =
-                //    [|
-                //        gr.thisT
-                //        //us.thisT
-                //    |]
-                //    |> Task.WaitAllWithTimeout _toMilli
-                let exists, value = gr.Result.kvOptionValue
-                //printfn "[TryGetValueNoThreadLock.kvOptionValue] exists: %A, value: %A" exists value
-#if DEBUG
-                trace <- 2
-#endif
-            
+            ChunkedValue.withKeyLock schemaPath (storageHash key) (fun () ->
+                let exists, value = sortedList.GetValue(SLK key, ifIgnoreQ).Result.kvOptionValue
                 if exists then
-                    let us = sortedListPersistenceStatus.Upsert(SLK key, SLPS Buffered, ifIgnoreQ).Result
-                    //printfn "[TryGetValueNoThreadLock.Upsert] value task: %A" us
-#if DEBUG
-                    trace <- 3
-#endif
-            
+                    sortedListPersistenceStatus.Upsert(SLK key, SLPS Buffered, ifIgnoreQ).Result |> ignore
                     true, value
                 else
-#if DEBUG
-                    trace <- 4
-#endif
                     match readFromFileBaseAndBuffer (key, _toMilli, ifIgnoreQ, ifIgnoreQ, ifIgnoreQ) with
-                    | Some v ->
-                        true, Some v
-                    | None -> false, None
-#if DEBUG
-            with
-            | exn ->    
-                printfn "[TryGetValueNoThreadLock] %s" exn.Message
-                printfn "[TryGetValueNoThreadLock][%d] Query KV %A" trace key
-                false, None
-#endif            
+                    | Some v -> true, Some v
+                    | None -> false, None)
 
         member this.TryGetValue(key: 'Key, _toMilli:int) = 
             lock sortedList.LockObj (fun () ->
