@@ -1,0 +1,11 @@
+# C25-05 PTC small-value perf gate
+
+## Pre-work plan
+
+Background: native 10.1.402-dev.chunk25.1 84/84 correct, but PTC GW isolated same-key small-write benchmark twice shows large regression vs 10.1.401. No formal package/Host publish.
+Goal: update only current C25 RFC SA/SD/WBS/Test with measured blocker and conditional fast-path design; keep native source and package untouched.
+Scope: doc/RFC/20261006.25MB.Chunk/{SA,SD,WBS,TEST_Feedback}.md plus this log and op_log. Verify UTF-8/no BOM, exact diff, sensitive scan and Git commit/push.
+Acceptance: WBS separates correctness from perf/package, records exact measurements and future gate; pseudocode preserves atomic publish, legacy read and crash recovery.
+Risk: microbenchmark is synthetic, not GW mixed load; do not treat it as production throughput proof. Owner M哥 decides implementation; Aster documents evidence.
+
+## Operations

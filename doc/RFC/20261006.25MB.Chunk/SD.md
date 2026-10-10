@@ -114,3 +114,24 @@ Manifest必需fields、未知/重複fields、size/count、ordinal/owner/codec/to
 ## Package／consumer rollout
 
 先native完整tests → 新immutable版本與codec docs → IFileSystem exact pin及large-content cold test → PTCS direct size/enum/purge適配＋真registry/ACK/restart → 三Host exact dependency deployment。PTCS root有writer fence仍不能熱copy當consistent Git checkpoint；停writer後才commit完整index/anchor/chunks，staging／locks不提交。
+
+## C25-05 小值效能修正候選（待native owner定案）
+
+目前`writeCommitted`對512字元小值也執行staging generation、part flush、payload重讀驗證、manifest anchor flush/rename與舊generation cleanup；PTC隔離200次更新相對401有約29–34倍p50延遲及約24倍allocation。候選保留大值chunk路徑，小值改為**相同codec的owned temp＋flush＋atomic anchor replace**；不可退回原地`File.WriteAllBytes(anchor)`。必須保留new-key index-last、existing orphan rollback、舊chunk→小值後cleanup、single-writer與reader lease語意。以下是設計待驗偽碼，尚未實作或接受：
+
+```text
+persist(key, value):
+  lock key; recover owned pending publication; validate existing index/anchor
+  encode once into owned bounded spool; if payload exceeds 25_000_000 then
+    return existing chunked writeCommitted path
+  assert spool bytes use legacy-compatible codec and fit physical limit
+  flush owned temp; fault(beforeAnchorPublish)
+  atomicReplace(temp, anchor)              // existing key: old or new whole value
+  fault(afterAnchorPublishBeforeIndex)
+  if new key then publish index last         // rollback existing orphan on failure
+  fault(afterIndexPublish)
+  after commit, retire old owned generation only when readers release it
+  on precommit failure restore previous visible state; retain repair material if rollback fails
+```
+
+定案前須證明小值格式可由既有legacy reader冷讀，涵蓋empty、25MB邊界、custom hook、舊chunk↔小值、missing/truncated、同key讀寫競態與六個真child crash points；不能用縮短flush或跳過已承諾持久化換速度。候選效能至少以401/修後402同一小值、同一GW task/status隔離負載的p50/p95、CPU、allocation、檔案/I/O量比較，之後再作Host真負載。量測與源碼修改由native owner審核；正式 package/Host gate仍未解除。

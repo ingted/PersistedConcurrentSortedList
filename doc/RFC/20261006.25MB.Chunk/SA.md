@@ -26,3 +26,7 @@
 ## 最小真使用例
 
 IFileSystem.Put("session/transcript", highEntropyText) → process關閉 →新process.TryGet同key →內容hash相同且每個committed `.val`≤25,000,000；更新小值後不留無用舊chunks；Delete後cold lookup不存在。使用者不管理part names、generation或manifest。
+
+## C25-05 PTC 小值寫入反證（2026-10-10）
+
+PTC GW task/status 是常寫小值；目前10.1.402候選不論值大小都建立generation、part與manifest，再驗payload並原子發布anchor。這修正10.1.401原地寫`.val`在中斷時可能留0 bytes的機制，但也使小值承擔大值流程成本。同機隔離PCSL2同key、20暖身＋200更新的兩輪結果：401 p50/p95為0.495/0.647與0.590/0.844 ms；402為16.852/22.590與17.204/22.567 ms。兩者cold read均通過。此為開發微基準，不是正式GW混合負載；差距足以阻擋402原樣發版，不能用84/84正確性測試推論效能。C25-05須先補小值原子寫低成本路徑或等價方案，並以相同負載及正式Host負載分別驗證。
