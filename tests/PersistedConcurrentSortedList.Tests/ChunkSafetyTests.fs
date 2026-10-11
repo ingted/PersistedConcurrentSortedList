@@ -11,6 +11,43 @@ open PersistedConcurrentSortedList.Type
 open ChunkStorageTests
 
 let tests parent = testSequenced <| testList "PCSL publication and ownership safety" [
+    testCase "indexed small update atomically replaces chunk with legacy-readable anchor" (fun _ ->
+        let root = fixture parent
+        let oldValue = bytes 201 5000
+        let small = bytes 202 512
+        write root oldValue |> ignore
+        let receipt = write root small
+        Expect.isNone receipt.Manifest "A complete direct value has no chunk manifest."
+        Expect.equal (File.ReadAllBytes(ChunkedValue.anchorPath root "owned")) small "The anchor contains the legacy-compatible bytes."
+        Expect.equal (read root) (Some small) "The current reader sees the complete replacement."
+        ChunkedValue.recoverStore root
+        Expect.equal (read root) (Some small) "Cold recovery retains the accepted direct value."
+        Expect.equal (Directory.GetFiles(root, "*.val", SearchOption.AllDirectories).Length) 1 "Old chunk parts are reclaimed after publication.")
+    testCase "small update publication fault keeps old value or accepts complete new value" (fun _ ->
+        let root = fixture parent
+        let before = bytes 203 5000
+        let after = bytes 204 512
+        write root before |> ignore
+        let fault stage = if stage = ChunkedValue.BeforeAnchorPublish then raise(IOException "synthetic precommit failure")
+        Expect.throws(fun () -> ChunkedValue.withTestSettings ({ ChunkedValue.productionSettings with Fault = fault }) (fun () -> write root after |> ignore)) "Precommit failure propagates."
+        Expect.equal (read root) (Some before) "Old bytes remain after a failed atomic publish."
+        let afterFault stage = if stage = ChunkedValue.AfterAnchorPublishBeforeIndex then raise(IOException "synthetic postcommit failure")
+        let receipt = ChunkedValue.withTestSettings ({ ChunkedValue.productionSettings with Fault = afterFault }) (fun () -> write root after)
+        Expect.isTrue receipt.CleanupPending "Postcommit fault is accepted with pending cleanup."
+        ChunkedValue.recoverStore root
+        Expect.equal (read root) (Some after) "Cold recovery sees complete accepted bytes.")
+    testCase "small default codec stays readable through the legacy file reader" (fun _ ->
+        let root = fixture parent
+        let store = native root
+        put store "before"
+        put store (String('x', 512))
+        let hash = store.GenerateKeyHash "key"
+        let anchor = ChunkedValue.anchorPath (Path.Combine(root, "store")) hash
+        Expect.isNone (ChunkedValue.readManifest (Path.Combine(root, "store")) hash) "Small update has direct format."
+        Expect.equal (PB.ModelContainer<fCell2<string>>.readFromFile anchor) (Some(fCell2.S(String('x', 512)))) "The old direct reader decodes the new value."
+        let fresh = native root
+        fresh.IndexInitialize()
+        Expect.equal (fresh.TryGetValueNoThreadLock("key", 60000, true)) (true, Some(fCell2.S(String('x', 512)))) "Fresh instance reads the same logical value.")
     for removeBuffer in [false; true] do
         testCase (sprintf "Add Update duplicate and missing preserve logical API buffer=%b" removeBuffer) (fun _ -> smallThreshold(fun () ->
             let root = fixture parent
@@ -121,6 +158,34 @@ let tests parent = testSequenced <| testList "PCSL publication and ownership saf
         Expect.throws(fun () -> smallThreshold(fun () -> write root (bytes 114 5000) |> ignore)) "Owned generation paths reject reparse links."
         Expect.equal (File.ReadAllText sentinel) "retain" "The linked resource is unchanged."
         Expect.equal (Directory.GetFileSystemEntries(neighbor).Length) 2 "Only its original owner and sentinel exist.")
+    testCase "indexed small custom update rejects linked old generation owner before publication" (fun _ ->
+        let root = fixture parent
+        let neighbor = fixture parent
+        let sentinel = Path.Combine(neighbor, "sentinel.txt")
+        File.WriteAllText(sentinel, "retain")
+        write root (bytes 215 5000) |> ignore
+        write root (bytes 216 512) |> ignore
+        let anchor = ChunkedValue.anchorPath root "owned"
+        let before = File.ReadAllBytes anchor
+        Directory.CreateSymbolicLink(Path.Combine(root, "__values__", "owned"), neighbor) |> ignore
+        Expect.throws(fun () -> write root (bytes 217 512) |> ignore) "A linked generation owner must fail before atomic replacement."
+        Expect.equal (File.ReadAllBytes anchor) before "Rejected custom update leaves accepted anchor unchanged."
+        Expect.equal (File.ReadAllText sentinel) "retain" "Linked neighbor is untouched.")
+    testCase "indexed small default update rejects linked old generation owner before publication" (fun _ ->
+        let root = fixture parent
+        let neighbor = fixture parent
+        let sentinel = Path.Combine(neighbor, "sentinel.txt")
+        File.WriteAllText(sentinel, "retain")
+        let store = native root
+        put store "before"
+        put store "stable"
+        let physicalRoot = Path.Combine(root, "store")
+        let anchor = ChunkedValue.anchorPath physicalRoot (store.GenerateKeyHash "key")
+        let before = File.ReadAllBytes anchor
+        Directory.CreateSymbolicLink(Path.Combine(physicalRoot, "__values__", store.GenerateKeyHash "key"), neighbor) |> ignore
+        Expect.throws(fun () -> put store "next") "Default fast path rejects linked owned generations."
+        Expect.equal (File.ReadAllBytes anchor) before "Rejected default update leaves accepted anchor unchanged."
+        Expect.equal (File.ReadAllText sentinel) "retain" "Linked neighbor is untouched.")
     for name, content in [
         "non-object", "[]"
         "part count bound", "{\"parts\":[" + String.concat "," (List.replicate (ChunkedValue.MaximumParts + 1) "{}") + "]}"

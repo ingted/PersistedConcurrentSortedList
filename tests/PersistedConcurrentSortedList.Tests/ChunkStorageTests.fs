@@ -36,13 +36,44 @@ let put (store: PCSL2.PersistedConcurrentSortedList<string, fCell2<string>>) tex
 
 let tests parent =
     testSequenced <| testList "PCSL chunk storage boundaries and safety" [
+        testCase "indexed default values cross bounded direct and chunk routes without losing bytes" (fun _ ->
+            let root = fixture parent
+            let publish () = ChunkedValue.publishIndex root "owned" (Encoding.UTF8.GetBytes "synthetic-key")
+            let writeDefault payload =
+                ChunkedValue.writeDefault root "owned" (fun output -> output.Write(payload, 0, payload.Length)) (Some publish)
+            let readDefault () =
+                let copy (input: Stream) =
+                    use output = new MemoryStream()
+                    input.CopyTo output
+                    output.ToArray()
+                ChunkedValue.readCommitted root "owned" true copy
+                    (fun path ->
+                        use input = File.OpenRead path
+                        use compressed = new Compression.DeflateStream(input, Compression.CompressionMode.Decompress)
+                        Some(copy compressed))
+            let large = bytes 211 70000
+            let small = bytes 212 60000
+            Expect.isSome (writeDefault large).Manifest "New key uses index-last chunk publication."
+            Expect.isNone (writeDefault small).Manifest "Existing compressed payload under 64 KiB uses direct anchor."
+            Expect.equal (readDefault ()) (Some small) "Chunk-to-direct transition is complete."
+            Expect.isSome (writeDefault large).Manifest "Compressed payload over 64 KiB returns to streaming chunks."
+            Expect.equal (readDefault ()) (Some large) "Direct-to-chunk transition is complete."
+            Expect.isNone (writeDefault [||]).Manifest "Empty existing value is a valid direct value."
+            ChunkedValue.recoverStore root
+            Expect.equal (readDefault ()) (Some [||]) "Cold recovery retains the empty direct value.")
+        testCase "custom payload beginning with manifest magic stays in chunk format" (fun _ ->
+            let root = fixture parent
+            write root (bytes 213 5000) |> ignore
+            let payload = Array.append ChunkedValue.magic (bytes 214 128)
+            Expect.isSome (write root payload).Manifest "Direct payload cannot impersonate a chunk manifest."
+            Expect.equal (read root) (Some payload) "Magic-prefixed custom bytes remain readable.")
         for length in [0; 4095; 4096; 4097; 8193] do
             testCase (sprintf "exact physical threshold payload=%d" length) (fun _ -> smallThreshold(fun () ->
                 let root = fixture parent
                 let payload = bytes 11 length
                 let receipt = write root payload
                 let expected = if length = 0 then 0 else (length + 4095) / 4096
-                Expect.equal receipt.Manifest.Parts.Length expected "Exact multiples must not create an empty trailing part."
+                Expect.equal receipt.Manifest.Value.Parts.Length expected "Exact multiples must not create an empty trailing part."
                 Expect.equal (read root) (Some payload) "Custom bytes are reassembled without truncation."
                 for path in Directory.EnumerateFiles(root, "*.val", SearchOption.AllDirectories) do
                     Expect.isLessThanOrEqual (FileInfo(path).Length) 4096L "Anchor and each part obey the exact byte threshold."
@@ -52,7 +83,7 @@ let tests parent =
             let value = fCell2<string>.S(Convert.ToBase64String(bytes 22 12000))
             let original = PB.ModelContainer<fCell2<string>>.serializeF2BArr value
             let receipt = ChunkedValue.writeDefault root "owned" (fun output -> PB.ModelContainer<fCell2<string>>.serializeF(output, value)) None
-            use stream = new ChunkedValue.PartReadStream(root, receipt.Manifest, CancellationToken.None)
+            use stream = new ChunkedValue.PartReadStream(root, receipt.Manifest.Value, CancellationToken.None)
             use assembled = new MemoryStream()
             stream.CopyTo assembled
             Expect.equal (SHA256.HashData(assembled.ToArray()) |> Convert.ToHexString) (SHA256.HashData(original) |> Convert.ToHexString) "The existing serializer and Deflate wire bytes remain unchanged."
@@ -75,14 +106,14 @@ let tests parent =
         testCase "missing required metadata is rejected even for an empty payload" (fun _ -> smallThreshold(fun () ->
             let root = fixture parent
             let receipt = write root [||]
-            let node = JsonSerializer.SerializeToNode(receipt.Manifest, ChunkedValue.jsonOptions).AsObject()
+            let node = JsonSerializer.SerializeToNode(receipt.Manifest.Value, ChunkedValue.jsonOptions).AsObject()
             node.Remove("totalLength") |> ignore
             File.WriteAllBytes(ChunkedValue.anchorPath root "owned", Array.append ChunkedValue.magic (Encoding.UTF8.GetBytes(node.ToJsonString())))
             Expect.throws(fun () -> read root |> ignore) "Missing zero-valued metadata is not a valid default."))
         testCase "changed part bytes fail SHA verification" (fun _ -> smallThreshold(fun () ->
             let root = fixture parent
             let receipt = write root (bytes 33 5000)
-            let path = ChunkedValue.partPath root receipt.Manifest receipt.Manifest.Parts[0]
+            let path = ChunkedValue.partPath root receipt.Manifest.Value receipt.Manifest.Value.Parts[0]
             let changed = File.ReadAllBytes path
             changed[0] <- changed[0] ^^^ 1uy
             File.WriteAllBytes(path, changed)

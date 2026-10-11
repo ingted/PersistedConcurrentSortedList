@@ -34,6 +34,7 @@ let phase = function
     | _ -> invalidArg "phase" "Unknown crash phase."
 let phases = [ "before-part"; "after-part"; "before-anchor"; "after-anchor"; "after-index" ]
 let newValue = Convert.ToBase64String(bytes 91 12000)
+let smallValue = String('x', 512)
 let checkChildRoot root =
     let absolute = Path.GetFullPath root
     let prefix = Chunk25ContractTests.fixtureTempRoot.TrimEnd(Path.DirectorySeparatorChar) + string Path.DirectorySeparatorChar
@@ -55,7 +56,9 @@ let child arguments =
                 Environment.Exit 86 // Actual abrupt termination: no catch/finally/disposal/ACK.
         ChunkedValue.withTestSettings (configured fault CancellationToken.None) (fun () ->
             match mode with
-            | "new" | "update" | "orphan" -> put store newValue
+            | "new" | "orphan" -> put store newValue
+            | "update" -> ChunkedValue.withTestSettings ({ ChunkedValue.settings () with Limit = 4096L }) (fun () -> put store newValue)
+            | "small-update" -> put store smallValue
             | "delete" -> store.RemoveAsync("key", true) |> awaitAll
             | _ -> invalidArg "mode" "Unknown crash mode.")
         failwith "Crash seam was not reached."
@@ -71,7 +74,7 @@ let child arguments =
             Expect.throws(fun () -> store.TryGetValueNoThreadLock("key", 60000, true) |> ignore) "Existing legacy orphan guard remains explicit."
         else
             let actual = store.TryGetValueNoThreadLock("key", 60000, true)
-            let value = match expected with "absent" -> false, None | "old" -> true, Some(fCell2.S "old") | "new" -> true, Some(fCell2.S newValue) | _ -> failwith "Unknown expected state."
+            let value = match expected with "absent" -> false, None | "old" -> true, Some(fCell2.S "old") | "new" -> true, Some(fCell2.S newValue) | "small" -> true, Some(fCell2.S smallValue) | _ -> failwith "Unknown expected state."
             if actual <> value then failwith "Fresh child reopen returned an incomplete or incorrect logical value."
         0
     else failwith "No child operation supplied."
@@ -101,6 +104,15 @@ let legacyPut (store: PCSL.PersistedConcurrentSortedList<string, fCell2<string>>
     store.UpsertAsync("key", fCell2.S text, removeBuffer, true) |> Array.map (fun task -> task :> Task) |> awaitAll
 
 let tests parent = testSequenced <| testList "PCSL abrupt exit and read ownership" [
+    for point in ["before-anchor"; "after-anchor"; "after-index"] do
+        testCase ("abrupt indexed small update at " + point + " cold-recovers atomically") (fun _ ->
+            let root = fixture parent
+            put (native root) "old"
+            runChild root ["--crash-root"; root; "--crash-phase"; point; "--crash-mode"; "small-update"] 86
+            Expect.isTrue (File.Exists(Path.Combine(root, "crash-hit.txt"))) "The child exited at the requested small-value seam."
+            verifyChild root (if point = "before-anchor" then "old" else "small")
+            put (native root) smallValue
+            verifyChild root "small")
     for point in ["before-anchor"; "after-anchor"] do
         testCase ("abrupt unpublished write preserves legacy orphan at " + point) (fun _ ->
             let root = fixture parent

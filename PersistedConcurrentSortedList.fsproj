@@ -60,7 +60,7 @@
 
 	<PropertyGroup>
 		<PackageId>$(AssemblyName)</PackageId>
-		<Version>10.1.402-dev.chunk25.1</Version>
+	  <Version>10.1.402-dev.chunk25.2</Version>
 	</PropertyGroup>
   <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="10.1.400" />

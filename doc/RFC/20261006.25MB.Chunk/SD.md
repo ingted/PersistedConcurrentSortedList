@@ -115,7 +115,7 @@ Manifest必需fields、未知/重複fields、size/count、ordinal/owner/codec/to
 
 先native完整tests → 新immutable版本與codec docs → IFileSystem exact pin及large-content cold test → PTCS direct size/enum/purge適配＋真registry/ACK/restart → 三Host exact dependency deployment。PTCS root有writer fence仍不能熱copy當consistent Git checkpoint；停writer後才commit完整index/anchor/chunks，staging／locks不提交。
 
-## C25-05 小值效能修正候選（待native owner定案）
+## C25-05 小值效能修正（原候選與本輪實作）
 
 目前`writeCommitted`對512字元小值也執行staging generation、part flush、payload重讀驗證、manifest anchor flush/rename與舊generation cleanup；PTC隔離200次更新相對401有約29–34倍p50延遲及約24倍allocation。候選保留大值chunk路徑，小值改為**相同codec的owned temp＋flush＋atomic anchor replace**；不可退回原地`File.WriteAllBytes(anchor)`。必須保留new-key index-last、existing orphan rollback、舊chunk→小值後cleanup、single-writer與reader lease語意。以下是設計待驗偽碼，尚未實作或接受：
 
@@ -135,3 +135,13 @@ persist(key, value):
 ```
 
 定案前須證明小值格式可由既有legacy reader冷讀，涵蓋empty、25MB邊界、custom hook、舊chunk↔小值、missing/truncated、同key讀寫競態與六個真child crash points；不能用縮短flush或跳過已承諾持久化換速度。候選效能至少以401/修後402同一小值、同一GW task/status隔離負載的p50/p95、CPU、allocation、檔案/I/O量比較，之後再作Host真負載。量測與源碼修改由native owner審核；正式 package/Host gate仍未解除。
+
+### 2026-10-11 source implementation
+
+`10.1.402-dev.chunk25.2` 在同key lock下先辨識既有index。預設Deflate codec的既有key把壓縮後最多64 KiB寫入有上限的記憶體stream，再以同磁碟暫存檔、`Flush(true)`、atomic rename替換`.val`；不原位覆寫。超過64 KiB會轉回原streaming chunk sink，新key始終保留generation與index-last發布，故舊orphan的rollback/recovery協定不變。custom file hook仍只呼叫一次，以owned spool取得完整bytes、flush後對既有key直接atomic replace；過25 MB或與manifest magic碰撞則用chunk。`WriteReceipt.Manifest`改為`Manifest option`：直接檔案是`None`，chunk是`Some`；PCSL/PCSL2使用端原本忽略receipt，對外讀寫方法未變。
+
+提交前的fault/cancel保留舊anchor；既有key在anchor原子替換後即算已提交，後續fault回傳`CleanupPending=true`，冷啟動清理舊generation。tombstone先收斂再建立新spool，避免刪到待發布資料。空的owned generation目錄才刪除，unknown/human目錄保留；既有key直接更新會在發布前拒絕linked舊generation owner。reparse檢查改為逐層`GetAttributes`單次查詢；atomic temp對≤4 KiB payload不預留buffer，其餘最多64 KiB，仍執行`Flush(true)`。此路徑只驗process abrupt exit，未驗硬體斷電。
+
+同一份PCSL2 512字元、20 warmup＋200更新、雙順序隔離bench，用**完整94/94測試的同一顆DLL** SHA `45E85B90FBC118AB12644E9FCE26DEED25154E098AC8B227913D5B545695AA33`：修正版p50/p95 2.327/2.742、2.277/2.686 ms，CPU 563/609 ms、allocation 4.221/4.229 MB；正式GW native401 SHA `2C5AA47E20EA18DF371DD3C99624F741027474AC09136B934A5AFCF241D2F44A`為0.638/0.966、0.719/1.050 ms，CPU 141/156 ms、allocation 2.144/2.146 MB。兩者cold read PASS、最後3 files/124 bytes。修正版比原402約17 ms快，但相對401原位覆寫仍有atomic flush＋rename成本。
+
+以Aster固定的postrepair GW task快照另做隔離`GatewayPcslTaskStore`負載：2293筆cold digest驗證，20個既有status暖身後輪流`SaveStatusAsync` 200次，四份相同ZIP快照、雙順序。修正版p50/p95為17.061/27.868與14.072/24.191 ms，吞吐51.3/61.8次每秒，CPU4750/4422ms；401為9.072/22.166與9.919/27.662 ms，吞吐89.8/75.6次每秒，CPU3422/3281ms。修正版process I/O readOps1600/readBytes約8.22 MB、writeOps800/writeBytes約3.18 MB；401 readOps800/readBytes約5.64 MB、writeOps1200/writeBytes約3.24 MB。兩者cold digest均PASS；allocation在兩輪明顯波動（修正版202/901 MB、401 1063/339 MB），不能據此單獨判定。這是使用真實GW DLL的隔離provider負載，仍不是完整Host服務負載；p50、吞吐與CPU退步，使正式package/部署gate維持關閉，待Aster判定下一步。

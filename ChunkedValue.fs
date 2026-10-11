@@ -61,7 +61,7 @@ module ChunkedValue =
           PayloadSha256: string
           Parts: Part array }
 
-    type WriteReceipt = { Manifest: Manifest; CleanupPending: bool }
+    type WriteReceipt = { Manifest: Manifest option; CleanupPending: bool }
     let keyGates = ConcurrentDictionary<string, obj>(StringComparer.OrdinalIgnoreCase)
     let invalid reason = raise (InvalidDataException("Invalid PCSL chunk value: " + reason))
 
@@ -83,9 +83,13 @@ module ChunkedValue =
     let rejectReparse path =
         let mutable current = Path.GetFullPath path
         while not (String.IsNullOrEmpty current) do
-            if (File.Exists current || Directory.Exists current)
-               && (File.GetAttributes(current) &&& FileAttributes.ReparsePoint) <> enum 0 then
-                invalid "reparse path"
+            let attributes =
+                try Some(File.GetAttributes current)
+                with
+                | :? FileNotFoundException | :? DirectoryNotFoundException -> None
+            match attributes with
+            | Some value when (value &&& FileAttributes.ReparsePoint) <> enum 0 -> invalid "reparse path"
+            | _ -> ()
             current <- Path.GetDirectoryName current
 
     let ensureDirectory path =
@@ -120,7 +124,8 @@ module ChunkedValue =
         rejectReparse path
         let temporary = path + "." + Guid.NewGuid().ToString("N") + ".tmp"
         try
-            use output = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None, 65536, FileOptions.WriteThrough)
+            let bufferSize = if bytes.Length <= 4096 then 1 else min 65536 bytes.Length
+            use output = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None, bufferSize, FileOptions.None)
             output.Write(bytes, 0, bytes.Length)
             output.Flush true
             output.Dispose()
@@ -321,6 +326,7 @@ module ChunkedValue =
                     let name = Path.GetFileName generation
                     if knownGeneration name && (area = "__staging__" || Some name <> keep) then
                         deleteOwnedDirectory directory generation
+                if Seq.isEmpty (Directory.EnumerateFileSystemEntries directory) then Directory.Delete(directory, false)
 
     let inspectCommitted root hash =
         withKeyLock root hash (fun () ->
@@ -328,20 +334,23 @@ module ChunkedValue =
             | Some manifest -> verifyPayload root manifest; Some manifest
             | None -> None)
 
+    let finishPendingDelete root hash =
+        let tombstone = tombstonePath root hash
+        if File.Exists tombstone then
+            rejectReparse tombstone
+            let oldAnchor = anchorPath root hash
+            rejectReparse oldAnchor
+            if File.Exists oldAnchor then File.Delete oldAnchor
+            cleanupGenerations root hash None
+            File.Delete tombstone
+
     let writeCommitted root hash codec (writePayload: string -> Stream -> unit) (publish: (unit -> unit) option) =
         withKeyLock root hash (fun () ->
             validateName hash |> ignore
             let configured = settings ()
             configured.Cancellation.ThrowIfCancellationRequested()
             ensureDirectory root
-            let tombstone = tombstonePath root hash
-            rejectReparse tombstone
-            if File.Exists tombstone then
-                let oldAnchor = anchorPath root hash
-                rejectReparse oldAnchor
-                if File.Exists oldAnchor then File.Delete oldAnchor
-                cleanupGenerations root hash None
-                File.Delete tombstone
+            finishPendingDelete root hash
             let isNew = not (File.Exists(indexPath root hash))
             if isNew && publish.IsSome then ensureDirectory (Path.GetDirectoryName(indexPath root hash))
             let generation = Guid.NewGuid().ToString("N")
@@ -386,11 +395,11 @@ module ChunkedValue =
                         cleanupGenerations root hash (Some generation)
                         false
                     with :? IOException -> true
-                { Manifest = manifest; CleanupPending = pending }
+                { Manifest = Some manifest; CleanupPending = pending }
             with error ->
                 if anchorPublished && visible then
                     // Publication already succeeded. A cleanup fault is not a retryable value-write failure.
-                    { Manifest = committedManifest.Value; CleanupPending = true }
+                    { Manifest = committedManifest; CleanupPending = true }
                 else
                     try
                         if anchorPublished then
@@ -405,24 +414,137 @@ module ChunkedValue =
                         try deleteOwnedDirectory root path with :? IOException -> ()
                     raise error)
 
+    // Existing indexed keys can publish a legacy-compatible complete value with one
+    // durable spool and one atomic anchor replacement. New keys retain the generation
+    // protocol so an interrupted index-last publication can restore an old orphan.
+    let writeAdaptive root hash codec (writeSpool: string -> unit) publish =
+        withKeyLock root hash (fun () ->
+            validateName hash |> ignore
+            let configured = settings ()
+            configured.Cancellation.ThrowIfCancellationRequested()
+            ensureDirectory root
+            finishPendingDelete root hash
+            let staging = generationPath root "__staging__" hash (Guid.NewGuid().ToString("N"))
+            ensureDirectory staging
+            let spool = Path.Combine(staging, "payload.spool.tmp")
+            let mutable directCommitted = false
+            try
+                try
+                    writeSpool spool
+                    rejectReparse spool
+                    // Custom hooks own their file handle; flush the completed file before
+                    // it can become the durable anchor.
+                    use sync = new FileStream(spool, FileMode.Open, FileAccess.ReadWrite, FileShare.None)
+                    sync.Flush true
+                    let length = sync.Length
+                    sync.Dispose()
+                    use probe = new FileStream(spool, FileMode.Open, FileAccess.Read, FileShare.Read)
+                    let header = Array.zeroCreate<byte> magic.Length
+                    let collidesWithManifest = probe.Read(header, 0, header.Length) = magic.Length && header = magic
+                    probe.Dispose()
+                    let index = indexPath root hash
+                    rejectReparse index
+                    let tombstone = tombstonePath root hash
+                    rejectReparse tombstone
+                    if File.Exists index && not (File.Exists tombstone) && length <= configured.Limit && not collidesWithManifest then
+                        rejectReparse (ownedPath root [ "__values__"; hash ])
+                        configured.Cancellation.ThrowIfCancellationRequested()
+                        configured.Fault BeforeAnchorPublish
+                        configured.Cancellation.ThrowIfCancellationRequested()
+                        File.Move(spool, anchorPath root hash, true)
+                        directCommitted <- true
+                        configured.Fault AfterAnchorPublishBeforeIndex
+                        configured.Fault AfterIndexPublish
+                        let pending =
+                            try cleanupGenerations root hash None; false
+                            with :? IOException -> true
+                        { Manifest = None; CleanupPending = pending }
+                    else
+                        writeCommitted root hash codec
+                            (fun _ output ->
+                                use input = new FileStream(spool, FileMode.Open, FileAccess.Read, FileShare.Read)
+                                input.CopyTo output) publish
+                with error ->
+                    if directCommitted then { Manifest = None; CleanupPending = true }
+                    else raise error
+            finally
+                try deleteOwnedDirectory root staging with :? IOException -> ())
+
+    exception SmallPayloadExceeded
+
+    // The default codec can probe a small value without allocating an unbounded
+    // buffer. A larger payload falls back to the original streaming chunk sink.
+    type BoundedWriteStream(limit: int) =
+        inherit Stream()
+        let buffer = new MemoryStream()
+        member _.Bytes = buffer.ToArray()
+        override _.CanRead = false
+        override _.CanSeek = false
+        override _.CanWrite = true
+        override _.Length = buffer.Length
+        override _.Position with get () = buffer.Position and set _ = raise(NotSupportedException())
+        override _.Flush() = ()
+        override _.Read(_, _, _) = raise(NotSupportedException())
+        override _.Seek(_, _) = raise(NotSupportedException())
+        override _.SetLength(_) = raise(NotSupportedException())
+        override _.Write(bytes, offset, count) =
+            if buffer.Length + int64 count > int64 limit then raise SmallPayloadExceeded
+            buffer.Write(bytes, offset, count)
+        override _.WriteByte(value) =
+            if buffer.Length + 1L > int64 limit then raise SmallPayloadExceeded
+            buffer.WriteByte value
+        override _.Dispose(disposing) =
+            if disposing then buffer.Dispose()
+            base.Dispose disposing
+
     let writeDefault root hash (serialize: Stream -> unit) publish =
-        writeCommitted root hash "deflate-pb-v1"
-            (fun _ output ->
-                use compressed = new Compression.DeflateStream(output, Compression.CompressionMode.Compress, true)
-                serialize compressed
-                // Dispose writes the Deflate trailer before sink.Finish computes the manifest.
-                compressed.Dispose()) publish
+        withKeyLock root hash (fun () ->
+            let configured = settings ()
+            configured.Cancellation.ThrowIfCancellationRequested()
+            let index = indexPath root hash
+            rejectReparse index
+            let small =
+                if File.Exists index && not (File.Exists(tombstonePath root hash)) then
+                    try
+                        use output = new BoundedWriteStream(int (min 65536L configured.Limit))
+                        use compressed = new Compression.DeflateStream(output, Compression.CompressionMode.Compress, true)
+                        serialize compressed
+                        compressed.Dispose()
+                        Some output.Bytes
+                    with SmallPayloadExceeded -> None
+                else None
+            match small with
+            | Some bytes when bytes.Length <= int configured.Limit &&
+                              not (bytes.Length >= magic.Length && bytes[..magic.Length-1] = magic) ->
+                let oldGenerationOwner = ownedPath root [ "__values__"; hash ]
+                let hasOldGenerations = Directory.Exists oldGenerationOwner
+                if hasOldGenerations then rejectReparse oldGenerationOwner
+                let mutable published = false
+                try
+                    configured.Fault BeforeAnchorPublish
+                    configured.Cancellation.ThrowIfCancellationRequested()
+                    atomicWrite (anchorPath root hash) bytes
+                    published <- true
+                    configured.Fault AfterAnchorPublishBeforeIndex
+                    configured.Fault AfterIndexPublish
+                    let pending =
+                        try
+                            if hasOldGenerations then cleanupGenerations root hash None
+                            false
+                        with :? IOException -> true
+                    { Manifest = None; CleanupPending = pending }
+                with error ->
+                    if published then { Manifest = None; CleanupPending = true }
+                    else raise error
+            | _ ->
+                writeCommitted root hash "deflate-pb-v1"
+                    (fun _ output ->
+                        use compressed = new Compression.DeflateStream(output, Compression.CompressionMode.Compress, true)
+                        serialize compressed
+                        compressed.Dispose()) publish)
 
     let writeCustom root hash (writeHook: string -> unit) publish =
-        writeCommitted root hash "custom-file-hook-v1"
-            (fun staging output ->
-                let spool = Path.Combine(staging, "hook.spool.tmp")
-                writeHook spool
-                rejectReparse spool
-                use input = new FileStream(spool, FileMode.Open, FileAccess.Read, FileShare.Read)
-                input.CopyTo output
-                input.Dispose()
-                File.Delete spool) publish
+        writeAdaptive root hash "custom-file-hook-v1" writeHook publish
 
     let readCommitted root hash preferDefault decode readHook =
         withKeyLock root hash (fun () ->
