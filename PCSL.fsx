@@ -606,7 +606,7 @@ module PCSL =
         member this.InitTask = initTask
         member this.PersistKeyValues = persistKeyValues
         member this.Write2File 
-            with get () = fun path value -> writePhysical path value None
+            with get () = write2File
             and set (v) = write2File <- v; defaultWriter <- false
 
         member this.GenerateKeyHash 

@@ -7,7 +7,7 @@
   <ItemGroup>
     <Compile Include="ParseLine.fsx" /><Compile Include="TEST.fsx" />
     <Reference Include="PersistedConcurrentSortedList"><HintPath>$(PcslAssemblyPath)</HintPath></Reference>
-    <PackageReference Include="Expecto" Version="[11.1.0]" />
+    <PackageReference Include="Expecto" Version="[11.1.1]" />
     <PackageReference Include="FAkka.Argu" Version="[10.1.400]" />
     <PackageReference Include="FAkka.FCell2" Version="[10.1.400]" />
     <PackageReference Include="FAkka.ProtoBuf.FSharp" Version="[10.1.400]" />

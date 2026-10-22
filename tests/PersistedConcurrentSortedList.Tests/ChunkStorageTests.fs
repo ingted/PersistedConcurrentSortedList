@@ -36,6 +36,22 @@ let put (store: PCSL2.PersistedConcurrentSortedList<string, fCell2<string>>) tex
 
 let tests parent =
     testSequenced <| testList "PCSL chunk storage boundaries and safety" [
+        testCase "public Write2File preserves the exact literal codec path" (fun _ ->
+            let expected = fCell2<string>.S "literal-codec-contract"
+            let verify label root (write: string -> fCell2<string> -> unit) =
+                let path = Path.Combine(root, "subset.codec.tmp")
+                write path expected
+                Expect.isTrue (File.Exists path) (label + " creates the requested literal file.")
+                Expect.equal (PB.ModelContainer<fCell2<string>>.readFromFile path) (Some expected) (label + " preserves the codec roundtrip.")
+            let modernRoot = fixture parent
+            let modern = native modernRoot
+            verify "PCSL2" modernRoot modern.Write2File
+            let legacyRoot = fixture parent
+            let legacy =
+                PCSL.PersistedConcurrentSortedList<string, fCell2<string>>(1, legacyRoot, "store", 60000,
+                    DefaultHelper.PCSLFunHelper<string, fCell2<string>>.oFun,
+                    DefaultHelper.PCSLFunHelper<string, fCell2<string>>.eFun, autoCache = 0)
+            verify "PCSL" legacyRoot legacy.Write2File)
         testCase "indexed default values cross bounded direct and chunk routes without losing bytes" (fun _ ->
             let root = fixture parent
             let publish () = ChunkedValue.publishIndex root "owned" (Encoding.UTF8.GetBytes "synthetic-key")

@@ -1,0 +1,13 @@
+# PCSL 10.2.6 dependency closeout
+
+## Pre-work plan
+- Background: the PT dependency closure requires PCSL 10.2.6 while preserving the native 25MB chunk implementation and the public literal `Write2File` codec hook.
+- Scope: PCSL/PCSL2 codec getter, chunk regression tests, package metadata and shared PostBuild migration already implemented in this workstream.
+- Invariants: retain 25MB auto-chunk behavior; no deployment or public NuGet push; local registry only.
+- Process deviation: the cross-repository edits preceded a repository-local pre-work log. This entry records that deviation at closeout and does not backdate it.
+
+## Operations
+- Source and packaged-DLL suites each executed 95 tests: 95 passed, 0 ignored/failed/errored.
+- Package version is 10.2.6; local nupkg SHA-256 is `7AB5ABC611DBFFADFCB9414565999577CA2A47F7D6716C8A1D0AB0CD521013C4`.
+- Main PT closure resolved all three Host assets to PCSL 10.2.6 with no relevant NU1107/NU1605/NU1608.
+- SPA downstream focused purge scope passed 56/56; its complete suite remains partial at 1,720/1,746 and is not represented as fully green.
